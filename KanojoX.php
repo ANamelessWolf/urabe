@@ -11,6 +11,10 @@
  */
 class KanojoX
 {
+    /**
+     * @var string CONN_FORMAT_SERVICE_NAME
+     * The default connection string
+     */
     const CONN_FORMAT_SERVICE_NAME = '//%s/%s';
     /**
      * @var string $error 
