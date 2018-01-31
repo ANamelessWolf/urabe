@@ -6,7 +6,7 @@ include_once "HasamiUtils.php";
  * 
  * This class parses a row from a table defintion
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
