@@ -31,8 +31,8 @@ class Urabe
      */
     private $database_id;
     /**
-     * @var mysqli $connection 
-     * Defines the MySql connection.
+     * @var resource $connection 
+     * The connection object type='oci8 connection'.
      */
     public $connection;
     /**
@@ -62,18 +62,10 @@ class Urabe
         $this->database_id = $database_id;
         $this->connection = $this->database_id->create_connection();
         if ($this->connection) {
-            mysqli_set_charset($this->connection, "utf8");
-            if ($this->connection->connect_error) {
-                $this->error = sprintf('Connection error [%s], %s.', $this->connection->connect_errno, $this->connection->connect_error);
-                $this->is_connected = FALSE;
-            }
-            else {
-                $this->is_connected = TRUE;
-                $this->database_name = $this->database_id->db_name;
-            }
-        }
-        else {
-            $this->is_connected = FALSE;
+            $this->is_connected = true;
+            $this->database_name = $this->database_id->service_name;
+        } else {
+            $this->is_connected = false;
             $this->error = $this->database_id->error;
         }
     }
@@ -86,16 +78,15 @@ class Urabe
      */
     function get_table_definition($table_name)
     {
-        $format_query = "SELECT `" . self::FIELD_COLUMN . "`, `" . self::FIELD_DATA_TYPE . "` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='%s' AND `TABLE_NAME`='%s'";
-        $query = sprintf($format_query, $this->database_name, $table_name);
+        $format_query = "SELECT column_name, data_type, data_length FROM all_tab_cols WHERE table_name = '%s'";
+        $query = sprintf($format_query, $table_name);
         $result = $this->select($query);
         $json_result = json_decode($result);
         $result = array();
         if (has_result($json_result))
             foreach ($json_result->result as &$value) {
             $result[$value->{self::FIELD_COLUMN}] = new FieldDefintion($value->{self::FIELD_COLUMN}, $value->{self::FIELD_DATA_TYPE});
-        }
-        else
+        } else
             throw new Exception(sprintf(ERR_MISS_TABLE, $table_name));
         return $result;
     }
@@ -106,7 +97,7 @@ class Urabe
      * @param MysteriousParser $row_parser Defines the row parsing task. 
      * @return string Returns the value encoded in a JSON string.
      */
-    function select($query, $row_parser = NULL)
+    function select($query, $row_parser = null)
     {
         $result = $this->get_array_response();
         try {
@@ -119,14 +110,12 @@ class Urabe
                         else
                             array_push($result[NODE_RESULT], $row_parser->parse($row));
                     }
-                    $result[NODE_QUERY_RESULT] = TRUE;
-                }
-                else {
+                    $result[NODE_QUERY_RESULT] = true;
+                } else {
                     $result[NODE_QUERY] = $query;
                     throw new Exception($this->connection->error);
                 }
-            }
-            else if ($this->error != "")
+            } else if ($this->error != "")
                 throw new Exception($this->error);
             else
                 throw new Exception(ERR_CONNECTION_CLOSED);
@@ -143,14 +132,13 @@ class Urabe
      */
     function select_one($query)
     {
-        $result = NULL;
+        $result = null;
         if ($this->is_connected) {
             $query_result = $this->connection->query($query);
             if ($query_result) {
                 while (is_null($result) && $row = $query_result->fetch_assoc())
                     $result = $row;
-            }
-            else
+            } else
                 $this->error = $this->connection->error;
         }
         if (!is_null($result))
@@ -174,20 +162,19 @@ class Urabe
                     $item = array_pop($arr);
                     array_push($result, $item);
                 }
-            }
-            else
+            } else
                 $this->error = $this->connection->error;
         }
         return $result;
     }
     /**
-     * Gets the name of the tables stored on the database
+     * Gets the table column definitions
      *
      * @return string Returns the value encoded in a JSON string.
      */
     function select_table_names()
     {
-        $query_format = "SELECT DISTINCT(`TABLE_NAME`) FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='%s'";
+        $query_format = "SELECT column_name, data_type, data_length FROM all_tab_cols WHERE table_name = '%s'";
         return $this->select_items(sprintf($query_format, $this->database_name));
     }
     /**
@@ -198,7 +185,7 @@ class Urabe
      * @param MysteriousParser $row_parser Defines the row parsing task. 
      * @return string Returns the value encoded in a JSON string.
      */
-    function select_all($table_name, $row_parser = NULL)
+    function select_all($table_name, $row_parser = null)
     {
         return $this->select(sprintf('SELECT * FROM `%s`', $table_name), $row_parser);
     }
@@ -271,8 +258,7 @@ class Urabe
     function update($table_name, $fields, $values, $condition)
     {
         $query = 'UPDATE ' . $table_name . ' SET ';
-        for ($i = 0; $i < $max; $i++)
-            {
+        for ($i = 0; $i < $max; $i++) {
             $query .= '`' . $fields[$i] . '`= ';
             if (gettype($values[$i]) == 'integer' || gettype($values[$i]) == 'double')
                 $query .= $values[$i] . ", ";
@@ -297,8 +283,7 @@ class Urabe
     function update_by_field($table_name, $fields, $values, $field, $value)
     {
         $query = 'UPDATE ' . $table_name . ' SET ';
-        for ($i = 0; $i < $max; $i++)
-            {
+        for ($i = 0; $i < $max; $i++) {
             $query .= '`' . $fields[$i] . '`= ';
             if (gettype($values[$i]) == 'integer' || gettype($values[$i]) == 'double')
                 $query .= $values[$i] . ", ";
@@ -357,11 +342,10 @@ class Urabe
             if ($this->is_connected) {
                 $query_result = $this->connection->query($query);
                 if ($query_result)
-                    $result[NODE_QUERY_RESULT] = TRUE;
+                    $result[NODE_QUERY_RESULT] = true;
                 else
                     throw new Exception($this->connection->error);
-            }
-            else if ($this->error != "")
+            } else if ($this->error != "")
                 throw new Exception($this->error);
             else
                 throw new Exception(ERR_CONNECTION_CLOSED);
@@ -393,7 +377,7 @@ class Urabe
     {
         $query = "SELECT * FROM information_schema . tables WHERE table_schema = '" . $this->database_name . "' AND table_name = '" . $table_name . "' LIMIT 1";
         $query_result = $this->connection->query($query);
-        $exists = FALSE;
+        $exists = false;
         if ($query_result)
             $exists = $query_result->num_rows > 0;
         $this->error = $this->connection->error;
@@ -434,7 +418,7 @@ class Urabe
      */
     private function get_array_response()
     {
-        return array(NODE_RESULT => array(), NODE_QUERY_RESULT => FALSE, NODE_ERROR => "");
+        return array(NODE_RESULT => array(), NODE_QUERY_RESULT => false, NODE_ERROR => "");
     }
 }
 ?>

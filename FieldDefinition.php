@@ -55,12 +55,13 @@ class FieldDefintion
      */
     public function GetValue($value)
     {
-        $integer_types = array("LONG", "TINYINT", "SMALLINT", "MEDIUMINT", "BIGINT", "INT", "INTEGER", "BIT" );
-        $float_types = array("NUMBER","DEC", "DECIMAL","BINARY_DOUBLE", "BINARY_FLOAT","DOUBLE", "DOUBLE PRECISION", "FLOAT");
+        $integer_types = array("LONG","ROWID","UROWID");
+        $float_types = array("FLOAT","NUMBER");
         if (in_array($this->data_type, $integer_types))
             return is_null($value) ? 0 : intval($value);
         else if (in_array($this->data_type, $float_types))
             return is_null($value) ? 0.0 : floatval($value);
+        //Not defined fields are treated as strings
         else
             return is_null($value) ? "" : $value;
     }
@@ -70,8 +71,11 @@ class FieldDefintion
      */
     function is_date()
     {
-        $date_types = array("DATE", "DATETIME");
-        return in_array($this->data_type, $date_types);
+       $condition = $this->data_type=="DATE" || 
+                    strpos($this->data_type, "TIMESTAMP") ||
+                    strpos($this->data_type, "INTERVAL DAY") ||
+                    strpos($this->data_type, "INTERVAL YEAR");
+        return $condition;
     }
 }
 ?>

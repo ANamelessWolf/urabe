@@ -17,6 +17,11 @@ class KanojoX
      */
     const CONN_FORMAT_SERVICE_NAME = '//%s/%s';
     /**
+     * @var string DEFAULT_CHAR_SET
+     * Oracle default char set, is UTF8
+     */
+    const DEFAULT_CHAR_SET = 'AL32UTF8';
+    /**
      * @var string $error 
      * The last error description.
      */
@@ -53,7 +58,7 @@ class KanojoX
                 $conn_string = sprintf(self::CONN_FORMAT_SERVICE_NAME, $this->host, $this->service_name);
             else
                 $conn_string = $conn_str;
-            $conn = oci_connect($this->user_name, $this->password, $conn_string);
+            $conn = oci_connect($this->user_name, $this->password, $conn_string, self::DEFAULT_CHAR_SET);
             if (!$conn) {
                 $err = oci_error();
                 $this->error = $err['message'];
