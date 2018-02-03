@@ -4,6 +4,7 @@ include_once "Warai.php";
 include_once "HasamiUtils.php";
 include_once "FieldDefintion.php";
 include_once "MysteriousParser.php";
+include_once "QueryResult.php";
 /**
  * A MySQL connector 
  * 
@@ -102,6 +103,7 @@ class Urabe
         $result = $this->get_array_response();
         try {
             if ($this->is_connected) {
+                $query_result = new QueryResult();
                 $query_result = $this->connection->query($query);
                 if ($query_result) {
                     while ($row = $query_result->fetch_assoc()) {
