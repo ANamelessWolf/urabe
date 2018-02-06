@@ -1,5 +1,5 @@
 <?php
-include_once "FieldDefintion.php";
+include_once "FieldDefinition.php";
 include_once "HasamiUtils.php";
 /**
  * Mysterious parser class
@@ -13,45 +13,55 @@ include_once "HasamiUtils.php";
 class MysteriousParser
 {
     /**
-     * @var FieldDefintion[] The table fields definition.
+     * @var FieldDefinition[] The table fields definition.
      */
     public $table_definition;
     /**
      * __construct
      *
      * Initialize a new instance of the Mysterious parser.
-     * @param FieldDefintion[] $table_definition The table fields definition.
+     * @param FieldDefinition[] $table_definition The table fields definition.
      */
     function __construct($table_definition)
     {
         $this->table_definition = $table_definition;
     }
     /**
+     * Check if a field name is defined on the table definition
+     *
+     * @param string $field_name The field name
+     * @return boolean True if the field name is defined otherwise false
+     */
+    function is_defined($field_name)
+    {
+        return array_key_exists($field_name, $this->table_definition);
+    }
+    /**
      * Gets a row obtained from a selection query and the row is parsed to match the table
      * definition types.
      * 
-     * @param mixed[] $row The selected row.
-     * @return mixed[] The row with table definition values.
+     * @param resource $sentence The Oracle sentence
+     * @return mixed[] The parsed row
      */
-    function parse($row)
+    function parse($sentence)
     {
-        $result = array();
-        foreach ($row as $field_name => $field_value) {
-            $is_in_table = array_key_exists($field_name, $this->table_definition);
-            //Filter only the selected values that are contained on the table definition
-            if ($is_in_table) {
-                //Gets the field definition
-                $field_defintion = new FieldDefintion($field_name, $this->table_definition[$field_name]->data_type);
-                $value = $field_defintion->GetValue($field_value);
-                if ($field_defintion->is_date()) {
-                    $result[$field_name . "_angular"] = date_format_angular($value);
-                    $result[$field_name] = $value;
-                }
-                else
-                    $result[$field_name] = $value;
+        $result = new stdClass();
+        foreach ($this->table_definition as &$field) {
+            try {
+                $value = oci_result($sentence, $field->field_name);
+                if ($field->is_date()) {
+                    $result->{$field->field_name . "_angular"} = date_format_angular($value);
+                    $result->{$field->field_name} = $value;
+                } else
+                    $result->{$field->field_name} = $field->get_value($value);
+                $result->{NODE_ERROR} = null;
+            } catch (Exception $e) {
+                $result->{$field->field_name} = $field->get_value(null);
+                $result->{NODE_ERROR} = $e->getMessage();
             }
         }
         return $result;
     }
+
 }
 ?>

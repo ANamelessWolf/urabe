@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Defines constants and messages relative to the Urabe API.
  * @version 1.0.0
@@ -14,6 +15,16 @@
  * The error message sent when the index is out of bounds.
  */
 const ERR_BAD_INDEX = 'Bad index, no such index %s in array.';
+/**
+ * @var string ERR_BAD_QUERY
+ * The error message sent when a bad query is executed.
+ */
+const ERR_BAD_QUERY = 'Bad query, "%s". Details: %s';
+/**
+ * @var string ERR_EMPTY_QUERY
+ * The error message sent when a query is null or empty
+ */
+const ERR_EMPTY_QUERY = 'The query is empty or null';
 /**
  * @var string ERR_BAD_TABLE
  * The error message sent when the given table does not matchs its service.
@@ -168,6 +179,24 @@ const PRETTY_PRINT_DARK = 'Dark';
  * The parameter key that specifies a light theme with pretty print
  */
 const PRETTY_PRINT_LIGHT = 'Light';
+/******************************************
+ ************ FIELD NAMES *****************
+ *****************************************/
+/**
+ * @var string FIELD_COL_NAME
+ * The field name that stores the column name
+ */
+const FIELD_COL_NAME = 'COLUMN_NAME';
+/**
+ * @var string FIELD_DATA_TP
+ * The field name that stores data type
+ */
+const FIELD_DATA_TP = 'DATA_TYPE';
+/**
+ * @var string FIELD_DATA_LEN
+ * The field name that stores data length
+ */
+const FIELD_DATA_LEN = 'DATA_LENGTH';
 /******************************************
  ************ FUNCTION NAMES **************
  *****************************************/

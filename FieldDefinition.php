@@ -9,7 +9,7 @@ include_once "Warai.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class FieldDefintion
+class FieldDefinition
 {
     /**
      * @var string STRING_FORMAT
@@ -53,10 +53,10 @@ class FieldDefintion
      * @param string $value The selected value as string
      * @return mixed The value as the same type of the table definition.
      */
-    public function GetValue($value)
+    public function get_value($value)
     {
-        $integer_types = array("LONG","ROWID","UROWID");
-        $float_types = array("FLOAT","NUMBER");
+        $integer_types = array("LONG", "ROWID", "UROWID");
+        $float_types = array("FLOAT", "NUMBER");
         if (in_array($this->data_type, $integer_types))
             return is_null($value) ? 0 : intval($value);
         else if (in_array($this->data_type, $float_types))
@@ -71,11 +71,37 @@ class FieldDefintion
      */
     function is_date()
     {
-       $condition = $this->data_type=="DATE" || 
-                    strpos($this->data_type, "TIMESTAMP") ||
-                    strpos($this->data_type, "INTERVAL DAY") ||
-                    strpos($this->data_type, "INTERVAL YEAR");
+        $condition = $this->data_type == "DATE" ||
+            strpos($this->data_type, "TIMESTAMP") ||
+            strpos($this->data_type, "INTERVAL DAY") ||
+            strpos($this->data_type, "INTERVAL YEAR");
         return $condition;
+    }
+    /**
+     * Gets the table definition parser
+     *
+     * @return MysteriousParser Table definition parser
+     */
+    public static function get_table_def_parser()
+    {
+        $fields = array();
+        array_push($fields, new FieldDefinition(FIELD_COL_NAME, "STRING"));
+        array_push($fields, new FieldDefinition(FIELD_DATA_TP, "STRING"));
+        array_push($fields, new FieldDefinition(FIELD_DATA_LEN, "LONG"));
+        return new MysteriousParser($fields);
+    }
+    /**
+     * Gets the table definition from a Mysterious Parser result
+     *
+     * @param stdClass[] $result The Mysterious Parser result
+     * @return FieldDefinition[] The Table definition
+     */
+    public static function parse_result($result)
+    {
+        $fields = array();
+        foreach ($result as &$row)
+            array_push($fields, new FieldDefinition($row->{FIELD_COL_NAME}, $row->{FIELD_DATA_TP}));
+        return $fields;
     }
 }
 ?>
