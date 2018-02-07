@@ -102,12 +102,11 @@ class Urabe
         $query_result->query = $query;
         try {
             if ($this->is_connected) {
-                $query_result->query = $query;
                 $stid = $query_result->oci_parse($this->connection);
                 if ($stid)
                     $query_result->query_result = $query_result->fetch($stid, $row_parser);
-                else                
-                throw new Exception($query_result->error); //An error is found
+                else
+                    throw new Exception($query_result->error); //An error is found
             } else
                 throw new Exception($this->connection->error);
         } catch (Exception $e) {
@@ -118,27 +117,28 @@ class Urabe
         else
             return $query_result;
     }
-    // /**
-    //  * Gets the first value found on the result. 
-    //  *
-    //  * @param string $query The query string. 
-    //  * @return string The first value.
-    //  */
-    // function select_one($query)
-    // {
-    //     $result = null;
-    //     if ($this->is_connected) {
-    //         $query_result = $this->connection->query($query);
-    //         if ($query_result) {
-    //             while (is_null($result) && $row = $query_result->fetch_assoc())
-    //                 $result = $row;
-    //         } else
-    //             $this->error = $this->connection->error;
-    //     }
-    //     if (!is_null($result))
-    //         $result = array_pop(array_reverse($result));
-    //     return $result;
-    // }
+    /**
+     * Gets the first value found on the first column. 
+     *
+     * @param string $query The query string. 
+     * @param string $default_val The default value to return as a string value.
+     * @return string The first value.
+     */
+    function select_one($query, $default_val = "")
+    {
+        $result = $default_val;
+        $query_result = new QueryResult();
+        $query_result->query = $query;
+        if ($this->is_connected) {
+            $stid = $query_result->oci_parse($this->connection);
+            oci_execute($stid);
+            oci_fetch_all($stid, $query_result->result, 0, 1);
+            if ($query_result->result)
+                $result = (string)reset($query_result->result)[0];
+        } else
+            $this->error = $this->connection->error;
+        return $result;
+    }
     // /**
     //  * Gets a list of items by selecting the values in the first row and then returns the values in an array with no keys.
     //  *

@@ -22,7 +22,7 @@ class MysteriousParser
      * Initialize a new instance of the Mysterious parser.
      * @param FieldDefinition[] $table_definition The table fields definition.
      */
-    function __construct($table_definition)
+    public function __construct($table_definition)
     {
         $this->table_definition = $table_definition;
     }
@@ -32,7 +32,7 @@ class MysteriousParser
      * @param string $field_name The field name
      * @return boolean True if the field name is defined otherwise false
      */
-    function is_defined($field_name)
+    public function is_defined($field_name)
     {
         return array_key_exists($field_name, $this->table_definition);
     }
@@ -43,7 +43,7 @@ class MysteriousParser
      * @param resource $sentence The Oracle sentence
      * @return mixed[] The parsed row
      */
-    function parse($sentence)
+    public function parse($sentence)
     {
         $result = new stdClass();
         foreach ($this->table_definition as &$field) {
@@ -62,6 +62,19 @@ class MysteriousParser
         }
         return $result;
     }
-
+    /**
+     * Creates a Mysterious parser from a JSON string
+     *
+     * @param string $json_string The JSON string
+     * @return MysteriousParser  Table definition parser
+     */
+    public static function create_from_JSON($json_string)
+    {
+        $fields = array();
+        $data = json_decode($json_string);
+        foreach ($data->{NODE_FIELDS} as &$field)
+            array_push($fields, new FieldDefinition($field->field_name, $field->data_type));
+        return new MysteriousParser($fields);
+    }
 }
 ?>

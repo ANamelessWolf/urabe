@@ -81,7 +81,7 @@ class KanojoX
      * User error handler must not modify error context. 
      * @return bool Returns a string containing the previously defined error handler.
      */
-    private function error_handler($err_no, $err_msg, $err_file, $err_line, array $err_context)
+    public function error_handler($err_no, $err_msg, $err_file, $err_line, array $err_context)
     {
         if (0 === error_reporting()) {
             return false;

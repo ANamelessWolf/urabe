@@ -60,7 +60,7 @@ class QueryResult
                 throw new Exception(ERR_EMPTY_QUERY);
         } catch (Exception $e) {
             $this->error = sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage());
-            return FALSE;
+            return false;
         }
     }
     /**
@@ -70,7 +70,7 @@ class QueryResult
      * @param MysteriousParser $row_parser Defines the row parsing task. 
      * @return bool True if the sentence is executed with no problems 
      */
-    public function fetch($sentence, $row_parser=NULL)
+    public function fetch($sentence, $row_parser = null)
     {
         try {
             oci_execute($sentence);
@@ -80,10 +80,10 @@ class QueryResult
                 while (oci_fetch($sentence))
                     array_push($this->result, $row_parser->parse($sentence));
             }
-            return TRUE;
+            return true;
         } catch (Exception $e) {
             $this->error = sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage());
-            return FALSE;
+            return false;
         }
     }
 }

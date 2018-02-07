@@ -147,6 +147,11 @@ const NODE_QUERY_RESULT = 'query_result';
  */
 const NODE_ERROR = 'error';
 /**
+ * @var string NODE_FIELDS
+ * The node name that saves the table field definition
+ */
+const NODE_FIELDS = 'fields';
+/**
  * @var string NODE_KEY
  * The node name that saves an element key
  */

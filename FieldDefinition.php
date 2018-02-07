@@ -103,5 +103,17 @@ class FieldDefinition
             array_push($fields, new FieldDefinition($row->{FIELD_COL_NAME}, $row->{FIELD_DATA_TP}));
         return $fields;
     }
+    /**
+     * Gets a JSON String from a collection of Fields Definitions
+     *
+     * @param FieldDefinition[] $fields_array A collection of fields to be encoded as a JSON String
+     * @return string The JSON string
+     */
+    public static function encode_json($fields_array)
+    {
+        $fields = new stdClass();
+        $fields->{NODE_FIELDS} = $fields_array;
+        return json_encode($fields);
+    }
 }
 ?>
