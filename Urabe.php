@@ -92,9 +92,9 @@ class Urabe
      *
      * @param string $query The query string. 
      * @param MysteriousParser $row_parser Defines the row parsing task. 
-     * @param boolean $encode True if the value is returns as encoded JSON string, otherwise
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
      * the result is returned as a query result
-     * @return QueryResult|string Returns the value encoded in a JSON string.
+     * @return QueryResult|string The query result as a JSON String or a query result.
      */
     function select($query, $row_parser = null, $encode = true)
     {
@@ -139,280 +139,273 @@ class Urabe
             $this->error = $this->connection->error;
         return $result;
     }
-    // /**
-    //  * Gets a list of items by selecting the values in the first row and then returns the values in an array with no keys.
-    //  *
-    //  * @param string $query The query string. 
-    //  * @return mixed[] A list of items.
-    //  */
-    // function select_items($query)
-    // {
-    //     $result = array();
-    //     if ($this->is_connected) {
-    //         $query_result = $this->connection->query($query);
-    //         if ($query_result) {
-    //             while ($row = $query_result->fetch_assoc()) {
-    //                 $arr = array_reverse($row);
-    //                 $item = array_pop($arr);
-    //                 array_push($result, $item);
-    //             }
-    //         } else
-    //             $this->error = $this->connection->error;
-    //     }
-    //     return $result;
-    // }
-    // /**
-    //  * Gets the table column definitions
-    //  *
-    //  * @return string Returns the value encoded in a JSON string.
-    //  */
-    // function select_table_names()
-    // {
-    //     $query_format = "SELECT column_name, data_type, data_length FROM all_tab_cols WHERE table_name = '%s'";
-    //     return $this->select_items(sprintf($query_format, $this->database_name));
-    // }
-    // /**
-    //  * Gets a JSON object from query that selects all rows
-    //  * from a table. 
-    //  *
-    //  * @param string $table_name The table name. 
-    //  * @param MysteriousParser $row_parser Defines the row parsing task. 
-    //  * @return string Returns the value encoded in a JSON string.
-    //  */
-    // function select_all($table_name, $row_parser = null)
-    // {
-    //     return $this->select(sprintf('SELECT * FROM `%s`', $table_name), $row_parser);
-    // }
-    // /**
-    //  * Performs an insert query on the database
-    //  *
-    //  * @param string $table_name The table name.
-    //  * @param string[] $fields The fields names used on the insert.
-    //  * @param mixed[] $values The values to insert.
-    //  * @return The query result
-    //  */
-    // function insert($table_name, $fields, $values)
-    // {
-    //     $query_format = "INSERT INTO `%s` (%s) VALUES (%s)";
-    //     $max = count($fields);
-    //     $fields_str = "";
-    //     $values_str = "";
-    //     for ($i = 0; $i < $max; $i++) {
-    //         $fields_str .= '`' . $fields[$i] . '`, ';
-    //         $values_str .= $this->format_value($values[$i]) . ', ';
-    //     }
-    //     $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
-    //     $values_str = substr($values_str, 0, strlen($values_str) - 2);
-    //     $query = sprintf($query_format, $table_name, $fields_str, $values_str);
-    //     return $this->query($query);
-    // }
-    // /**
-    //  * Performs an insert query on the database, that inserts more than one value.
-    //  *
-    //  * @param string $table_name The table name.
-    //  * @param string[] $fields The fields names used on the insert.
-    //  * @param mixed[] $array_values The collection of values to insert.
-    //  * @return The query result
-    //  */
-    // function insert_bulk($table_name, $fields, $array_values)
-    // {
-    //     $query_format = "INSERT INTO `%s` (%s) VALUES %s";
-    //     $fields_count = count($fields);
-    //     $array_length = count($array_values);
-    //     $fields_str = "";
-    //     $values_str = "";
-    //     $values_coll = array();
-    //     for ($i = 0; $i < $fields_count; $i++) {
-    //         $fields_str .= '`' . $fields[$i] . '`, ';
-    //         for ($j = 0; $j < $array_length; $j++) {
-    //             if ($i == 0)
-    //                 array_push($values_coll, "(" . $this->format_value($array_values[$j][$i]) . ", ");
-    //             else if ($i < ($fields_count - 1))
-    //                 $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . ", ";
-    //             else
-    //                 $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . "), ";
-    //         }
-    //     }
-    //     $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
-    //     foreach ($values_coll as &$value)
-    //         $values_str .= $value;
-    //     $values_str = substr($values_str, 0, strlen($values_str) - 2);
-    //     $query = sprintf($query_format, $table_name, $fields_str, $values_str);
-    //     return $this->query($query);
-    // }
-    // /**
-    //  * Performs an update query on the database by defining a condition
-    //  *
-    //  * @param string $table_name The table name.
-    //  * @param string[] $fields The fields names used on the update.
-    //  * @param mixed[] $values The values to update.
-    //  * @param string $condition The condition to match
-    //  * @return The query result
-    //  */
-    // function update($table_name, $fields, $values, $condition)
-    // {
-    //     $query = 'UPDATE ' . $table_name . ' SET ';
-    //     for ($i = 0; $i < $max; $i++) {
-    //         $query .= '`' . $fields[$i] . '`= ';
-    //         if (gettype($values[$i]) == 'integer' || gettype($values[$i]) == 'double')
-    //             $query .= $values[$i] . ", ";
-    //         else
-    //             $query .= "'" . $values[$i] . "', ";
-    //     }
-    //     $query = substr($query, 0, strlen($query) - 2);
-    //     $query .= ' WHERE ' . $condition;
-    //     return $this->query($query);
-    // }
-    // /**
-    //  * Performs an update query on the database by defining a condition
-    //  * where the $field has to be equal to the $value.
-    //  *
-    //  * @param string $table_name The table name.
-    //  * @param string[] $fields The fields names used on the update.
-    //  * @param mixed[] $values The values to update.
-    //  * @param string $field The field name used on the condition.
-    //  * @param string $value The field value used on the condition.
-    //  * @return The query result
-    //  */
-    // function update_by_field($table_name, $fields, $values, $field, $value)
-    // {
-    //     $query = 'UPDATE ' . $table_name . ' SET ';
-    //     for ($i = 0; $i < $max; $i++) {
-    //         $query .= '`' . $fields[$i] . '`= ';
-    //         if (gettype($values[$i]) == 'integer' || gettype($values[$i]) == 'double')
-    //             $query .= $values[$i] . ", ";
-    //         else
-    //             $query .= "'" . $values[$i] . "', ";
-    //     }
-    //     $query = substr($query, 0, strlen($query) - 2);
-    //     $query .= ' WHERE ' . $field . ' = ';
-    //     if (gettype($value) == 'integer' || gettype($value) == 'double')
-    //         $query .= $value;
-    //     else
-    //         $query .= "'" . $value;
-    //     return $this->query($query);
-    // }
-    // /**
-    //  * Performs a delete query on the database by defining a condition
-    //  *
-    //  * @param string $table_name The table name.
-    //  * @param string $condition The condition to match
-    //  * @return The query result
-    //  */
-    // function delete($table_name, $condition)
-    // {
-    //     $query = 'DELETE FROM ' . $table_name . ' WHERE ' . $condition;
-    //     return $this->query($query);
-    // }
-    // /**
-    //  * Performs a delete query on the database by defining a condition
-    //  * where the $field has to be equal to the $value.
-    //  *
-    //  * @param string $table_name The table name.
-    //  * @param string $field The field name used on the condition.
-    //  * @param string $value The field value used on the condition.
-    //  * @return The query result
-    //  */
-    // function delete_by_field($table_name, $field, $value)
-    // {
-    //     $query = 'DELETE FROM ' . $table_name . ' WHERE `' . $field . '` = ' . $value;
-    //     $result = $this->connection->query($query);
-    //     if (gettype($value) == 'integer' || gettype($value) == 'double')
-    //         $query .= $value;
-    //     else
-    //         $query .= "'" . $value;
-    //     return $this->query($query);
-    // }
-    // /**
-    //  * Perfoms a query
-    //  *
-    //  * @param string $query The query string. 
-    //  * @return string Returns the query result encoded in a JSON string.
-    //  */
-    // public function query($query)
-    // {
-    //     $result = $this->get_array_response();
-    //     try {
-    //         if ($this->is_connected) {
-    //             $query_result = $this->connection->query($query);
-    //             if ($query_result)
-    //                 $result[NODE_QUERY_RESULT] = true;
-    //             else
-    //                 throw new Exception($this->connection->error);
-    //         } else if ($this->error != "")
-    //             throw new Exception($this->error);
-    //         else
-    //             throw new Exception(ERR_CONNECTION_CLOSED);
-    //     } catch (Exception $e) {
-    //         $this->error = $e->getMessage();
-    //         $result[NODE_ERROR] = $e->getMessage();
-    //     }
-    //     return json_encode($result);
-    // }
-    // /**
-    //  * Close the connection to the database
-    //  * @return void
-    //  */
-    // public function close()
-    // {
-    //     if ($this->is_connected) {
-    //         $this->connection->close();
-    //         $this->is_connected = false;
-    //         $this->error = ERR_CONNECTION_CLOSED;
-    //     }
-    // }
-    // /**
-    //  * Check if a table exists on the database
-    //  *
-    //  * @param string $table_name The name of the table
-    //  * @return bool The query result
-    //  */
-    // public function table_exists($table_name)
-    // {
-    //     $query = "SELECT * FROM information_schema . tables WHERE table_schema = '" . $this->database_name . "' AND table_name = '" . $table_name . "' LIMIT 1";
-    //     $query_result = $this->connection->query($query);
-    //     $exists = false;
-    //     if ($query_result)
-    //         $exists = $query_result->num_rows > 0;
-    //     $this->error = $this->connection->error;
-    //     return $exists;
-    // }
-    // /**
-    //  * Test current connection
-    //  * 
-    //  * Test the current connection an gets a message with the connection status.
-    //  * @return string The result message
-    //  */
-    // public function test_connection()
-    // {
-    //     if ($this->is_connected)
-    //         return "Connected..." . $this->connection->host_info;
-    //     else
-    //         return "Not Connected..." . $this->error;
-    // }
-    // /**
-    //  * Gets the format string from a given value
-    //  *
-    //  * @param object $value The value to format.
-    //  * @return string Gets the format value.
-    //  */
-    // private function format_value($value)
-    // {
-    //     if (is_numeric($value))
-    //         return strval($value);
-    //     else if (is_null($value))
-    //         return "NULL";
-    //     else
-    //         return sprintf("'%s'", $value);
-    // }
-    // /**
-    //  * Gets an array to save the server response
-    //  *
-    //  * @return mixed[] The response array structure.
-    //  */
-    // private function get_array_response()
-    // {
-    //     return array(NODE_RESULT => array(), NODE_QUERY_RESULT => false, NODE_ERROR => "");
-    // }
+    /**
+     * Select all values taken from the first selected column.
+     *
+     * @param string $query The query string. 
+     * @return mixed[] The first column values inside an array.
+     */
+    function select_items($query)
+    {
+        $result = array();
+        $query_result = new QueryResult();
+        $query_result->query = $query;
+        if ($this->is_connected) {
+            $stid = $query_result->oci_parse($this->connection);
+            oci_execute($stid);
+            oci_fetch_all($stid, $result);
+            if ($query_result->result)
+                $result = reset($query_result->result);
+        } else
+            $this->error = $this->connection->error;
+        return $result;
+    }
+    /**
+     * Gets the table names from the current schema
+     *
+     * @return string[] The table names inside a string array.
+     */
+    function select_table_names()
+    {
+        $query = "SELECT DISTINCT OBJECT_NAME FROM USER_OBJECTS WHERE OBJECT_TYPE = 'TABLE'";
+        return $this->select_items($query);
+    }
+    /**
+     * Gets a JSON object from an Oracle query, that selects all fields
+     * from the table.
+     *
+     * @param MysteriousParser $row_parser Defines the row parsing task. 
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function select_all($table_name, $row_parser = null, $encode = true)
+    {
+        return $this->select(sprintf('SELECT * FROM `%s`', $table_name), $row_parser, $encode);
+    }
+    /**
+     * Executes a query
+     *
+     * @param string $query The query string. 
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    public function query($query, $encode = true)
+    {
+        $query_result = new QueryResult();
+        $query_result->query = $query;
+        try {
+            if ($this->is_connected) {
+                $stid = $query_result->oci_parse($this->connection);
+                if ($stid)
+                    $query_result->query_result = oci_execute($stid);
+                else
+                    throw new Exception($query_result->error); //An error is found
+            } else
+                throw new Exception($this->connection->error);
+        } catch (Exception $e) {
+            $query_result->error = $e->getMessage();
+        }
+        if ($encode)
+            return $query_result->encode();
+        else
+            return $query_result;
+    }
+    /**
+     * Performs an insertion query to the current scheme
+     *
+     * @param string $table_name The table name.
+     * @param string[] $fields The insertion field names.
+     * @param mixed[] $values The values to insert.
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function insert($table_name, $fields, $values, $encode = true)
+    {
+        $query_format = "INSERT INTO `%s` (%s) VALUES (%s)";
+        $max = count($fields);
+        $fields_str = "";
+        $values_str = "";
+        for ($i = 0; $i < $max; $i++) {
+            $fields_str .= '`' . $fields[$i] . '`, ';
+            $values_str .= $this->format_value($values[$i]) . ', ';
+        }
+        $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
+        $values_str = substr($values_str, 0, strlen($values_str) - 2);
+        $query = sprintf($query_format, $table_name, $fields_str, $values_str);
+        return $this->query($query, $encode);
+    }
+    /**
+     * Performs an insertion query to the current schema, inserting more than
+     * one value.
+     *
+     * @param string $table_name The table name.
+     * @param string[] $fields The insertion field names.
+     * @param mixed[][] $array_values The collection of values to insert.
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function insert_bulk($table_name, $fields, $array_values, $encode = true)
+    {
+        $query_format = "INSERT INTO `%s` (%s) VALUES %s";
+        $fields_count = count($fields);
+        $array_length = count($array_values);
+        $fields_str = "";
+        $values_str = "";
+        $values_coll = array();
+        for ($i = 0; $i < $fields_count; $i++) {
+            $fields_str .= '`' . $fields[$i] . '`, ';
+            for ($j = 0; $j < $array_length; $j++) {
+                if ($i == 0)
+                    array_push($values_coll, "(" . $this->format_value($array_values[$j][$i]) . ", ");
+                else if ($i < ($fields_count - 1))
+                    $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . ", ";
+                else
+                    $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . "), ";
+            }
+        }
+        $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
+        foreach ($values_coll as &$value)
+            $values_str .= $value;
+        $values_str = substr($values_str, 0, strlen($values_str) - 2);
+        $query = sprintf($query_format, $table_name, $fields_str, $values_str);
+        return $this->query($query, $encode);
+    }
+    /**
+     * Performs an update query on the database by defining a condition
+     *
+     * @param string $table_name The table name.
+     * @param string[] $fields The field names to update.
+     * @param mixed[] $values The values to update.
+     * @param string $condition The condition to match
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function update($table_name, $fields, $values, $condition, $encode = true)
+    {
+        $query = 'UPDATE ' . $table_name . ' SET ';
+        for ($i = 0; $i < $max; $i++) {
+            $query .= '`' . $fields[$i] . '`= ';
+            if (gettype($values[$i]) == 'integer' || gettype($values[$i]) == 'double')
+                $query .= $values[$i] . ", ";
+            else
+                $query .= "'" . $values[$i] . "', ";
+        }
+        $query = substr($query, 0, strlen($query) - 2);
+        $query .= ' WHERE ' . $condition;
+        return $this->query($query);
+    }
+    /**
+     * Performs an update query on the database by defining a condition
+     * where the $field has to be equal to the $value.
+     *
+     * @param string $table_name The table name.
+     * @param string[] $fields The fields names used on the update.
+     * @param mixed[] $values The values to update.
+     * @param string $field The field name used on the condition.
+     * @param string $value The field value used on the condition.
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function update_by_field($table_name, $fields, $values, $field, $value, $encode = true)
+    {
+        $condition = $field . ' = ';
+        if (gettype($value) == 'integer' || gettype($value) == 'double')
+            $condition .= $value;
+        else
+            $condition .= "'" . $value . "'";
+        return $this->update($query, $fields, $values, $condition, $encode);
+    }
+    /**
+     * Performs a delete query on the database by defining a condition
+     *
+     * @param string $table_name The table name.
+     * @param string $condition The condition to match
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function delete($table_name, $condition, $encode = true)
+    {
+        $query = 'DELETE FROM ' . $table_name . ' WHERE ' . $condition;
+        return $this->query($query, $encode);
+    }
+    /**
+     * Performs a delete query on the database by defining a condition
+     * where the $field has to be equal to the $value.
+     *
+     * @param string $table_name The table name.
+     * @param string $field The field name used on the condition.
+     * @param string $value The field value used on the condition.
+     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
+     * the result is returned as a query result
+     * @return QueryResult|string The query result as a JSON String or a query result.
+     */
+    function delete_by_field($table_name, $field, $value, $encode = true)
+    {
+        $condition = $field . ' = ';
+        if (gettype($value) == 'integer' || gettype($value) == 'double')
+            $condition .= $value;
+        else
+            $condition .= "'" . $value . "'";
+        return $this->delete($table_name, $condition, $encode);
+    }
+
+    /**
+     * Close the connection to the database
+     * @return void
+     */
+    public function close()
+    {
+        if ($this->is_connected) {
+            oci_close($this->connection);
+            $this->is_connected = false;
+            $this->error = ERR_CONNECTION_CLOSED;
+        }
+    }
+    /**
+     * Check if a table exists on the database
+     *
+     * @param string $table_name The name of the table
+     * @return bool The query result
+     */
+    public function table_exists($table_name)
+    {
+        $query = "SELECT DISTINCT OBJECT_NAME FROM USER_OBJECTS WHERE OBJECT_TYPE = 'TABLE' AND OBJECT_NAME = " . "'" . $table_name . "'";
+        return sizeof($this->select_items($query)) > 0;
+    }
+    /**
+     * Test the current connection
+     * 
+     * Test the current connection an gets a message with current connection status.
+     * @return string The result message
+     */
+    public function test_connection()
+    {
+        if ($this->is_connected)
+            return "Connected..." . oci_client_version();
+        else
+            return "Not Connected..." . $this->error;
+    }
+    /**
+     * Gets the format string from a given value
+     *
+     * @param object $value The value to format.
+     * @return string Gets the format value.
+     */
+    private function format_value($value)
+    {
+        if (is_numeric($value))
+            return strval($value);
+        else if (is_null($value))
+            return "NULL";
+        else
+            return sprintf("'%s'", $value);
+    }
 }
 ?>
