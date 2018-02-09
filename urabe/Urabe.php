@@ -52,6 +52,11 @@ class Urabe
      */
     public $is_connected;
     /**
+     * @var string $stids 
+     * The generated stid during the connection.
+     */
+    private $stids;
+    /**
      * __construct
      *
      * Initialize a new instance of the Urabe MySql connector.
@@ -59,6 +64,7 @@ class Urabe
      */
     function __construct($database_id)
     {
+        $stids = array();
         $this->error = "";
         $this->database_id = $database_id;
         $this->connection = $this->database_id->create_connection();
@@ -103,6 +109,7 @@ class Urabe
         try {
             if ($this->is_connected) {
                 $stid = $query_result->oci_parse($this->connection);
+                array_push($stid);
                 if ($stid)
                     $query_result->query_result = $query_result->fetch($stid, $row_parser);
                 else
@@ -131,9 +138,10 @@ class Urabe
         $query_result->query = $query;
         if ($this->is_connected) {
             $stid = $query_result->oci_parse($this->connection);
+            array_push($stid);
             oci_execute($stid);
-            oci_fetch_all($stid, $query_result->result, 0, 1);
-            if ($query_result->result)
+            $query_result->query_result = oci_fetch_all($stid, $query_result->result, 0, 1);
+            if ($query_result->query_result)
                 $result = (string)reset($query_result->result)[0];
         } else
             $this->error = $this->connection->error;
@@ -152,9 +160,9 @@ class Urabe
         $query_result->query = $query;
         if ($this->is_connected) {
             $stid = $query_result->oci_parse($this->connection);
-            oci_execute($stid);
-            oci_fetch_all($stid, $result);
-            if ($query_result->result)
+            array_push($stid);
+            $query_result->query_result = $query_result->fetch($stid, $row_parser);
+            if ($query_result->query_result)
                 $result = reset($query_result->result);
         } else
             $this->error = $this->connection->error;
@@ -198,6 +206,7 @@ class Urabe
         try {
             if ($this->is_connected) {
                 $stid = $query_result->oci_parse($this->connection);
+                array_push($stid);
                 if ($stid)
                     $query_result->query_result = oci_execute($stid);
                 else
@@ -250,7 +259,7 @@ class Urabe
      */
     function insert_bulk($table_name, $fields, $array_values, $encode = true)
     {
-        $query_format = "INSERT INTO `%s` (%s) VALUES %s";
+        $query_format = "INSERT INTO `%s` (%s) %s";
         $fields_count = count($fields);
         $array_length = count($array_values);
         $fields_str = "";
@@ -260,17 +269,18 @@ class Urabe
             $fields_str .= '`' . $fields[$i] . '`, ';
             for ($j = 0; $j < $array_length; $j++) {
                 if ($i == 0)
-                    array_push($values_coll, "(" . $this->format_value($array_values[$j][$i]) . ", ");
+                    array_push($values_coll, "SELECT " . $this->format_value($array_values[$j][$i]) . ", ");
                 else if ($i < ($fields_count - 1))
                     $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . ", ";
                 else
-                    $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . "), ";
+                    $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . " FROM DUAL UNION ALL ";
             }
         }
+        $cut_length = strlen(" FROM DUAL UNION ALL ");
         $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
         foreach ($values_coll as &$value)
             $values_str .= $value;
-        $values_str = substr($values_str, 0, strlen($values_str) - 2);
+        $values_str = substr($values_str, 0, strlen($values_str) - $cut_length);
         $query = sprintf($query_format, $table_name, $fields_str, $values_str);
         return $this->query($query, $encode);
     }
@@ -314,12 +324,7 @@ class Urabe
      */
     function update_by_field($table_name, $fields, $values, $field, $value, $encode = true)
     {
-        $condition = $field . ' = ';
-        if (gettype($value) == 'integer' || gettype($value) == 'double')
-            $condition .= $value;
-        else
-            $condition .= "'" . $value . "'";
-        return $this->update($query, $fields, $values, $condition, $encode);
+        return $this->update($query, $fields, $values, $this->create_field_condition($field, $value), $encode);
     }
     /**
      * Performs a delete query on the database by defining a condition
@@ -348,12 +353,7 @@ class Urabe
      */
     function delete_by_field($table_name, $field, $value, $encode = true)
     {
-        $condition = $field . ' = ';
-        if (gettype($value) == 'integer' || gettype($value) == 'double')
-            $condition .= $value;
-        else
-            $condition .= "'" . $value . "'";
-        return $this->delete($table_name, $condition, $encode);
+        return $this->delete($table_name, $this->create_field_condition($field, $value), $encode);
     }
 
     /**
@@ -363,6 +363,8 @@ class Urabe
     public function close()
     {
         if ($this->is_connected) {
+            foreach ($stids as &$stid)
+                oci_free_statement($stid);
             oci_close($this->connection);
             $this->is_connected = false;
             $this->error = ERR_CONNECTION_CLOSED;
@@ -406,6 +408,22 @@ class Urabe
             return "NULL";
         else
             return sprintf("'%s'", $value);
+    }
+    /**
+     * Creates a condition where a field name must be equals to a value
+     *
+     * @param string $field The field name
+     * @param mixed $value The field value
+     * @return string The SQL condition
+     */
+    private function create_field_condition($field, $value)
+    {
+        $condition = $field . ' = ';
+        if (gettype($value) == 'integer' || gettype($value) == 'double')
+            $condition .= $value;
+        else
+            $condition .= "'" . $value . "'";
+        return $condition;
     }
 }
 ?>
