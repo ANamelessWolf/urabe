@@ -1,6 +1,6 @@
 <?php
-include_once("../KanojoX.php");
-include_once("../Urabe.php");
+include_once("../urabe/KanojoX.php");
+include_once("../urabe/Urabe.php");
 $kanojo = new KanojoX();
 $kanojo->host = "10.0.0.3";
 $kanojo->user_name = "riviera";
