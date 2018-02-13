@@ -123,6 +123,11 @@ const CAP_UPDATE = 'Update';
  * String caption for Insert.
  */
 const CAP_INSERT = 'Insert';
+/**
+ * @var string CAP_EXTRACT
+ * String caption for Extract.
+ */
+const CAP_EXTRACT = 'Extract';
 /***************************************
  ************** JSON NODES *************
  ***************************************/
@@ -215,4 +220,22 @@ const F_POST = 'POST_action';
  * The name of the GET action function
  */
 const F_GET = 'GET_action';
+/************************************
+ ************ Settings **************
+ ************************************/
+/**
+ * @var string PARAM_TYPE
+ * The type of parameter to be used on the web service.
+ */
+const PARAM_TYPE = URL_PARAM;
+/**
+ * @var string GET_PARAM
+ * The type of parameters that are obtains from get variables
+ */
+const GET_PARAM = 'GET_PARAMETERS';
+/**
+ * @var string URL_PARAM
+ * The type of parameters that are obtains from url parameters
+ */
+const URL_PARAM = 'URL_PARAMETERS';
 ?>
