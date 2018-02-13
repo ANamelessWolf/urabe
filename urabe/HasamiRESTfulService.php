@@ -13,9 +13,9 @@ include_once "Urabe.php";
 class HasamiRESTfulService
 {
     /**
-     * @var Urabe Access the Oracle connector
+     * @var HasamiWrapper Access the Oracle web service wrapper
      */
-    public $connector;
+    public $service;
     /**
      * @var ParameterCollection The web service parameter collection
      */
@@ -40,11 +40,12 @@ class HasamiRESTfulService
      *
      * Initialize a new instance of the Hasami RESTful service class.
      * 
-     * @param Urabe $connector The urabe connector
+     * @param HasamiWrapper $service The web service wrapper
+     * @param stdClass $body The JSON body
      */
-    public function __construct($conn, $body = null)
+    public function __construct($service, $body = null)
     {
-        $this->connector = $conn;
+        $this->service = $service;
         $this->body = $body;
     }
     /**

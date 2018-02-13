@@ -37,7 +37,7 @@ class Urabe
      */
     public $connection;
     /**
-     * @var string $db_name 
+     * @var string $database_name 
      * The database name used when performing queries.
      */
     public $database_name;

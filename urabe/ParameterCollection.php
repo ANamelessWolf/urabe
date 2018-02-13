@@ -77,5 +77,15 @@ class ParameterCollection
     {
         return exists($parameter_key) && $this->parameters[$parameter_key] == $parameter_value;
     }
+    /**
+     * Gets the parameter value by its key
+     *
+     * @param string $param_key The parameter key value
+     * @return mixed The parameter value
+     */
+    public function get_value($param_key)
+    {
+        return array_key_exists($param_key, $this->parameters) ? $this->parameters[$param_key] : null;
+    }
 }
 ?>
