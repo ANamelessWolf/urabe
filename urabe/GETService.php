@@ -1,5 +1,6 @@
 <?php
 include_once "Warai.php";
+include_once "HasamiUtils.php";
 include_once "HasamiRESTfulService.php";
 /**
  * GET Service Class
@@ -31,19 +32,17 @@ class GETService extends HasamiRESTfulService
      * Defines the default GET action. The action selects all fields from the current table 
      * without using the parameters
      *
-     * @param bool $encode True if the result is encoded as a JSON string
      * @return QueryResult|string The server response
      */
-    public function default_GET_action($encode = true)
+    public function default_GET_action()
     {
         try {
             if (!is_null($this->parameters) && !is_null($this->service->primary_key) &&
                 $this->parameters->exists($this->service->primary_key)) {
                 $id = $this->parameters->get_value($this->service->primary_key);
-                return $this->select_by_primary_key($id);
+                return select_by_primary_key($service, $id, $this->response_is_encoded);
             } else {
-                $selection = selection_all($this);
-                return $selection->get_response();
+                return select_all($this->service, $this->response_is_encoded);
             }
         } catch (Exception $e) {
             return error_response($e->getMessage());

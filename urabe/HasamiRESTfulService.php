@@ -1,6 +1,8 @@
 <?php
 include_once "Warai.php";
 include_once "Urabe.php";
+include_once "ParameterCollection.php";
+include_once "HasamiWrapper.php";
 /**
  * Hasami RESTful Service Class
  *
@@ -17,6 +19,11 @@ class HasamiRESTfulService
      */
     public $service;
     /**
+     * @var bool True if the response is returned as a
+     * JSON string otherwise is returned as QueryResult object
+     */
+    public $response_is_encoded;
+    /**
      * @var ParameterCollection The web service parameter collection
      */
     public $parameters;
@@ -26,10 +33,6 @@ class HasamiRESTfulService
      * @var stdclass The body as JSON object
      */
     public $body;
-    /**
-     * @var string Saves the last error executed on a query..
-     */
-    protected $query_error;
     /**
      * @var callback Defines the service task
      * (HasamiRESTfulService $service): string
@@ -47,6 +50,8 @@ class HasamiRESTfulService
     {
         $this->service = $service;
         $this->body = $body;
+        $this->parameters = $service->parameters;
+        $this->response_is_encoded = $service->response_is_encoded;
     }
     /**
      * Extract the values from the body in the same order that the $table_fields are defined.
@@ -71,17 +76,45 @@ class HasamiRESTfulService
      *
      * @return stdClass The web server response
      */
-    public function get_response_result()
+    public function get_response()
     {
-        $this->parameters = new ParameterCollection();
-        if (PARAM_TYPE == URL_PARAM)
-            $this->parameters->get_url_parameters();
-        else
-            $this->parameters->get_variables();
-        if (!is_null($this->service_task))
-            $result = call_user_func_array($this->service_task, array($this));
-        else
-            $result = new QueryResult();
+        try {
+            if (is_string($this->service_task))
+                $result = $this->{$service->service_task}($this);
+            else if (!is_null($this->service_task))
+                $result = call_user_func_array($this->service_task, array($this));
+            else
+                throw new Exception(ERR_BAD_RESPONSE);
+        } catch (Exception $e) {
+            $result = error_response($e->getMessage());
+        }
+        return $result;
+    }
+    /**
+     * Get a server response via a web service query
+     *
+     * @param HasamiRESTfulService $service The restful service
+     * @param bool $is_enabled Check if the service is disabled.
+     * @throws Exception An exception is thrown when an error is found on the petition or
+     * when the access to the webservice is restricted.
+     * @return string The server response
+     */
+    public function get_server_response($service, $is_enabled)
+    {
+        try {
+            //Web service is disabled
+            if (!$is_enabled) {
+                http_response_code(403);
+                throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $service->method));
+            }
+            //Web service work around
+            if (is_string($this->service_task))
+                $result = $this->{$service->service_task}($this);
+            else
+                $result = call_user_func_array($service->service_task, array($this));
+        } catch (Exception $e) {
+            $result = error_response($e->getMessage());
+        }
         return $result;
     }
     /**

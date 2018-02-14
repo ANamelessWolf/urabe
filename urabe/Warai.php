@@ -16,6 +16,11 @@
  */
 const ERR_BAD_INDEX = 'Bad index, no such index %s in array.';
 /**
+ * @var string ERR_BAD_RESPONSE
+ * The error message sent when the service returns a bad response
+ */
+const ERR_BAD_RESPONSE = 'The web service returns a bad response';
+/**
  * @var string ERR_BAD_QUERY
  * The error message sent when a bad query is executed.
  */
@@ -223,11 +228,7 @@ const F_GET = 'GET_action';
 /************************************
  ************ Settings **************
  ************************************/
-/**
- * @var string PARAM_TYPE
- * The type of parameter to be used on the web service.
- */
-const PARAM_TYPE = URL_PARAM;
+
 /**
  * @var string GET_PARAM
  * The type of parameters that are obtains from get variables
@@ -238,4 +239,9 @@ const GET_PARAM = 'GET_PARAMETERS';
  * The type of parameters that are obtains from url parameters
  */
 const URL_PARAM = 'URL_PARAMETERS';
+/**
+ * @var string BOTH_PARAMS
+ * Use get variables and url parameters.
+ */
+const GET_AND_URL_PARAM = "BOTH_PARAMS";
 ?>

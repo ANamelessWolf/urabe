@@ -68,6 +68,7 @@ class Urabe
         $this->error = "";
         $this->database_id = $database_id;
         $this->connection = $this->database_id->create_connection();
+        $this->stids = array();
         if ($this->connection) {
             $this->is_connected = true;
             $this->database_name = $this->database_id->service_name;
@@ -109,7 +110,7 @@ class Urabe
         try {
             if ($this->is_connected) {
                 $stid = $query_result->oci_parse($this->connection);
-                array_push($stid);
+                array_push($this->stids, $stid);
                 if ($stid)
                     $query_result->query_result = $query_result->fetch($stid, $row_parser);
                 else

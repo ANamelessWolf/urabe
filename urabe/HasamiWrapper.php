@@ -1,9 +1,11 @@
 <?php
 include_once "Urabe.php";
 include_once "MysteriousParser.php";
-include_once "FieldDefintion.php";
+include_once "FieldDefinition.php";
+include_once "UrabeSettings.php";
 include_once "GETService.php";
 include_once "ParameterCollection.php";
+
 /**
  * A Hasami Wrapper is a web service wrapper Class
  * This class encapsulate and manage webservice verbose PUT, POST, DELETE and GET
@@ -35,6 +37,15 @@ class HasamiWrapper
      */
     public $table_fields;
     /**
+     * @var ParameterCollection The web service parameter collection
+     */
+    public $parameters;
+    /**
+     * @var bool True if the response is returned as a
+     * JSON string otherwise is returned as QueryResult object
+     */
+    public $response_is_encoded;
+    /**
      * @var string Gets or sets the name of the table primary key field name.
      */
     public $primary_key;
@@ -61,6 +72,7 @@ class HasamiWrapper
     {
         $this->table_name = $table_name;
         $this->connector = new Urabe($connection_id);
+        $this->response_is_encoded = true;
         if (is_null($table_def))
             $this->table_fields = $this->connector->get_table_definition($this->table_name);
         else
@@ -70,6 +82,7 @@ class HasamiWrapper
         $this->database = $this->connector->database_name;
         $this->method = $_SERVER['REQUEST_METHOD'];
         $this->get_body();
+        $this->get_parameters();
         //Por default se permiten todos los servicios
         $this->enable_GET = true;
         //Se inicializan los métodos a los que tiene disponible el servidor.
@@ -88,6 +101,23 @@ class HasamiWrapper
             $this->body = json_decode($this->body);
         } else
             $this->body = null;
+    }
+    /**
+     * Initialize the web service parameters.
+     * To change the default parameters change the
+     * @return void
+     */
+    public function get_parameters()
+    {
+        $this->parameters = new ParameterCollection();
+        if (UrabeSettings::$parameter_mode == URL_PARAM)
+            $this->parameters->get_url_parameters();
+        else if (UrabeSettings::$parameter_mode == GET_PARAM)
+            $this->parameters->get_variables();
+        else if (UrabeSettings::$parameter_mode == GET_AND_URL_PARAM) {
+            $this->parameters->get_url_parameters();
+            $this->parameters->get_variables();
+        }
     }
 }
 ?>
