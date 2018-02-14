@@ -6,8 +6,12 @@ $kanojo = new KanojoX();
 $kanojo->host = "10.0.0.3";
 $kanojo->user_name = "riviera";
 $kanojo->password = "r4cks";
-$service = new HasamiWrapper("BASES", $kanojo, "ID_REVIT");
-$result = $service->GET->get_response();
-echo $result;
+$table_def = open_json_file("table_test_definition.json");
+$parser = FieldDefinition::parse_result($table_def);
+//echo pretty_print_format($table_def);
+ $service = new HasamiWrapper("BASES", $kanojo, "ID_REVIT",$parser);
+ $service->response_is_encoded = false;
+ $result = $service->GET->get_response();
+ echo pretty_print_format($result);
 // var_dump($result);
 ?>

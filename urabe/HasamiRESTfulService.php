@@ -19,11 +19,6 @@ class HasamiRESTfulService
      */
     public $service;
     /**
-     * @var bool True if the response is returned as a
-     * JSON string otherwise is returned as QueryResult object
-     */
-    public $response_is_encoded;
-    /**
      * @var ParameterCollection The web service parameter collection
      */
     public $parameters;
@@ -51,7 +46,6 @@ class HasamiRESTfulService
         $this->service = $service;
         $this->body = $body;
         $this->parameters = $service->parameters;
-        $this->response_is_encoded = $service->response_is_encoded;
     }
     /**
      * Extract the values from the body in the same order that the $table_fields are defined.

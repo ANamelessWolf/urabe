@@ -36,6 +36,11 @@ const ERR_EMPTY_QUERY = 'The query is empty or null';
  */
 const ERR_BAD_TABLE = 'The table %s does not match the selected service.';
 /**
+ * @var string ERR_READING_JSON
+ * The error message sent when a JSON file can not be parsed.
+ */
+const ERR_READING_JSON_FILE = 'Error reading the JSON file from "%s"';
+/**
  * @var string ERR_BAD_URL
  * The error message sent when the url parameters are not sent in pairs
  */
@@ -201,17 +206,17 @@ const PRETTY_PRINT_LIGHT = 'Light';
  * @var string FIELD_COL_NAME
  * The field name that stores the column name
  */
-const FIELD_COL_NAME = 'COLUMN_NAME';
+const FIELD_COL_NAME = 'field_name';
 /**
  * @var string FIELD_DATA_TP
  * The field name that stores data type
  */
-const FIELD_DATA_TP = 'DATA_TYPE';
+const FIELD_DATA_TP = 'data_type';
 /**
  * @var string FIELD_DATA_LEN
  * The field name that stores data length
  */
-const FIELD_DATA_LEN = 'DATA_LENGTH';
+const FIELD_DATA_LEN = 'data_length';
 /******************************************
  ************ FUNCTION NAMES **************
  *****************************************/

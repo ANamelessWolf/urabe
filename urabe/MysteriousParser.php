@@ -54,7 +54,6 @@ class MysteriousParser
                     $result->{$field->field_name} = $value;
                 } else
                     $result->{$field->field_name} = $field->get_value($value);
-                $result->{NODE_ERROR} = null;
             } catch (Exception $e) {
                 $result->{$field->field_name} = $field->get_value(null);
                 $result->{NODE_ERROR} = $e->getMessage();

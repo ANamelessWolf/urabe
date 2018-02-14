@@ -40,9 +40,9 @@ class GETService extends HasamiRESTfulService
             if (!is_null($this->parameters) && !is_null($this->service->primary_key) &&
                 $this->parameters->exists($this->service->primary_key)) {
                 $id = $this->parameters->get_value($this->service->primary_key);
-                return select_by_primary_key($service, $id, $this->response_is_encoded);
+                return select_by_primary_key($this->service, $id, $this->service->response_is_encoded);
             } else {
-                return select_all($this->service, $this->response_is_encoded);
+                return select_all($this->service, $this->service->response_is_encoded);
             }
         } catch (Exception $e) {
             return error_response($e->getMessage());

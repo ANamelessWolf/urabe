@@ -99,7 +99,7 @@ class FieldDefinition
     public static function parse_result($result)
     {
         $fields = array();
-        foreach ($result as &$row)
+        foreach ($result->fields as &$row)
             array_push($fields, new FieldDefinition($row->{FIELD_COL_NAME}, $row->{FIELD_DATA_TP}));
         return $fields;
     }
