@@ -85,33 +85,6 @@ class HasamiRESTfulService
         return $result;
     }
     /**
-     * Get a server response via a web service query
-     *
-     * @param HasamiRESTfulService $service The restful service
-     * @param bool $is_enabled Check if the service is disabled.
-     * @throws Exception An exception is thrown when an error is found on the petition or
-     * when the access to the webservice is restricted.
-     * @return string The server response
-     */
-    public function get_server_response($service, $is_enabled)
-    {
-        try {
-            //Web service is disabled
-            if (!$is_enabled) {
-                http_response_code(403);
-                throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $service->method));
-            }
-            //Web service work around
-            if (is_string($this->service_task))
-                $result = $this->{$service->service_task}($this);
-            else
-                $result = call_user_func_array($service->service_task, array($this));
-        } catch (Exception $e) {
-            $result = error_response($e->getMessage());
-        }
-        return $result;
-    }
-    /**
      * Concatenate a collection of fields with comas
      *
      * @param string[]|int[] $fields The fields to concatenate
