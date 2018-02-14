@@ -74,7 +74,7 @@ class HasamiRESTfulService
     {
         try {
             if (is_string($this->service_task))
-                $result = $this->{$service->service_task}($this);
+                $result = $this->service->{$this->service_task}($this);
             else if (!is_null($this->service_task))
                 $result = call_user_func_array($this->service_task, array($this));
             else

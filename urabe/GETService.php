@@ -19,7 +19,7 @@ class GETService extends HasamiRESTfulService
      *
      * Initialize a new instance of the GET Service class.
      * 
-     * @param HAsamiWrapper The web service wrapper
+     * @param HasamiWrapper $service The web service wrapper
      */
     public function __construct($service)
     {
@@ -27,6 +27,20 @@ class GETService extends HasamiRESTfulService
         $this->service_task = function ($sender) {
             return $this->default_GET_action();
         };
+    }
+    /**
+     * Defines a selection query
+     *
+     * @param string $query The selection query
+     * @return QueryResult|string The server response
+     */
+    public function select($query)
+    {
+        try {
+            return $this->service->connector->select($query, $this->service->parser, $this->service->response_is_encoded);
+        } catch (Exception $e) {
+            return error_response($e->getMessage());
+        }
     }
     /**
      * Defines the default GET action. The action selects all fields from the current table 

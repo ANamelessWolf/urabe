@@ -25,9 +25,17 @@ class HasamiWrapper
      */
     public $body;
     /**
+     * @var bool Determines if the access to the service is allowed
+     */
+    public $access_is_allowed;
+    /**
      * @var Urabe The Oracle Connector
      */
     public $connector;
+        /**
+     * @var MysteriousParser The query result parser
+     */
+    public $parser;
     /**
      * @var string The table name
      */
@@ -81,12 +89,15 @@ class HasamiWrapper
         $this->parser = new MysteriousParser($this->table_fields);
         $this->database = $this->connector->database_name;
         $this->method = $_SERVER['REQUEST_METHOD'];
+        $this->access_is_allowed = true;
         $this->get_body();
         $this->get_parameters();
         //Por default se permiten todos los servicios
         $this->enable_GET = true;
         //Se inicializan los métodos a los que tiene disponible el servidor.
         $this->GET = new GETService($this);
+        if (method_exists($this, "GETServiceTask"))
+            $this->GET->service_task = "GETServiceTask";
     }
     /**
      * Initialize the body object extracting the data from the file contents 
@@ -119,5 +130,62 @@ class HasamiWrapper
             $this->parameters->get_variables();
         }
     }
+    /**
+     * Gets the service response
+     *
+     * @param boolean $pretty_print If true the response is printed in the pretty JSON format
+     * @return QueryResult|string The web service response
+     */
+    public function get_response($pretty_print = false)
+    {
+        try {
+            if (!$this->access_is_allowed) {
+                http_response_code(403);
+                throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
+            }
+            switch ($this->method) {
+                case 'GET':
+                    $result = $this->get_restful_service_responcer($this->GET, $this->enable_GET);
+                    http_response_code(200);
+                    break;
+            // case 'PUT':
+            //     $result = $this->get_server_response($this->PUT, $this->enable_PUT);
+            //     break;
+            // case 'POST':
+            //     $result = $this->get_server_response($this->POST, $this->enable_POST);
+            //     break;
+            // case 'DELETE':
+            //     $result = $this->get_server_response($this->DELETE, $this->enable_DELETE);
+            //     break;
+            }
+        } catch (Exception $e) {
+            $result = get_error_response($e, "", $this->response_is_encoded);
+        }
+        if ($pretty_print)
+            return pretty_print_format($this->response_is_encoded ? json_decode($result) : $result, null, true);
+        else
+            return $result;
+    }
+    /**
+     * Gets the web service response if the service is enabled
+     *
+     * @param HasamiRESTfulService $restful_service The RESTfull service
+     * @param bool $is_enable True if the service is enabled
+     * @return QueryResult|string The web service response
+     */
+    private function get_restful_service_responcer($restful_service, $is_enable)
+    {
+        try {
+            if (!$is_enable) {
+                http_response_code(403);
+                throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
+            } else
+                $result = $restful_service->get_response();
+        } catch (Exception $e) {
+            $result = get_error_response($e, "", $this->response_is_encoded);
+        }
+        return $result;
+    }
+
 }
 ?>
