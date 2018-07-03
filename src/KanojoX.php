@@ -1,6 +1,6 @@
 <?php 
 /**
- * A Database data struct 
+ * Database connection model
  * 
  * Kanojo means girlfriend in japanase and this class saves the connection data structure used to connect to
  * an the database.
@@ -9,13 +9,8 @@
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class KanojoX
+abstract class KanojoX
 {
-    /**
-     * @var string CONN_FORMAT_SERVICE_NAME
-     * The default connection string
-     */
-    const CONN_FORMAT_SERVICE_NAME = '//%s/%s';
     /**
      * @var string DEFAULT_CHAR_SET
      * The default char set, is UTF8
@@ -31,6 +26,10 @@ class KanojoX
      */
     public $host = "127.0.0.1";
     /**
+     * @var string $port Connection port
+     */
+    public $port;
+    /**
      * @var string $db_name The database name.
      */
     public $db_name;
@@ -44,29 +43,37 @@ class KanojoX
     public $password = "";
     /**
      * Initialize a new instance for the database connector
-     *
+     * @param string $params The parameters needed to initialize the connection object
      * @return stdClass The database connector
      */
-    abstract protected function init_connection();
+    abstract protected function init_connection($params);
+    /**
+     * Returns the last error found
+     *
+     * @return array The last error found
+     */
+    abstract protected function get_error();
+    /**
+     * Excecutes a query
+     *
+     * @return void
+     */
+    abstract protected function execute($sql);
     /**
      * Creates a connection object to or returns false if the connection fails.
      * Errors are save on $this->error property
-     * @param string $conn_str The connection string if available
+     * @param string $params The connection parameters
      * @param boolean $throw_warnings if true warnings are thrown as exceptions errors
      * @return bool|resource The connection object or false if the connection could not be created
      */
-    public function create_connection($conn_str = null, $throw_warnings = true)
+    public function create_connection($params = null, $throw_warnings)
     {
         try {
             if ($throw_warnings)
                 set_error_handler('KanojoX::error_handler');
-            if (is_null($conn_str))
-                $conn_string = sprintf(self::CONN_FORMAT_SERVICE_NAME, $this->host, $this->service_name);
-            else
-                $conn_string = $conn_str;
-                $conn = $this->init_connection();
+            $conn = $this->init_connection($params);
             if (!$conn) {
-                $err = oci_error();
+                $err = $this->get_error();
                 $this->error = $err['message'];
             }
             return $conn;
