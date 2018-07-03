@@ -3,9 +3,9 @@
  * A Database data struct 
  * 
  * Kanojo means girlfriend in japanase and this class saves the connection data structure used to connect to
- * an Oracle database.
+ * an the database.
  * @version 1.0.0
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe database connector
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -18,7 +18,7 @@ class KanojoX
     const CONN_FORMAT_SERVICE_NAME = '//%s/%s';
     /**
      * @var string DEFAULT_CHAR_SET
-     * Oracle default char set, is UTF8
+     * The default char set, is UTF8
      */
     const DEFAULT_CHAR_SET = 'AL32UTF8';
     /**
@@ -31,23 +31,29 @@ class KanojoX
      */
     public $host = "127.0.0.1";
     /**
-     * @var string $db_name The Oracle service name.
+     * @var string $db_name The database name.
      */
-    public $service_name = "pdb_orcl";
+    public $db_name;
     /**
-     * @var string $user_name The Oracle connection user name.
+     * @var string $user_name The database connection user name.
      */
-    public $user_name = "root";
+    public $user_name;
     /**
-     * @var string|NULL $server The Oracle user password can be null.
+     * @var string|NULL $password The password can be null.
      */
     public $password = "";
     /**
-     * Creates a connection object to oracle or returns false if the connection fails.
+     * Initialize a new instance for the database connector
+     *
+     * @return stdClass The database connector
+     */
+    abstract protected function init_connection();
+    /**
+     * Creates a connection object to or returns false if the connection fails.
      * Errors are save on $this->error property
      * @param string $conn_str The connection string if available
-     * @param boolean $throw_warnings if true oracle warnings are thrown as exceptions errors
-     * @return bool|resource The connection object type='oci8 connection' or false
+     * @param boolean $throw_warnings if true warnings are thrown as exceptions errors
+     * @return bool|resource The connection object or false if the connection could not be created
      */
     public function create_connection($conn_str = null, $throw_warnings = true)
     {
@@ -58,7 +64,7 @@ class KanojoX
                 $conn_string = sprintf(self::CONN_FORMAT_SERVICE_NAME, $this->host, $this->service_name);
             else
                 $conn_string = $conn_str;
-            $conn = oci_connect($this->user_name, $this->password, $conn_string, self::DEFAULT_CHAR_SET);
+                $conn = $this->init_connection();
             if (!$conn) {
                 $err = oci_error();
                 $this->error = $err['message'];
