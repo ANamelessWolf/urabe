@@ -54,11 +54,21 @@ abstract class KanojoX
      */
     abstract protected function get_error();
     /**
-     * Excecutes a query
+     * Prepares a SQL statement for execution
      *
-     * @return void
+     * @param stdClass $connection The database active connection
+     * @param string $sql The SQL statement
+     * @return stdClass Returns a statement handle on success, or FALSE on error.
      */
-    abstract protected function execute($sql);
+    abstract public function parse($connection, $sql);
+    /**
+     * Returns the next row from a query as an associative array
+     *
+     * @param stdClass $connection A valid SQL statement identifier created by parse().
+     * @return array|bool Returns an associative array. If there are no more rows in the statement then FALSE is returned. 
+     */
+    abstract public function fetch_asoc($statement);
+
     /**
      * Creates a connection object to or returns false if the connection fails.
      * Errors are save on $this->error property

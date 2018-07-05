@@ -52,11 +52,6 @@ class Urabe
      */
     public $is_connected;
     /**
-     * @var string $stids 
-     * The generated stid during the connection.
-     */
-    private $stids;
-    /**
      * __construct
      *
      * Initialize a new instance of the Urabe MySql connector.
