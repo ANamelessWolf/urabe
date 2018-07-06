@@ -72,5 +72,31 @@ class PGKanojoX extends KanojoX implements IKanojoX
         $error->sql = $sql;
         return $error;
     }
+    /**
+     * Sends a request to execute a prepared statement with given parameters, 
+     * and waits for the result
+     *
+     * @param resource $connection PostgreSQL database connection resource. 
+     * The default connection is the last connection made by pg_connect().
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
+     * @return resource A query result resource on success or FALSE on failure.
+     */
+    public function execute($connection, $sql, $variables = null)
+    {
+        try {
+            if (isset($variables) && is_array($variables)) {
+                $result = pg_prepare($connection, "", $sql);
+                $vars = array();
+                foreach ($variables as &$value)
+                    array_push($vars, $value->variable);
+                $result = pg_execute($connection, "", $vars);
+            } else
+                $result = pg_query($connection, $sql);
+            return $result ? $result : error($connection, $sql);
+        } catch (Exception $e) {
+            return error($connection, sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+        }
+    }
 }
 ?>

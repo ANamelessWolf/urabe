@@ -38,5 +38,16 @@ interface IKanojoX
      * @return ConnectionError The connection error 
      */
     public function error($connection, $sql);
+
+    /**
+     * Sends a request to execute a prepared statement with given parameters, 
+     * and waits for the result
+     *
+     * @param stdClass $connection A Database connection identifier returned by connect()
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @return stdClass A query result resource on success or FALSE on failure.
+     */
+    public function execute($connection, $sql, $variables = null);
 }
 ?>

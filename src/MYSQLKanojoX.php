@@ -22,7 +22,7 @@ class MYSQLKanojoX extends KanojoX implements IKanojoX
      */
     public function close($connection)
     {
-        return mysqli_close($connection);
+        return $connection->close();
     }
     /**
      * Open a MySQL Database connection
@@ -54,6 +54,60 @@ class MYSQLKanojoX extends KanojoX implements IKanojoX
         $error->message = $mysqli->connect_error;
         $error->sql = $sql;
         return $error;
+    }
+    /**
+     * Sends a request to execute a prepared statement with given parameters, 
+     * and waits for the result
+     *
+     * @param mysqli $link Procedural style only: A link identifier returned by mysqli_connect()
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
+     * @return resource Returns a statement object or FALSE if an error occurred. 
+     */
+    public function execute($connection, $sql, $variables = null)
+    {
+        try {
+            $statement = $this->parse($connection, $sql);
+            if (isset($variables) && is_array($variables))
+                $this->bind($statement, $variables);
+            $ok =  $statement->execute();
+            return $ok ? $statement : error($connection, $sql);
+        } catch (Exception $e) {
+            return error($connection, sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+        }
+    }
+    /**
+     * Prepares sql_text using connection and returns the statement identifier, 
+     * which can be used with execute(). 
+     *
+     * @param mysqli $link Procedural style only: A link identifier returned by mysqli_connect()
+     * @param string $sql The SQL text statement
+     * @return mysqli Returns a statement handle on success, or FALSE on error. 
+     */
+    private function parse($link, $sql)
+    {
+        return $mysqli->prepare($sql);
+    }
+    /**
+     * Binds a PHP variable to an Oracle placeholder
+     *
+     * @param resource $statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
+     * @return void
+     */
+    private function bind($statement, $variables)
+    {
+        foreach ($variable as &$value) {
+            if (is_int($value->variable))
+                $tp = "i";
+            else if (is_double($value->variable))
+                $tp = "d";
+            else if (is_string($value->variable))
+                $tp = "s";
+            else
+                $tp = "b";
+            return $stmt->bind_param($tp, $value->variable);
+        }
     }
 }
 ?>

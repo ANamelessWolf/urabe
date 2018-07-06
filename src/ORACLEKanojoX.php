@@ -69,6 +69,51 @@ class ORACLEKanojoX extends KanojoX implements IKanojoX
         $error->sql = isset($sql) ? $sql : $e['sqltext'];
         return $error;
     }
+    /**
+     * Sends a request to execute a prepared statement with given parameters, 
+     * and waits for the result
+     *
+     * @param resource $connection An Oracle connection identifier returned by oci_connect()
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
+     * @return resource Returns a statement handle on success, or FALSE on error.
+     */
+    public function execute($connection, $sql, $variables = null)
+    {
+        try {
+            $statement = $this->parse($connection, $sql);
+            if (isset($variables) && is_array($variables))
+                $this->bind($statement, $variables);
+            $ok = oci_execute($statement);
+            return $ok ? $statement : error($connection, $sql);
+        } catch (Exception $e) {
+            return error($connection, sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+        }
+    }
+    /**
+     * Prepares sql_text using connection and returns the statement identifier, 
+     * which can be used with oci_execute(). 
+     *
+     * @param resource $connection An Oracle connection identifier returned by oci_connect()
+     * @param string $sql The SQL text statement
+     * @return resource Returns a statement handle on success, or FALSE on error. 
+     */
+    private function parse($connection, $sql)
+    {
+        return oci_parse($connection, $sql);
+    }
+    /**
+     * Binds a PHP variable to an Oracle placeholder
+     *
+     * @param resource $statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
+     * @return void
+     */
+    private function bind($statement, $variables)
+    {
+        foreach ($variable as &$value)
+            oci_bind_by_name($statement, ":" . $value->bv_name, $value->variable);
+    }
 }
 /**
  * Creates a SID connection to an ORACLE database
