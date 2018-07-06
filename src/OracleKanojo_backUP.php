@@ -11,7 +11,7 @@ include_once "Warai.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class OracleKanojoX extends KanojoX
+class OracleKanojoX extends KanojoX implements IKanojoX
 {
     /**
      * @var string $stids 
