@@ -6,9 +6,10 @@ include_once "FieldDefinition.php";
 include_once "MysteriousParser.php";
 include_once "QueryResult.php";
 /**
- * A MySQL connector 
+ * A Database connection manager
  * 
- * Urabe is the main protagonist in the Nazo no Kanajo X, this class manage all transaction to the MySQL database.
+ * Urabe is the main protagonist in the Nazo no Kanajo X, this class manage and wraps all transactions to the database.
+ * Given the Kanojo profile can connect to ORACLE, PG and MySQL
  * @version 1.0.0
  * @api Makoto Urabe
  * @author A nameless wolf <anamelessdeath@gmail.com>
@@ -27,50 +28,53 @@ class Urabe
      */
     const FIELD_DATA_TYPE = 'DATA_TYPE';
     /**
-     * @var KanojoX $database_id 
-     * Defines the connection id to the database.
+     * @var KanojoX $connector 
+     * Defines the database connector
      */
-    private $database_id;
-    /**
-     * @var resource $connection 
-     * The connection object type='oci8 connection'.
-     */
-    public $connection;
+    private $connector;
+
     /**
      * @var string $database_name 
-     * The database name used when performing queries.
+     * The database name.
      */
     public $database_name;
-    /**
-     * @var string $error 
-     * The last error description.
-     */
-    public $error;
+
     /**
      * @var string $is_connected 
      * Check if there is an active connection to the database.
      */
     public $is_connected;
+
     /**
      * __construct
      *
-     * Initialize a new instance of the Urabe MySql connector.
-     * @param KanojoX $database_id The database connection id.
+     * Initialize a new instance of the Urabe Database manager.
+     * @param KanojoX $connector The database connector.
      */
-    function __construct($database_id)
+    public function __construct($connector)
     {
-        $stids = array();
-        $this->error = "";
-        $this->database_id = $database_id;
-        $this->connection = $this->database_id->create_connection();
-        $this->stids = array();
-        if ($this->connection) {
-            $this->is_connected = true;
-            $this->database_name = $this->database_id->service_name;
-        } else {
-            $this->is_connected = false;
-            $this->error = $this->database_id->error;
-        }
+        if (KanojoX::is_error($statement)) {
+            $this->connector = $connector;
+            $this->connector->connect();
+            if ($this->connection) {
+                $this->is_connected = true;
+                $this->database_name = $this->connector->db_name;
+            } else {
+                $this->is_connected = false;
+                $this->error = $this->connector;
+            }
+        } else
+            throw new Exception(ERR_BAD_CONNECTION);
+    }
+    /**
+     * Gets the database connection from the current
+     * Kanojo object connector
+     *
+     * @return stdClass The database connection
+     */
+    private function get_db_connection()
+    {
+        return $this->connector->connection;
     }
     /**
      * Gets the table defintion on an array

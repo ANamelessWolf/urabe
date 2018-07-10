@@ -1,4 +1,7 @@
 <?php 
+
+include_once "Warai.php";
+include_once "IKanojoX.php";
 /**
  * Database connection model
  * 
@@ -9,16 +12,11 @@
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-abstract class KanojoX
+abstract class KanojoX implements IKanojoX
 {
     /**
-     * @var string DEFAULT_CHAR_SET
-     * The default char set, is UTF8
-     */
-    const DEFAULT_CHAR_SET = 'AL32UTF8';
-    /**
-     * @var string $error 
-     * The last error description.
+     * @var ConnectionError $error 
+     * The last found error.
      */
     public $error;
     /**
@@ -42,12 +40,23 @@ abstract class KanojoX
      */
     public $password = "";
     /**
-     * Initialize a new instance for the database connector
-     * @param string $params The parameters needed to initialize the connection object
-     * @return stdClass The database connector
+     * Returns the collections of statement handled
+     *
+     * @var array statementsIds The statements ids collection
      */
-    abstract protected function init_connection($params);
-
+    public $statementsIds;
+    /**
+     * @var resource $connection 
+     * The connection object.
+     */
+    public $connection;
+    /**
+     * Initialize a new instance of the connection object
+     */
+    public function __construct()
+    {
+        $this->statementsIds = array();
+    }
 
     /**
      * Creates a connection object to or returns false if the connection fails.
@@ -91,5 +100,82 @@ abstract class KanojoX
         } else
             throw new Exception($err_msg, $err_no);
     }
+    /**
+     * Check if the class is of type ConnectionError
+     *
+     * @param stdClass $class The Kanojo class
+     * @return boolean return True if the class is of type ConnectionError
+     */
+    public static function is_error($class){
+        return get_class($class) == 'ConnectionError';
+    }
+    /*********************
+     * Interface Methods *
+     *********************/
+    /**
+     * Closes a connection
+     *
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function close()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "close", "KanojoX"));
+    }
+    /**
+     * Open a Database connection
+     *
+     * @return stdClass The database connection object
+     */
+    public function connect()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "connect", "KanojoX"));
+    }
+    /**
+     * Get the last error message string of a connection
+     *
+     * @param string|null $sql The last excecuted statement. Can be null
+     * @return ConnectionError The connection error 
+     */
+    public function error($sql)
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "error", "KanojoX"));
+    }
+    /**
+     * Sends a request to execute a prepared statement with given parameters, 
+     * and waits for the result
+     *
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @return stdClass A query result resource on success or FALSE on failure.
+     */
+    public function execute($sql, $variables = null)
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "execute", "KanojoX"));
+    }
+    /**
+     * Returns an associative array containing the next result-set row of a 
+     * query. Each array entry corresponds to a column of the row. 
+     * This function is typically called in a loop until it returns FALSE, 
+     * indicating no more rows exist.
+     *
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * */
+    public function fetch_assoc($sql, $variables)
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "fetch_assoc", "KanojoX"));
+    }
+    /**
+     * Frees the memory associated with a result
+     *
+     * @param stdClass $statement The statement result
+     * @return void
+     */
+    public function free_result()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "free_result", "KanojoX"));
+    }
 }
+
 ?>

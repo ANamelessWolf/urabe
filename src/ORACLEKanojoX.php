@@ -1,7 +1,5 @@
 <?php 
-include_once "Kanojo.php";
-include_once "Warai.php";
-include_once "IKanojo.php";
+include_once "KanojoX.php";
 /**
  * An ORACLE Connection object
  * 
@@ -12,8 +10,35 @@ include_once "IKanojo.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class ORACLEKanojoX extends KanojoX implements IKanojoX
+class ORACLEKanojoX extends KanojoX
 {
+    /**
+     * @var string DEFAULT_CHAR_SET
+     * The default char set, is UTF8
+     */
+    const DEFAULT_CHAR_SET = 'AL32UTF8';
+    /**
+     * Open an ORACLE Database connection
+     *
+     * @return resource The database connection object
+     */
+    public function connect()
+    {
+        try {
+            $host = $this->host;
+            $port = $this->port;
+            $dbname = $this->db_name;
+            $username = $this->user_name;
+            $passwd = $this->password;
+            if (!isset($host) || strlen($host) == 0)
+                $host = "127.0.0.1";
+            $connString = $this->buildConnectionString($host, $dbname, $port);
+            $this->connection = oci_connect($username, $passwd, $connString, DEFAULT_CHAR_SET);
+            return $this->connection;
+        } catch (Exception $e) {
+            return $this->error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
+        }
+    }
     /**
      * This function builds a connection string to connecto to ORACLE
      * by default is connected via SID
@@ -27,42 +52,32 @@ class ORACLEKanojoX extends KanojoX implements IKanojoX
     /**
      * Closes a connection
      *
-     * @param resource $connection An Oracle connection identifier returned by oci_connect()
      * @return bool Returns TRUE on success or FALSE on failure.
      */
-    public function close($connection)
+    public function close()
     {
-        return oci_close($connection);
+        $this->free_result();
+        return oci_close($this->connection);
     }
     /**
-     * Open an ORACLE Database connection
+     * Frees the memory associated with a result
      *
-     * @param string $host Can be either a host name or an IP address. 
-     * Passing the NULL value or the string "localhost" to this parameter, the local host is assumed.
-     * @param string $username The database user name
-     * @param string $passwd The database password, If not provided or NULL, 
-     * the server will attempt to authenticate the user with no password only. 
-     * @param string $dbname The database name
-     * @param string $port The database port
-     * @return resource The database connection object
+     * @return void
      */
-    public function connect($host, $username, $passwd, $dbname, $port)
+    public function free_result()
     {
-        if (!isset($host) || strlen($host) == 0)
-            $host = "127.0.0.1";
-        $connString = $this->buildConnectionString($host, $dbname, $port);
-        return oci_connect($username, $passwd, $connString);
+        foreach ($this->statementsIds as &$statementId)
+            oci_free_statement($statementId);
     }
     /**
      * Get the last error message string of a connection
      *
-     * @param resource $connection An Oracle connection identifier returned by oci_connect()
      * @param string|null $sql The last excecuted statement. Can be null
      * @return ConnectionError The connection error 
      */
-    public function error($connection, $sql)
+    public function error($sql)
     {
-        $e = oci_error($connection);
+        $e = oci_error($this->connection);
         $error = new ConnectionError();
         $error->code = $e['code'];
         $error->message = $e['message'];
@@ -73,34 +88,52 @@ class ORACLEKanojoX extends KanojoX implements IKanojoX
      * Sends a request to execute a prepared statement with given parameters, 
      * and waits for the result
      *
-     * @param resource $connection An Oracle connection identifier returned by oci_connect()
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
      * @return resource Returns a statement handle on success, or FALSE on error.
      */
-    public function execute($connection, $sql, $variables = null)
+    public function execute($sql, $variables = null)
     {
         try {
-            $statement = $this->parse($connection, $sql);
+            $statement = $this->parse($this->connection, $sql);
             if (isset($variables) && is_array($variables))
                 $this->bind($statement, $variables);
             $ok = oci_execute($statement);
-            return $ok ? $statement : error($connection, $sql);
+            return $ok ? $statement : $this->error($sql);
         } catch (Exception $e) {
-            return error($connection, sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+            return $this->error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+        }
+    }
+    /**
+     * Returns an associative array containing the next result-set row of a 
+     * query. Each array entry corresponds to a column of the row. 
+     * This function is typically called in a loop until it returns FALSE, 
+     * indicating no more rows exist.
+     *
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * */
+    public function fetch_assoc($sql, $variables = null)
+    {
+        $statement = $this->execute($sql, $variables);
+        if (KanojoX::is_error($statement))
+            return $statement;
+        else {
+            array_push($this->statementsIds, $statement);
+            return oci_fetch_assoc($statement);
         }
     }
     /**
      * Prepares sql_text using connection and returns the statement identifier, 
      * which can be used with oci_execute(). 
      *
-     * @param resource $connection An Oracle connection identifier returned by oci_connect()
      * @param string $sql The SQL text statement
      * @return resource Returns a statement handle on success, or FALSE on error. 
      */
-    private function parse($connection, $sql)
+    private function parse($sql)
     {
-        return oci_parse($connection, $sql);
+        return oci_parse($this->connection, $sql);
     }
     /**
      * Binds a PHP variable to an Oracle placeholder

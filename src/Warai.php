@@ -11,6 +11,11 @@
  **************** Errors ***************
  ***************************************/
 /**
+ * @var string ERR_NOT_IMPLEMENTED
+ * The error message sent when method is not implemented.
+ */
+const ERR_NOT_IMPLEMENTED = 'The method "%s", is not implemented in the class "%s".';
+/**
  * @var string ERR_BAD_INDEX
  * The error message sent when the index is out of bounds.
  */
@@ -55,6 +60,11 @@ const ERR_BODY_IS_NULL = 'An error ocurred parsing the message body. The body me
  * The error message sent when the the body is needed to be an array.
  */
 const ERR_BODY_NOT_ARRAY = 'The body must be an array.';
+/**
+ * @var string ERR_BAD_CONNECTION
+ * The error message sent when the connection is not valid.
+ */
+const ERR_BAD_CONNECTION = 'The database connection is not valid.\n%s';
 /**
  * @var string ERR_CONNECTION
  * The error message sent when the connection to the database is closed.

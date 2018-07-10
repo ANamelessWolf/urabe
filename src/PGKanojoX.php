@@ -1,7 +1,5 @@
 <?php 
-include_once "Kanojo.php";
-include_once "Warai.php";
-include_once "IKanojo.php";
+include_once "KanojoX.php";
 /**
  * A PostgreSQL Connection object
  * 
@@ -12,48 +10,60 @@ include_once "IKanojo.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class PGKanojoX extends KanojoX implements IKanojoX
+class PGKanojoX extends KanojoX
 {
-    /**
-     * Closes a connection
-     *
-     * @param resource $connection PostgreSQL database connection resource. 
-     * The default connection is the last connection made by pg_connect().
-     * @return bool Returns TRUE on success or FALSE on failure.
-     */
-    public function close($connection)
-    {
-        return pg_close($connection);
-    }
     /**
      * Open a PostgreSQL Database connection
      *
-     * @param string $host Can be either a host name or an IP address. 
-     * Passing the NULL value or the string "localhost" to this parameter, the local host is assumed.
-     * @param string $username The database user name
-     * @param string $passwd The database password, If not provided or NULL, 
-     * the server will attempt to authenticate the user with no password only. 
-     * @param string $dbname The database name
-     * @param string $port The database port
      * @return resource The database connection object
      */
-    public function connect($host, $username, $passwd, $dbname, $port)
+    public function connect()
     {
-        if (!isset($host) || strlen($host) == 0)
-            $host = "127.0.0.1";
-        $connString = $strConn = "host='$host' port='$port' dbname='$dbname' user='$username' ";
-        if (isset($passwd) && strlen($passwd) > 0)
-            $connString .= "password='$passwd'";
-        return pg_connect($connString);
+        try {
+            $host = $this->host;
+            $port = $this->port;
+            $dbname = $this->db_name;
+            $username = $this->user_name;
+            $passwd = $this->password;
+            if (!isset($this->host) || strlen($host) == 0)
+                $host = "127.0.0.1";
+            $connString = $strConn = "host='$host' port='$port' dbname='$dbname' user='$username' ";
+            if (isset($passwd) && strlen($passwd) > 0)
+                $connString .= "password='$passwd'";
+            $this->connection = pg_connect($connString);
+            return $this->connection;
+        } catch (Exception $e) {
+            return $this->error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
+        }
     }
+    /**
+     * Closes a PostgreSQL database connection resource. 
+     * The connection is the last connection made by pg_connect().
+     *
+     * @return bool Returns TRUE on success or FALSE on failure.
+     */
+    public function close()
+    {
+        return pg_close($this->connection);
+    }
+    /**
+     * Frees the memory associated with a result
+     *
+     * @return void
+     */
+    public function free_result()
+    {
+        foreach ($this->statementsIds as &$statementId)
+            pg_free_result($statementId);
+    }
+
     /**
      * Get the last error message string of a connection
      *
-     * @param resource $connection PostgreSQL database connection resource. 
      * @param string|null $sql The last excecuted statement. Can be null
      * @return ConnectionError The connection error 
      */
-    public function error($connection, $sql)
+    public function error($sql)
     {
         /**
          * Posssible errors
@@ -66,36 +76,54 @@ class PGKanojoX extends KanojoX implements IKanojoX
          * 6 = PGSQL_NONFATAL_ERROR
          * 7 = PGSQL_FATAL_ERROR
          */
-        $error = new ConnectionError();
-        $error->code = pg_last_error($connection);
-        $error->message = pg_result_status($connection);
-        $error->sql = $sql;
-        return $error;
+        $this->error = new ConnectionError();
+        $this->error->code = pg_last_error($this->connection);
+        $this->error->message = pg_result_status($this->connection);
+        $this->error->sql = $sql;
+        return $this->error;
     }
     /**
      * Sends a request to execute a prepared statement with given parameters, 
      * and waits for the result
      *
-     * @param resource $connection PostgreSQL database connection resource. 
-     * The default connection is the last connection made by pg_connect().
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
      * @return resource A query result resource on success or FALSE on failure.
      */
-    public function execute($connection, $sql, $variables = null)
+    public function execute($sql, $variables = null)
     {
         try {
             if (isset($variables) && is_array($variables)) {
-                $result = pg_prepare($connection, "", $sql);
+                $result = pg_prepare($this->connection, "", $sql);
                 $vars = array();
                 foreach ($variables as &$value)
                     array_push($vars, $value->variable);
-                $result = pg_execute($connection, "", $vars);
+                $result = pg_execute($this->connection, "", $vars);
             } else
-                $result = pg_query($connection, $sql);
-            return $result ? $result : error($connection, $sql);
+                $result = pg_query($this->connection, $sql);
+            return $result ? $result : $this-> error($sql);
         } catch (Exception $e) {
-            return error($connection, sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+            return $this-> error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+        }
+    }
+    /**
+     * Returns an associative array containing the next result-set row of a 
+     * query. Each array entry corresponds to a column of the row. 
+     * This function is typically called in a loop until it returns FALSE, 
+     * indicating no more rows exist.
+     *
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * */
+    public function fetch_assoc($sql, $variables = null)
+    {
+        $statement = $this->execute($this->connection, $sql, $variables);
+        if (KanojoX::is_error($statement))
+            return $statement;
+        else {
+            array_push($this->statementsIds, $statement);
+            return pg_fetch_assoc($statement);
         }
     }
 }

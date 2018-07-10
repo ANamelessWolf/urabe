@@ -1,7 +1,5 @@
 <?php 
-include_once "Kanojo.php";
-include_once "Warai.php";
-include_once "IKanojo.php";
+include_once "KanojoX.php";
 /**
  * A MySQL Connection object
  * 
@@ -12,45 +10,63 @@ include_once "IKanojo.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class MYSQLKanojoX extends KanojoX implements IKanojoX
+class MYSQLKanojoX extends KanojoX
 {
+    /**
+     * @var string DEFAULT_CHAR_SET
+     * The default char set, is UTF8
+     */
+    const DEFAULT_CHAR_SET = 'utf8';
     /**
      * Closes a connection
      *
-     * @param mysqli $connection Procedural style only: A link identifier returned by mysqli_connect()
      * @return bool Returns TRUE on success or FALSE on failure.
      */
-    public function close($connection)
+    public function close()
     {
-        return $connection->close();
+        $this->free_result();
+        return $this->connection->close();
+    }
+    /**
+     * Frees the memory associated with a result
+     *
+     * @return void
+     */
+    public function free_result()
+    {
+        foreach ($this->statementsIds as &$statementId)
+            mysqli_free_result($statementId);
     }
     /**
      * Open a MySQL Database connection
      *
-     * @param string $host Can be either a host name or an IP address. 
-     * Passing the NULL value or the string "localhost" to this parameter, the local host is assumed.
-     * @param string $username The database user name
-     * @param string $passwd The database password, If not provided or NULL, 
-     * the server will attempt to authenticate the user with no password only. 
-     * @param string $dbname The database name
-     * @param string $port The database port
      * @return stdClass The database connection object
      */
-    public function connect($host, $username, $passwd, $dbname, $port)
+    public function connect()
     {
-        return mysqli_connect($host, $username, $passwd, $dbname, $port);
+        try {
+            $host = $this->host;
+            $port = $this->port;
+            $dbname = $this->db_name;
+            $username = $this->user_name;
+            $passwd = $this->password;
+            $this->connection = mysqli_connect($host, $username, $passwd, $dbname, $port);
+            $this->connection->set_charset(DEFAULT_CHAR_SET);
+            return $this->connection;
+        } catch (Exception $e) {
+            return error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
+        }
     }
     /**
      * Get the last error message string of a connection
      *
-     * @param mysqli $connection Procedural style only: A link identifier returned by mysqli_connect()
      * @param string|null $sql The last excecuted statement. Can be null
      * @return ConnectionError The connection error 
      */
-    public function error($connection, $sql)
+    public function error($sql)
     {
         $error = new ConnectionError();
-        $error->code = $connection->connect_errno;
+        $error->code = $this->connection->connect_errno;
         $error->message = $mysqli->connect_error;
         $error->sql = $sql;
         return $error;
@@ -59,28 +75,46 @@ class MYSQLKanojoX extends KanojoX implements IKanojoX
      * Sends a request to execute a prepared statement with given parameters, 
      * and waits for the result
      *
-     * @param mysqli $link Procedural style only: A link identifier returned by mysqli_connect()
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
      * @return resource Returns a statement object or FALSE if an error occurred. 
      */
-    public function execute($connection, $sql, $variables = null)
+    public function execute($sql, $variables = null)
     {
         try {
-            $statement = $this->parse($connection, $sql);
+            $statement = $this->parse($sql);
             if (isset($variables) && is_array($variables))
                 $this->bind($statement, $variables);
-            $ok =  $statement->execute();
-            return $ok ? $statement : error($connection, $sql);
+            $ok = $statement->execute();
+            return $ok ? $statement : error($sql);
         } catch (Exception $e) {
-            return error($connection, sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+            return error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+        }
+    }
+    /**
+     * Returns an associative array containing the next result-set row of a 
+     * query. Each array entry corresponds to a column of the row. 
+     * This function is typically called in a loop until it returns FALSE, 
+     * indicating no more rows exist.
+     *
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * */
+    public function fetch_assoc($sql, $variables = null)
+    {
+        $statement = $this->execute($sql, $variables);
+        if (KanojoX::is_error($statement))
+            return $statement;
+        else {
+            array_push($this->statementsIds, $statement);
+            return $statement->fetch_assoc();
         }
     }
     /**
      * Prepares sql_text using connection and returns the statement identifier, 
      * which can be used with execute(). 
      *
-     * @param mysqli $link Procedural style only: A link identifier returned by mysqli_connect()
      * @param string $sql The SQL text statement
      * @return mysqli Returns a statement handle on success, or FALSE on error. 
      */
