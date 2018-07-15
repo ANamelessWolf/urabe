@@ -1,4 +1,5 @@
 <?php
+
 /**
  * An Connection database error
  * 
@@ -10,17 +11,28 @@
 class ConnectionError
 {
     /**
-     * @var int $code 
-     * The last error code number.
+     * @var int $code The last error code number.
      */
     public $code;
     /**
      * @var string $message The database connection error text. 
      */
-    public $message = "127.0.0.1";
+    public $message;
     /**
      * @var string $sql The SQL statement text. If there was no statement, this is an empty string. 
      */
     public $sql;
+    /**
+     * @var string $file The file where the error was found
+     */
+    public $file;
+    /**
+     * @var int The line where the error was found
+     */
+    public $line;
+    /**
+     * @var array The error context
+     */
+    public $context;
 }
 ?>

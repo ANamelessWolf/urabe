@@ -18,6 +18,25 @@ class ORACLEKanojoX extends KanojoX
      */
     const DEFAULT_CHAR_SET = 'AL32UTF8';
     /**
+     * @var string ERR_CODE
+     * The OCI Error field for error code
+     */
+    const ERR_CODE = 'code';
+    /**
+     * @var string ERR_MSG
+     * The OCI Error field for error message
+     */
+    const ERR_MSG = 'message';
+    /**
+     * @var string ERR_SQL
+     * The OCI Error field for error SQL
+     */
+    const ERR_SQL = 'sqltext';
+    /**
+     * @var string $owner The table owner used to filter the table definition
+     */
+    public $owner;
+    /**
      * Open an ORACLE Database connection
      *
      * @return resource The database connection object
@@ -33,7 +52,7 @@ class ORACLEKanojoX extends KanojoX
             if (!isset($host) || strlen($host) == 0)
                 $host = "127.0.0.1";
             $connString = $this->buildConnectionString($host, $dbname, $port);
-            $this->connection = oci_connect($username, $passwd, $connString, DEFAULT_CHAR_SET);
+            $this->connection = oci_connect($username, $passwd, $connString, self::DEFAULT_CHAR_SET);
             return $this->connection;
         } catch (Exception $e) {
             return $this->error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
@@ -72,17 +91,21 @@ class ORACLEKanojoX extends KanojoX
     /**
      * Get the last error message string of a connection
      *
+     * @param ConnectionError $error If the error exists pass the eror
      * @param string|null $sql The last excecuted statement. Can be null
      * @return ConnectionError The connection error 
      */
-    public function error($sql)
+    public function error($sql, $error = null)
     {
-        $e = oci_error($this->connection);
-        $error = new ConnectionError();
-        $error->code = $e['code'];
-        $error->message = $e['message'];
-        $error->sql = isset($sql) ? $sql : $e['sqltext'];
-        return $error;
+        if (is_null($error)) {
+            $e = oci_error($this->connection);
+            $this->error = new ConnectionError();
+            $this->error->code = $e[self::ERR_CODE];
+            $this->error->message = $e[self::ERR_MSG];
+            $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
+        } else
+            $this->error = $error;
+        return $this->error;
     }
     /**
      * Sends a request to execute a prepared statement with given parameters, 
@@ -123,6 +146,24 @@ class ORACLEKanojoX extends KanojoX
             array_push($this->statementsIds, $statement);
             return oci_fetch_assoc($statement);
         }
+    }
+    /**
+     * Gets the query for selecting the table definition
+     *
+     * @param string $table_name The table name
+     * @return string The table definition selection query
+     */
+    public function get_table_definition_query($table_name)
+    {
+        $fields = ORACLE_FIELD_COL_NAME+", "+
+        if (isset($this->owner)){
+            $format_query = "SELECT %s, %s, %s FROM ALL_TAB_COLS WHERE TABLE_NAME = '%s' AND OWNER = '%s'";
+            $sql =sprintf($format_query,FIELD_COL_NAME, FIELD_DATA_TP, FIELD_DATA_LEN)
+        }
+        else
+            $format_query = "SELECT %s, %s, %s FROM ALL_TAB_COLS WHERE TABLE_NAME = '%s'";
+
+        return $sql;
     }
     /**
      * Prepares sql_text using connection and returns the statement identifier, 

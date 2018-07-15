@@ -1,6 +1,7 @@
 <?php 
 
 include_once "Warai.php";
+include_once "ConnectionError.php";
 include_once "IKanojoX.php";
 /**
  * Database connection model
@@ -56,6 +57,7 @@ abstract class KanojoX implements IKanojoX
     public function __construct()
     {
         $this->statementsIds = array();
+        set_error_handler('KanojoX::error_handler');
     }
 
     /**
@@ -93,12 +95,15 @@ abstract class KanojoX implements IKanojoX
      * User error handler must not modify error context. 
      * @return bool Returns a string containing the previously defined error handler.
      */
-    public function error_handler($err_no, $err_msg, $err_file, $err_line, array $err_context)
+    public function error_handler($err_no, $err_msg, $err_file, $err_line, $err_context)
     {
-        if (0 === error_reporting()) {
-            return false;
-        } else
-            throw new Exception($err_msg, $err_no);
+        $error = new ConnectionError();
+        $error->code = $err_no;
+        $error->message = $err_msg;
+        $error->file = $err_file;
+        $error->line = $err_line;
+        $err_context = $err_context;
+        return $this->error(null, $error);
     }
     /**
      * Check if the class is of type ConnectionError
@@ -106,7 +111,8 @@ abstract class KanojoX implements IKanojoX
      * @param stdClass $class The Kanojo class
      * @return boolean return True if the class is of type ConnectionError
      */
-    public static function is_error($class){
+    public static function is_error($class)
+    {
         return get_class($class) == 'ConnectionError';
     }
     /*********************
@@ -134,9 +140,10 @@ abstract class KanojoX implements IKanojoX
      * Get the last error message string of a connection
      *
      * @param string|null $sql The last excecuted statement. Can be null
+     * @param ConnectionError $error If the error exists pass the eror
      * @return ConnectionError The connection error 
      */
-    public function error($sql)
+    public function error($sql, $error = null)
     {
         throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "error", "KanojoX"));
     }
@@ -175,6 +182,16 @@ abstract class KanojoX implements IKanojoX
     public function free_result()
     {
         throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "free_result", "KanojoX"));
+    }
+    /**
+     * Gets the query for selecting the table definition
+     *
+     * @param string $table_name The table name
+     * @return string The table definition selection query
+     */
+    public function get_table_definition_query($table_name)
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "get_table_definition_query", "KanojoX"));
     }
 }
 

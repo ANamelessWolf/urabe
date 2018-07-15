@@ -213,20 +213,30 @@ const PRETTY_PRINT_LIGHT = 'Light';
  ************ FIELD NAMES *****************
  *****************************************/
 /**
- * @var string FIELD_COL_NAME
+ * @var string ORACLE_FIELD_COL_NAME
  * The field name that stores the column name
  */
-const FIELD_COL_NAME = 'field_name';
+const ORACLE_FIELD_COL_NAME = 'COLUMN_NAME';
 /**
- * @var string FIELD_DATA_TP
+ * @var string ORACLE_FIELD_DATA_TP
  * The field name that stores data type
  */
-const FIELD_DATA_TP = 'data_type';
+const ORACLE_FIELD_DATA_TP = 'DATA_TYPE';
 /**
- * @var string FIELD_DATA_LEN
+ * @var string ORACLE_FIELD_CHAR_LENGTH
  * The field name that stores data length
  */
-const FIELD_DATA_LEN = 'data_length';
+const ORACLE_FIELD_CHAR_LENGTH = 'CHAR_LENGTH';
+/**
+ * @var string ORACLE_FIELD_NUM_PRECISION
+ * The field name that stores data length
+ */
+const ORACLE_FIELD_NUM_PRECISION = 'DATA_PRECISION';
+/**
+ * @var string ORACLE_FIELD_NUM_SCALE
+ * The field name that stores data length
+ */
+const ORACLE_FIELD_NUM_SCALE = 'DATA_SCALE';
 /******************************************
  ************ FUNCTION NAMES **************
  *****************************************/

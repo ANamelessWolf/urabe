@@ -51,7 +51,7 @@ class MYSQLKanojoX extends KanojoX
             $username = $this->user_name;
             $passwd = $this->password;
             $this->connection = mysqli_connect($host, $username, $passwd, $dbname, $port);
-            $this->connection->set_charset(DEFAULT_CHAR_SET);
+            $this->connection->set_charset(self::DEFAULT_CHAR_SET);
             return $this->connection;
         } catch (Exception $e) {
             return error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));

@@ -26,9 +26,10 @@ interface IKanojoX
      * Get the last error message string of a connection
      *
      * @param string|null $sql The last excecuted statement. Can be null
+     * @param ConnectionError $error If the error exists pass the eror
      * @return ConnectionError The connection error 
      */
-    public function error($sql);
+    public function error($sql, $error);
     /**
      * Sends a request to execute a prepared statement with given parameters, 
      * and waits for the result
@@ -54,6 +55,13 @@ interface IKanojoX
      *
      * @return void
      */
-    public function free_result ();
+    public function free_result();
+    /**
+     * Gets the query for selecting the table definition
+     *
+     * @param string $table_name The table name
+     * @return string The table definition selection query
+     */
+    public function get_table_definition_query($table_name);
 }
 ?>

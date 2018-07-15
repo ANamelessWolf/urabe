@@ -1,9 +1,9 @@
 <html>
   <body style="background-color: black">
-		<h1 style="color: white; font-size: 80px; vertical-align: middle;">
+		<p style="color: white; font-size: 80px; vertical-align: middle;">
         <?php
         include_once "../src/ORACLEKanojoX.php";
-        
+
         $kanojo = new ORACLEKanojoX();
         $kanojo->host = "172.25.39.186";
         $kanojo->user_name = "AYESA";
@@ -13,12 +13,11 @@
         $conn = $kanojo->connect();
         if ($conn) {
             $msg = "Connected to ORACLE";
-            // Do some transactions to ORACLE
-            oci_close($conn);
+            $kanojo->close();
         } else
-            $msg = $kanojo->error;
+            $msg = json_encode($kanojo);
         echo $msg;
         ?>
-        </h1>
+        </p>
   </body>
 </html>
