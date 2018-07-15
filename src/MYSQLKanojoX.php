@@ -143,5 +143,22 @@ class MYSQLKanojoX extends KanojoX
             return $stmt->bind_param($tp, $value->variable);
         }
     }
+    /**
+     * Gets the query for selecting the table definition
+     *
+     * @param string $table_name The table name
+     * @return string The table definition selection query
+     */
+    public function get_table_definition_query($table_name)
+    {
+        $fields = PG_FIELD_COL_ORDER . ", " . PG_FIELD_COL_NAME . ", " + PG_FIELD_DATA_TP . ", " .
+            PG_FIELD_CHAR_LENGTH . ", " . PG_FIELD_NUM_PRECISION . ", " . PG_FIELD_NUM_SCALE;
+        if (isset($this->schema)) {
+            $schema = $this->schema;
+            $sql = "SELECT $fields FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` = '$table_name' AND `TABLE_SCHEMA` = '$schema'";
+        } else
+            $sql = "SELECT $fields FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` = '$table_name'";
+        return $sql;
+    }
 }
 ?>

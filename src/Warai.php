@@ -213,6 +213,11 @@ const PRETTY_PRINT_LIGHT = 'Light';
  ************ FIELD NAMES *****************
  *****************************************/
 /**
+ * @var string ORACLE_FIELD_COL_ORDER
+ * The field name that stores the column name
+ */
+const ORACLE_FIELD_COL_ORDER = 'COLUMN_ID';
+/**
  * @var string ORACLE_FIELD_COL_NAME
  * The field name that stores the column name
  */
@@ -237,6 +242,36 @@ const ORACLE_FIELD_NUM_PRECISION = 'DATA_PRECISION';
  * The field name that stores data length
  */
 const ORACLE_FIELD_NUM_SCALE = 'DATA_SCALE';
+/**
+ * @var string PG_FIELD_COL_ORDER
+ * The field name that stores the column name
+ */
+const PG_FIELD_COL_ORDER = 'ordinal_position';
+/**
+ * @var string PG_FIELD_COL_NAME
+ * The field name that stores the column name
+ */
+const PG_FIELD_COL_NAME = 'column_name';
+/**
+ * @var string PG_FIELD_DATA_TP
+ * The field name that stores data type
+ */
+const PG_FIELD_DATA_TP = 'data_type';
+/**
+ * @var string PG_FIELD_CHAR_LENGTH
+ * The field name that stores data length
+ */
+const PG_FIELD_CHAR_LENGTH = 'character_maximum_length';
+/**
+ * @var string PG_FIELD_NUM_PRECISION
+ * The field name that stores data length
+ */
+const PG_FIELD_NUM_PRECISION = 'numeric_scale';
+/**
+ * @var string PG_FIELD_NUM_SCALE
+ * The field name that stores data length
+ */
+const PG_FIELD_NUM_SCALE = 'numeric_precision';
 /******************************************
  ************ FUNCTION NAMES **************
  *****************************************/

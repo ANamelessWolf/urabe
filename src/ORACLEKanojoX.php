@@ -155,14 +155,13 @@ class ORACLEKanojoX extends KanojoX
      */
     public function get_table_definition_query($table_name)
     {
-        $fields = ORACLE_FIELD_COL_NAME+", "+
-        if (isset($this->owner)){
-            $format_query = "SELECT %s, %s, %s FROM ALL_TAB_COLS WHERE TABLE_NAME = '%s' AND OWNER = '%s'";
-            $sql =sprintf($format_query,FIELD_COL_NAME, FIELD_DATA_TP, FIELD_DATA_LEN)
-        }
-        else
-            $format_query = "SELECT %s, %s, %s FROM ALL_TAB_COLS WHERE TABLE_NAME = '%s'";
-
+        $fields = ORACLE_FIELD_COL_ORDER.", ". ORACLE_FIELD_COL_NAME . ", " + ORACLE_FIELD_DATA_TP . ", " .
+            ORACLE_FIELD_CHAR_LENGTH . ", " . ORACLE_FIELD_NUM_PRECISION . ", " . ORACLE_FIELD_NUM_SCALE;
+        if (isset($this->owner)) {
+            $owner = $this->owner;
+            $sql = "SELECT $fields FROM ALL_TAB_COLS WHERE TABLE_NAME = '$table_name' AND OWNER = '$owner'";
+        } else
+            $sql = "SELECT $fields FROM ALL_TAB_COLS WHERE TABLE_NAME = '$table_name'";
         return $sql;
     }
     /**

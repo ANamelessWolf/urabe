@@ -13,6 +13,10 @@ include_once "KanojoX.php";
 class PGKanojoX extends KanojoX
 {
     /**
+     * @var string $schema The database schema used to filter the table definition
+     */
+    public $schema;
+    /**
      * Open a PostgreSQL Database connection
      *
      * @return resource The database connection object
@@ -101,9 +105,9 @@ class PGKanojoX extends KanojoX
                 $result = pg_execute($this->connection, "", $vars);
             } else
                 $result = pg_query($this->connection, $sql);
-            return $result ? $result : $this-> error($sql);
+            return $result ? $result : $this->error($sql);
         } catch (Exception $e) {
-            return $this-> error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+            return $this->error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
         }
     }
     /**
@@ -125,6 +129,23 @@ class PGKanojoX extends KanojoX
             array_push($this->statementsIds, $statement);
             return pg_fetch_assoc($statement);
         }
+    }
+    /**
+     * Gets the query for selecting the table definition
+     *
+     * @param string $table_name The table name
+     * @return string The table definition selection query
+     */
+    public function get_table_definition_query($table_name)
+    {
+        $fields = PG_FIELD_COL_ORDER . ", " . PG_FIELD_COL_NAME . ", " + PG_FIELD_DATA_TP . ", " .
+            PG_FIELD_CHAR_LENGTH . ", " . PG_FIELD_NUM_PRECISION . ", " . PG_FIELD_NUM_SCALE;
+        if (isset($this->schema)) {
+            $schema = $this->schema;
+            $sql = "SELECT $fields FROM information_schema.columns WHERE table_name = '$table_name' AND table_schema = '$schema'";
+        } else
+            $sql = "SELECT $fields FROM information_schema.columns WHERE table_name = '$table_name'";
+        return $sql;
     }
 }
 ?>
