@@ -151,11 +151,11 @@ class MYSQLKanojoX extends KanojoX
      */
     public function get_table_definition_query($table_name)
     {
-        $fields = PG_FIELD_COL_ORDER . ", " . PG_FIELD_COL_NAME . ", " + PG_FIELD_DATA_TP . ", " .
-            PG_FIELD_CHAR_LENGTH . ", " . PG_FIELD_NUM_PRECISION . ", " . PG_FIELD_NUM_SCALE;
+        $fields = MYSQL_FIELD_COL_ORDER . ", " . MYSQL_FIELD_COL_NAME . ", " + MYSQL_FIELD_DATA_TP . ", " .
+            MYSQL_FIELD_CHAR_LENGTH . ", " . MYSQL_FIELD_NUM_PRECISION . ", " . MYSQL_FIELD_NUM_SCALE;
         if (isset($this->schema)) {
             $schema = $this->schema;
-            $sql = "SELECT $fields FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` = '$table_name' AND `TABLE_SCHEMA` = '$schema'";
+            $sql = "SELECT $fields FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` = '$table_name' AND `TABLE_SCHEMA` = '$this->db_name'";
         } else
             $sql = "SELECT $fields FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` = '$table_name'";
         return $sql;

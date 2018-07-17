@@ -266,12 +266,42 @@ const PG_FIELD_CHAR_LENGTH = 'character_maximum_length';
  * @var string PG_FIELD_NUM_PRECISION
  * The field name that stores data length
  */
-const PG_FIELD_NUM_PRECISION = 'numeric_scale';
+const PG_FIELD_NUM_PRECISION = 'numeric_precision';
 /**
  * @var string PG_FIELD_NUM_SCALE
  * The field name that stores data length
  */
-const PG_FIELD_NUM_SCALE = 'numeric_precision';
+const PG_FIELD_NUM_SCALE = 'numeric_scale';
+/**
+ * @var string MYSQL_FIELD_COL_ORDER
+ * The field name that stores the column name
+ */
+const MYSQL_FIELD_COL_ORDER = 'ORDINAL_POSITION';
+/**
+ * @var string MYSQL_FIELD_COL_NAME
+ * The field name that stores the column name
+ */
+const MYSQL_FIELD_COL_NAME = 'COLUMN_NAME';
+/**
+ * @var string MYSQL_FIELD_DATA_TP
+ * The field name that stores data type
+ */
+const MYSQL_FIELD_DATA_TP = 'COLUMN_TYPE';
+/**
+ * @var string MYSQL_FIELD_CHAR_LENGTH
+ * The field name that stores data length
+ */
+const MYSQL_FIELD_CHAR_LENGTH = 'CHARACTER_MAXIMUM_LENGTH';
+/**
+ * @var string MYSQL_FIELD_NUM_PRECISION
+ * The field name that stores data length
+ */
+const MYSQL_FIELD_NUM_PRECISION = 'NUMERIC_PRECISION';
+/**
+ * @var string MYSQL_FIELD_NUM_SCALE
+ * The field name that stores data length
+ */
+const MYSQL_FIELD_NUM_SCALE = 'NUMERIC_SCALE';
 /******************************************
  ************ FUNCTION NAMES **************
  *****************************************/
