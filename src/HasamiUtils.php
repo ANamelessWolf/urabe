@@ -119,4 +119,17 @@ function open_json_file($file_path)
     } else
         return false;
 }
+/**
+ * From the current request body create a JSON object
+ *
+ * @return stdClass The JSON body
+ */
+function get_body_as_json()
+{
+    $body = file_get_contents('php://input');
+    $body = json_decode($body);
+    return $body;
+}
+
+
 ?>

@@ -3,6 +3,7 @@
 include_once "Warai.php";
 include_once "ConnectionError.php";
 include_once "IKanojoX.php";
+include_once "HasamiUtils.php";
 /**
  * Database connection model
  * 
@@ -59,7 +60,25 @@ abstract class KanojoX implements IKanojoX
         $this->statementsIds = array();
         set_error_handler('KanojoX::error_handler');
     }
-
+    /**
+     * Initialize the class with a JSON object
+     *
+     * @param stdClass $body_json The request body as JSON object
+     * @return void
+     */
+    public function init($body_json)
+    {
+        $fields = array("host", "user_name", "password", "port", "db_name");
+        if (isset($body_json)) {
+            foreach ($fields as &$value) {
+                if (isset($body_json->{$value}))
+                    $this->{$value} = $body_json->{$value};
+                else
+                    throw new Exception(sprintf(ERR_INCOMPLETE_BODY, "initialize", join(', ', $fields)));
+            }
+        } else
+            throw new Exception(ERR_BODY_IS_NULL);
+    }
     /**
      * Creates a connection object to or returns false if the connection fails.
      * Errors are save on $this->error property

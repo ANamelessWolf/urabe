@@ -1,23 +1,17 @@
-<html>
-  <body style="background-color: black">
-		<p style="color: white; font-size: 80px; vertical-align: middle;">
-        <?php
-        include_once "../src/ORACLEKanojoX.php";
+<?php
+include_once "../src/ORACLEKanojoX.php";
 
-        $kanojo = new ORACLEKanojoX();
-        $kanojo->host = "172.25.39.186";
-        $kanojo->user_name = "AYESA";
-        $kanojo->password = "4y3542017";
-        $kanojo->port = "1630";
-        $kanojo->db_name = "DBDWHQA";
-        $conn = $kanojo->connect();
-        if ($conn) {
-            $msg = "Connected to ORACLE";
-            $kanojo->close();
-        } else
-            $msg = json_encode($kanojo);
-        echo $msg;
-        ?>
-        </p>
-  </body>
-</html>
+$kanojo = new ORACLEKanojoX();
+$kanojo->init(get_body_as_json());
+$conn = $kanojo->connect();
+$response = (object)array("msg" => "", "status" => false, "error" => "");
+if ($conn)
+    $response->msg = "Connected to ORACLE";
+else {
+    http_response_code(403);
+    $response->msg = "Error connecting to ORACLE. See error for more details.";
+    $response->error = $kanojo->error;
+}
+$kanojo->close();
+echo json_encode($response);
+?>
