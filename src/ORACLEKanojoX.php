@@ -3,7 +3,7 @@ include_once "KanojoX.php";
 /**
  * An ORACLE Connection object
  * 
- * Kanojo means girlfriend in japanase and this class saves the connection data structure used to connect to
+ * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an Oracle database.
  * @version 1.0.0
  * @api Makoto Urabe
@@ -91,8 +91,8 @@ class ORACLEKanojoX extends KanojoX
     /**
      * Get the last error message string of a connection
      *
-     * @param ConnectionError $error If the error exists pass the eror
-     * @param string|null $sql The last excecuted statement. Can be null
+     * @param string|null $sql The last executed statement. Can be null
+     * @param ConnectionError $error If the error exists pass the error
      * @return ConnectionError The connection error 
      */
     public function error($sql, $error = null)
@@ -140,7 +140,7 @@ class ORACLEKanojoX extends KanojoX
     public function fetch_assoc($sql, $variables = null)
     {
         $statement = $this->execute($sql, $variables);
-        if (KanojoX::is_error($statement))
+        if ($this->is_error($statement))
             return $statement;
         else {
             array_push($this->statementsIds, $statement);
@@ -155,7 +155,7 @@ class ORACLEKanojoX extends KanojoX
      */
     public function get_table_definition_query($table_name)
     {
-        $fields = ORACLE_FIELD_COL_ORDER.", ". ORACLE_FIELD_COL_NAME . ", " + ORACLE_FIELD_DATA_TP . ", " .
+        $fields = ORACLE_FIELD_COL_ORDER . ", " . ORACLE_FIELD_COL_NAME . ", " . ORACLE_FIELD_DATA_TP . ", " .
             ORACLE_FIELD_CHAR_LENGTH . ", " . ORACLE_FIELD_NUM_PRECISION . ", " . ORACLE_FIELD_NUM_SCALE;
         if (isset($this->owner)) {
             $owner = $this->owner;

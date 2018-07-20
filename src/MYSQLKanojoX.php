@@ -61,15 +61,20 @@ class MYSQLKanojoX extends KanojoX
      * Get the last error message string of a connection
      *
      * @param string|null $sql The last excecuted statement. Can be null
+     * @param ConnectionError $error If the error exists pass the erorr
      * @return ConnectionError The connection error 
      */
-    public function error($sql)
+    public function error($sql, $error = null)
     {
-        $error = new ConnectionError();
-        $error->code = $this->connection->connect_errno;
-        $error->message = $mysqli->connect_error;
-        $error->sql = $sql;
-        return $error;
+        if (is_null($error)) {
+            $error = new ConnectionError();
+            $error->code = $this->connection->connect_errno;
+            $error->message = $mysqli->connect_error;
+            $error->sql = $sql;
+            return $error;
+        } else
+            $this->error = $error;
+        return $this->error;
     }
     /**
      * Sends a request to execute a prepared statement with given parameters, 

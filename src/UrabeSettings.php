@@ -1,19 +1,26 @@
 <?php
-include_once("Warai.php");
+include "Warai.php";
 /**
- * Urabe web service settings
+ * Urabe application settings
+ *
+ * In this file the application work around can be customized
+ * 
  * @version 1.0.0
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe database connector
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class UrabeSettings
-{
+return (object)array(
     /**
      * @var string Defines the type of parameters to use by the web services.
-     * Available modes URL_PARAM or GET_PARAM or GET_AND_URL_PARAM
+     * Available modes URL_PARAM_MODE or GET_PARAM_MODE or MIX_PARAM_MODE
      */
-    public static $parameter_mode = URL_PARAM;
+    "parameter_mode" => URL_PARAM_MODE,
+    /**
+     * @var bool If sets to true Urabe handles errors as defined in the KanojoX Class
+     */
+    "handle_errors" => true,
+);
+?>
 
-}
 ?>

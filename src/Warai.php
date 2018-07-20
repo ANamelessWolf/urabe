@@ -320,18 +320,18 @@ const F_GET = 'GET_action';
  ************************************/
 
 /**
- * @var string GET_PARAM
+ * @var string GET_PARAM_MODE
  * The type of parameters that are obtains from get variables
  */
-const GET_PARAM = 'GET_PARAMETERS';
+const GET_PARAM_MODE = 'GET_VARS';
 /**
- * @var string URL_PARAM
+ * @var string URL_PARAM_MODE
  * The type of parameters that are obtains from url parameters
  */
-const URL_PARAM = 'URL_PARAMETERS';
+const URL_PARAM_MODE = 'URL_PARAMETERS';
 /**
- * @var string BOTH_PARAMS
+ * @var string MIX_PARAM_MODE
  * Use get variables and url parameters.
  */
-const GET_AND_URL_PARAM = "BOTH_PARAMS";
+const GET_AND_URL_PARAM = "MIXED";
 ?>

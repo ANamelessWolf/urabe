@@ -1,21 +1,17 @@
 <?php
-include_once "Warai.php";
+
 /**
  * Field Definition Class
  * 
- * This class encapsulates a table field. Each table field is asociated with a the table field name and the table field data type.
- * This class treats the database fields types in three types; strings, dates and numbers.
+ * This class encapsulates a table field definition. 
+ * Each table field is associated to a column name and the column data type.
+ * This class treats the database fields types in three types; text, date and numeric.
  * @api Makoto Urabe Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
 class FieldDefinition
 {
-    /**
-     * @var string STRING_FORMAT
-     * The format that saves the JSON data with a string format.
-     */
-    const STRING_FORMAT = '"%s" : "%s"';
     /**
      * @var string INTEGER_FORMAT
      * The format that saves the JSON data with a number format.
@@ -27,26 +23,41 @@ class FieldDefinition
      * Saves the date in JSON format and in the database format.
      */
     const DATE_FORMAT = '"%s" : "%s", "%s_db" : "%s"';
+
     /**
-     * @var string The field name
+     * @var int The column index
      */
-    public $field_name;
+    public $column_index;
     /**
-     * @var string The field data type
+     * @var string The column name
+     */
+    public $column_name;
+    /**
+     * @var string The column alias used in the JSON key value pair.
+     * By default the data alias is the column name
+     */
+    public $data_alias;
+
+    /**
+     * @var string The column data type
      */
     public $data_type;
+
+
     /**
+     * Initialize a new instance of a Field Definition class
      *
-     * Initialize a new instance of a Field Defintion class
-     *
+     * @param string $index The field name
      * @param string $field The field name
      * @param string $data_type The field data type
      */
-    public function __construct($field, $data_type)
+    public function __construct($index, $column, $data_type)
     {
-        $this->field_name = $field;
+        $this->column_index = $column;
+        $this->field_name = $column;
         $this->data_type = $data_type;
     }
+
     /**
      * Gets the value from a string in the row definition data type
      *

@@ -1,13 +1,12 @@
 <?php 
 
-include_once "Warai.php";
-include_once "ConnectionError.php";
-include_once "IKanojoX.php";
-include_once "HasamiUtils.php";
+include "IKanojoX.php";
+include "HasamiUtils.php";
+include "ConnectionError.php";
 /**
  * Database connection model
  * 
- * Kanojo means girlfriend in japanase and this class saves the connection data structure used to connect to
+ * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an the database.
  * @version 1.0.0
  * @api Makoto Urabe database connector
@@ -17,10 +16,15 @@ include_once "HasamiUtils.php";
 abstract class KanojoX implements IKanojoX
 {
     /**
-     * @var ConnectionError $error 
+     * @var array $error 
      * The last found error.
      */
-    public $error;
+    public static $errors;
+    /**
+     * @var array $settings 
+     * Access the application settings.
+     */
+    public static $settings;
     /**
      * @var string $host Can be either a host name or an IP address.
      */
@@ -58,7 +62,10 @@ abstract class KanojoX implements IKanojoX
     public function __construct()
     {
         $this->statementsIds = array();
-        set_error_handler('KanojoX::error_handler');
+        KanojoX::$errors = array();
+        KanojoX::$settings = require "UrabeSettings.php";
+        if (KanojoX::$settings->handle_errors)
+            set_error_handler('KanojoX::error_handler');
     }
     /**
      * Initialize the class with a JSON object
@@ -103,6 +110,18 @@ abstract class KanojoX implements IKanojoX
         }
     }
     /**
+     * Gets the last executed error
+     *
+     * @return ConnectionError The last executed error
+     */
+    public function get_last_error()
+    {
+        $errors = KanojoX::$errors;
+        $index = sizeof($errors) - 1;
+        return $index >= 0 ? $errors[0] : null;
+    }
+
+    /**
      * This functions converts oracle warnings in to exceptions
      *
      * @param int $err_no Contains the level of the error raised, as an integer. 
@@ -114,25 +133,15 @@ abstract class KanojoX implements IKanojoX
      * User error handler must not modify error context. 
      * @return bool Returns a string containing the previously defined error handler.
      */
-    public function error_handler($err_no, $err_msg, $err_file, $err_line, $err_context)
+    public static function error_handler($err_no, $err_msg, $err_file, $err_line, $err_context)
     {
         $error = new ConnectionError();
         $error->code = $err_no;
         $error->message = $err_msg;
         $error->file = $err_file;
         $error->line = $err_line;
-        $err_context = $err_context;
-        return $this->error(null, $error);
-    }
-    /**
-     * Check if the class is of type ConnectionError
-     *
-     * @param stdClass $class The Kanojo class
-     * @return boolean return True if the class is of type ConnectionError
-     */
-    public static function is_error($class)
-    {
-        return get_class($class) == 'ConnectionError';
+        $error->err_context = $err_context;
+        array_push(KanojoX::$errors, $error);
     }
     /*********************
      * Interface Methods *

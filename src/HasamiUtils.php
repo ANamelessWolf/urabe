@@ -1,8 +1,8 @@
 <?php
-include_once("HasamiWrapper.php");
-include_once("QueryResult.php");
-include_once("JsonPrettyPrint.php");
-include_once("JsonPrettyPrintLight.php");
+// include_once("HasamiWrapper.php");
+// include_once("QueryResult.php");
+// include_once("JsonPrettyPrint.php");
+// include_once("JsonPrettyPrintLight.php");
 /******************************************
  ************ Default queries *************
  *****************************************/

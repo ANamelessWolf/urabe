@@ -1,14 +1,14 @@
 <?php
-include_once "KanojoX.php";
-include_once "Warai.php";
-include_once "HasamiUtils.php";
+include_once "ORACLEKanojoX.php";
+include_once "PGKanojoX.php";
+include_once "MYSQLKanojoX.php";
 include_once "FieldDefinition.php";
 include_once "MysteriousParser.php";
 include_once "QueryResult.php";
 /**
  * A Database connection manager
  * 
- * Urabe is the main protagonist in the Nazo no Kanajo X, this class manage and wraps all transactions to the database.
+ * Urabe is the main protagonist in the Nazo no Kanojo X, this class manage and wraps all transactions to the database.
  * Given the Kanojo profile can connect to ORACLE, PG and MySQL
  * @version 1.0.0
  * @api Makoto Urabe
@@ -17,16 +17,6 @@ include_once "QueryResult.php";
  */
 class Urabe
 {
-    /**
-     * @var string FIELD_COLUMN
-     * The name of the field column name from the table INFORMATION_SCHEMA .
-     */
-    const FIELD_COLUMN = 'COLUMN_NAME';
-    /**
-     * @var string FIELD_DATA_TYPE
-     * The name of the field data type from the table INFORMATION_SCHEMA .
-     */
-    const FIELD_DATA_TYPE = 'DATA_TYPE';
     /**
      * @var KanojoX $connector 
      * Defines the database connector
@@ -53,10 +43,10 @@ class Urabe
      */
     public function __construct($connector)
     {
-        if (KanojoX::is_error($statement)) {
+        if (isset($connector)) {
             $this->connector = $connector;
             $this->connector->connect();
-            if ($this->connection) {
+            if ($this->connector) {
                 $this->is_connected = true;
                 $this->database_name = $this->connector->db_name;
             } else {
@@ -74,22 +64,20 @@ class Urabe
      */
     private function get_db_connection()
     {
-        return $this->connector->connection;
+        return $this->connector->connector;
     }
     /**
-     * Gets the table defintion on an array
+     * Gets the table definition on an array
      *
      * @param string $table_name The name of the table
-     * @throws Exception An excpetion is thrown when the table doesn't exists.
-     * @return FieldDefintion[] The row definition of the table fields.
+     * @throws Exception An exception is thrown when the table doesn't exists.
+     * @return FieldDefinition[] The row definition of the table fields.
      */
     function get_table_definition($table_name)
     {
-        $format_query = "SELECT %s, %s, %s FROM all_tab_cols WHERE table_name = '%s'";
-        $query = sprintf($format_query, FIELD_COL_NAME, FIELD_DATA_TP, FIELD_DATA_LEN, $table_name);
-        $result = $this->select($query, FieldDefinition::get_table_def_parser(), false);
+        $result = $this->select($this->connector->get_table_definition_query($table_name), null, false);
         if ($result->query_result)
-            return FieldDefinition::parse_result($result->result);
+            return $result;
         else
             return array();
     }
@@ -108,14 +96,9 @@ class Urabe
         $query_result->query = $query;
         try {
             if ($this->is_connected) {
-                $stid = $query_result->oci_parse($this->connection);
-                array_push($this->stids, $stid);
-                if ($stid)
-                    $query_result->query_result = $query_result->fetch($stid, $row_parser);
-                else
-                    throw new Exception($query_result->error); //An error is found
+                $query_result->query_result = $this->connector->fetch_assoc($sql, null);
             } else
-                throw new Exception($this->connection->error);
+                throw new Exception($this->connector->error);
         } catch (Exception $e) {
             $query_result->error = $e->getMessage();
         }
@@ -362,13 +345,8 @@ class Urabe
      */
     public function close()
     {
-        if ($this->is_connected) {
-            foreach ($stids as &$stid)
-                oci_free_statement($stid);
-            oci_close($this->connection);
-            $this->is_connected = false;
-            $this->error = ERR_CONNECTION_CLOSED;
-        }
+        if (isset($this->connector))
+            $this->connector->close();
     }
     /**
      * Check if a table exists on the database

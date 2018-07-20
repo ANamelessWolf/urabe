@@ -3,7 +3,7 @@ include_once "KanojoX.php";
 /**
  * A PostgreSQL Connection object
  * 
- * Kanojo means girlfriend in japanase and this class saves the connection data structure used to connect to
+ * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an PostgreSQL database.
  * @version 1.0.0
  * @api Makoto Urabe
@@ -65,9 +65,10 @@ class PGKanojoX extends KanojoX
      * Get the last error message string of a connection
      *
      * @param string|null $sql The last excecuted statement. Can be null
+     * @param ConnectionError $error If the error exists pass the erorr
      * @return ConnectionError The connection error 
      */
-    public function error($sql)
+    public function error($sql, $error = null)
     {
         /**
          * Posssible errors
@@ -80,10 +81,13 @@ class PGKanojoX extends KanojoX
          * 6 = PGSQL_NONFATAL_ERROR
          * 7 = PGSQL_FATAL_ERROR
          */
-        $this->error = new ConnectionError();
-        $this->error->code = pg_last_error($this->connection);
-        $this->error->message = pg_result_status($this->connection);
-        $this->error->sql = $sql;
+        if (is_null($error)) {
+            $this->error = new ConnectionError();
+            $this->error->code = pg_last_error($this->connection);
+            $this->error->message = pg_result_status($this->connection);
+            $this->error->sql = $sql;
+        } else
+            $this->error = $error;
         return $this->error;
     }
     /**
