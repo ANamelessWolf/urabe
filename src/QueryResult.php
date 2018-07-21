@@ -46,7 +46,7 @@ class QueryResult
         return json_encode($this);
     }
     /**
-     * Prepare an Oracle sentence to be excecuted
+     * Prepare an Oracle sentence to be executed
      *
      * @param resource $conn The Oracle connection object
      * @return resource|bool The Oracle sentence or False if an error is found. 

@@ -59,7 +59,7 @@ class ORACLEKanojoX extends KanojoX
         }
     }
     /**
-     * This function builds a connection string to connecto to ORACLE
+     * This function builds a connection string to connect to ORACLE
      * by default is connected via SID
      *
      * @return string The connection string
@@ -98,11 +98,13 @@ class ORACLEKanojoX extends KanojoX
     public function error($sql, $error = null)
     {
         if (is_null($error)) {
+           //echo $this->connection;
             $e = oci_error($this->connection);
             $this->error = new ConnectionError();
             $this->error->code = $e[self::ERR_CODE];
             $this->error->message = $e[self::ERR_MSG];
             $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
+            var_dump($e);
         } else
             $this->error = $error;
         return $this->error;
@@ -118,13 +120,16 @@ class ORACLEKanojoX extends KanojoX
     public function execute($sql, $variables = null)
     {
         try {
+            if (!isset($this->connection))
+                throw new Exception(ERR_NOT_CONNECTED);
             $statement = $this->parse($this->connection, $sql);
+            var_dump($this->connection);
             if (isset($variables) && is_array($variables))
                 $this->bind($statement, $variables);
             $ok = oci_execute($statement);
             return $ok ? $statement : $this->error($sql);
         } catch (Exception $e) {
-            return $this->error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+            throw new Exception(sprintf(ERR_BAD_QUERY, $sql, $e->getMessage()));
         }
     }
     /**

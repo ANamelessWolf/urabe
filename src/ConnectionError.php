@@ -34,5 +34,9 @@ class ConnectionError
      * @var array The error context
      */
     public $context;
+    /**
+     * @var array The generated stack trace
+     */
+    public $stack_trace;
 }
 ?>

@@ -66,6 +66,8 @@ abstract class KanojoX implements IKanojoX
         KanojoX::$settings = require "UrabeSettings.php";
         if (KanojoX::$settings->handle_errors)
             set_error_handler('KanojoX::error_handler');
+        if (KanojoX::$settings->handle_errors)
+            set_exception_handler('KanojoX::exception_handler');
     }
     /**
      * Initialize the class with a JSON object
@@ -122,7 +124,7 @@ abstract class KanojoX implements IKanojoX
     }
 
     /**
-     * This functions converts oracle warnings in to exceptions
+     * Handles application errors
      *
      * @param int $err_no Contains the level of the error raised, as an integer. 
      * @param string $err_msg The error message, as a string. 
@@ -142,6 +144,24 @@ abstract class KanojoX implements IKanojoX
         $error->line = $err_line;
         $error->err_context = $err_context;
         array_push(KanojoX::$errors, $error);
+    }
+    /**
+     * Handles application exceptions
+     *
+     * @param [type] $exception
+     * @return void
+     */
+    public static function exception_handler($exception)
+    {
+        $error = new ConnectionError();
+        $error->code = $exception->getCode();
+        $error->message = $exception->getMessage();
+        $error->file = $exception->getFile();
+        $error->line = $exception->getLine();
+        if (KanojoX::$settings->enable_stack_trace)
+            $error->stack_trace = $exception->getTraceAsString();
+        $response =array("message"=>$exception->getMessage());            
+       json_encode($response);
     }
     /*********************
      * Interface Methods *

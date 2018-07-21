@@ -71,6 +71,11 @@ const ERR_BAD_CONNECTION = 'The database connection is not valid.\n%s';
  */
 const ERR_CONNECTION_CLOSED = 'The connection to the database is closed.';
 /**
+ * @var string ERR_NOT_CONNECTED
+ * The error message sent when the KanojoX connector is not connected.
+ */
+const ERR_NOT_CONNECTED = 'No connection to the database, did you use connect()?';
+/**
  * @var string ERR_INCOMPLETE_BODY
  * The error message sent when the the body is missing data.
  */
