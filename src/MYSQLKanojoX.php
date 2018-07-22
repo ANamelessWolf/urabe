@@ -25,7 +25,7 @@ class MYSQLKanojoX extends KanojoX
     public function close()
     {
         $this->free_result();
-        return $this->connection->close();
+        return mysqli_close($this->connection);
     }
     /**
      * Frees the memory associated with a result
@@ -51,8 +51,9 @@ class MYSQLKanojoX extends KanojoX
             $username = $this->user_name;
             $passwd = $this->password;
             $this->connection = mysqli_connect($host, $username, $passwd, $dbname, $port);
-            $this->connection->set_charset(self::DEFAULT_CHAR_SET);
+            mysql_set_charset(self::DEFAULT_CHAR_SET, $this->connection);
             return $this->connection;
+
         } catch (Exception $e) {
             return error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
         }
@@ -69,7 +70,7 @@ class MYSQLKanojoX extends KanojoX
         if (is_null($error)) {
             $error = new ConnectionError();
             $error->code = $this->connection->connect_errno;
-            $error->message = $mysqli->connect_error;
+            $error->message = $this->connection->error;
             $error->sql = $sql;
             return $error;
         } else
@@ -87,13 +88,20 @@ class MYSQLKanojoX extends KanojoX
     public function execute($sql, $variables = null)
     {
         try {
-            $statement = $this->parse($sql);
-            if (isset($variables) && is_array($variables))
-                $this->bind($statement, $variables);
-            $ok = $statement->execute();
-            return $ok ? $statement : error($sql);
+            if (!isset($this->connection))
+                throw new Exception(ERR_NOT_CONNECTED);
+            $statement = $this->parse($this->connection, $sql);
+
+            if ($statement) {
+                if (isset($variables) && is_array($variables))
+                    $this->bind($statement, $variables);
+                $ok = $statement->execute();
+                return $ok ? $statement : $this->error($sql);
+            } else {
+                return $this->error($sql);
+            }
         } catch (Exception $e) {
-            return error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+            throw new Exception($e->getMessage());
         }
     }
     /**
@@ -109,8 +117,9 @@ class MYSQLKanojoX extends KanojoX
     public function fetch_assoc($sql, $variables = null)
     {
         $statement = $this->execute($sql, $variables);
-        if (KanojoX::is_error($statement))
-            return $statement;
+        $class = get_class($statement);
+        if ($class == CLASS_ERR)
+            throw new Exception($statement->message, $statement->code);
         else {
             array_push($this->statementsIds, $statement);
             return $statement->fetch_assoc();
@@ -125,7 +134,7 @@ class MYSQLKanojoX extends KanojoX
      */
     private function parse($link, $sql)
     {
-        return $mysqli->prepare($sql);
+        return $this->connection->prepare($sql);
     }
     /**
      * Binds a PHP variable to an Oracle placeholder

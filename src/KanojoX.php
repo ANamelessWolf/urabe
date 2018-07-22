@@ -3,6 +3,7 @@
 include "IKanojoX.php";
 include "HasamiUtils.php";
 include "ConnectionError.php";
+include "UrabeResponse.php";
 /**
  * Database connection model
  * 
@@ -148,20 +149,25 @@ abstract class KanojoX implements IKanojoX
     /**
      * Handles application exceptions
      *
-     * @param [type] $exception
+     * @param exception $exception The generated exeption
      * @return void
      */
     public static function exception_handler($exception)
     {
+        http_response_code(400);
+
         $error = new ConnectionError();
         $error->code = $exception->getCode();
         $error->message = $exception->getMessage();
         $error->file = $exception->getFile();
         $error->line = $exception->getLine();
-        if (KanojoX::$settings->enable_stack_trace)
-            $error->stack_trace = $exception->getTraceAsString();
-        $response =array("message"=>$exception->getMessage());            
-       json_encode($response);
+
+        $response = new UrabeResponse();
+        $response->error = $error->get_exception_error();
+        echo json_encode($response->get_exception_response(
+            $exception->getMessage(),
+            KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
+        ));
     }
     /*********************
      * Interface Methods *

@@ -8,6 +8,14 @@
  * @copyright 2015-2020 Nameless Studios
  */
 /***************************************
+ *********** Class Names ***************
+ ***************************************/
+/**
+ * @var string CLASS_ERR
+ * The class names used for application errors
+ */
+const CLASS_ERR = 'ConnectionError';
+/***************************************
  **************** Errors ***************
  ***************************************/
 /**
@@ -162,6 +170,16 @@ const CAP_EXTRACT = 'Extract';
  */
 const NODE_RESULT = 'result';
 /**
+ * @var string NODE_SIZE
+ * The node name that saves the result size
+ */
+const NODE_SIZE = 'size';
+/**
+ * @var string NODE_MSG
+ * The node name to save the response message
+ */
+const NODE_MSG = 'message';
+/**
  * @var string NODE_QUERY
  * The node name that saves the transaction query
  */
@@ -177,6 +195,11 @@ const NODE_QUERY_RESULT = 'query_result';
  */
 const NODE_ERROR = 'error';
 /**
+ * @var string NODE_ERROR
+ * The node name that saves the error context
+ */
+const NODE_ERROR_CONTEXT = 'err_context';
+/**
  * @var string NODE_FIELDS
  * The node name that saves the table field definition
  */
@@ -186,6 +209,21 @@ const NODE_FIELDS = 'fields';
  * The node name that saves an element key
  */
 const NODE_KEY = 'key';
+/**
+ * @var string NODE_CODE
+ * The node name that saves the number code
+ */
+const NODE_CODE = 'code';
+/**
+ * @var string NODE_FILE
+ * The node name that saves the file path
+ */
+const NODE_FILE = 'file';
+/**
+ * @var string NODE_LINE
+ * The node name that saves the file line
+ */
+const NODE_LINE = 'line';
 /****************************************
  ************ URL PARAMS KEYS ************
  *****************************************/

@@ -33,10 +33,26 @@ class ConnectionError
     /**
      * @var array The error context
      */
-    public $context;
+    public $err_context;
     /**
-     * @var array The generated stack trace
+     * Formats an exception error
+     *
+     * @return array The exception error is a mixed array
      */
-    public $stack_trace;
+    public function get_exception_error()
+    {
+        $err_context = array();
+        foreach (KanojoX::$errors as &$error)
+            array_push(
+            $err_context,
+            array(NODE_ERROR => array(
+                NODE_CODE => $error->code,
+                NODE_FILE => $error->file,
+                NODE_LINE => $error->line,
+                NODE_ERROR_CONTEXT => $error->err_context
+            ))
+        );
+        return array(NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+    }
 }
 ?>
