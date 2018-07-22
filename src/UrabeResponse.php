@@ -41,7 +41,7 @@ class UrabeResponse
      */
     public function get_exception_response($msg, $stack_trace = null)
     {
-        return (object)(array(NODE_MSG => $msg, NODE_RESULT => array(), NODE_SIZE => 0, NODE_ERROR => array($this->error)));
+        return (object)(array(NODE_MSG => $msg, NODE_RESULT => array(), NODE_SIZE => 0, NODE_ERROR => $this->error));
     }
 }
 ?>

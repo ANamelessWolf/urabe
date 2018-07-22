@@ -15,6 +15,11 @@
  * The class names used for application errors
  */
 const CLASS_ERR = 'ConnectionError';
+/**
+ * @var string CLASS_SQL_EXC
+ * The class names used for sql exceptions
+ */
+const CLASS_SQL_EXC = 'UrabeSQLException';
 /***************************************
  **************** Errors ***************
  ***************************************/
@@ -37,7 +42,7 @@ const ERR_BAD_RESPONSE = 'The web service returns a bad response';
  * @var string ERR_BAD_QUERY
  * The error message sent when a bad query is executed.
  */
-const ERR_BAD_QUERY = 'Bad query, "%s". Details: %s';
+const ERR_BAD_QUERY = 'Bad query: %s';
 /**
  * @var string ERR_EMPTY_QUERY
  * The error message sent when a query is null or empty

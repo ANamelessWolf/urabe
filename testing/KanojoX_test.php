@@ -33,19 +33,13 @@ else {
 if (isset($kanojo)) {
     $sql = $body->sql;
     //2: Initialize the connection data
- //   $kanojo->init($body);
+    $kanojo->init($body->connection);
     //3: Connect to the Database
-    //$conn = $kanojo->connect();
+    $conn = $kanojo->connect();
 
-    while ($row = $kanojo->fetch_assoc($sql)) {
-
-        foreach ($row as $item) {
-    //        echo "    <td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
-        }
-
-    }
-    $response->error = $kanojo->get_last_error();
+   $row = $kanojo->fetch_assoc($sql);
+  //  $response->error = $kanojo->get_last_error();
     
-    //echo json_encode($response);
+    echo json_encode($row);
 }
 ?>

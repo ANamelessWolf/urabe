@@ -33,7 +33,26 @@ class ConnectionError
     /**
      * @var array The error context
      */
-    public $err_context;
+    private $err_context;
+    /**
+     * Gets the error context if the urabe settings allows
+     * to print error settings
+     *
+     * @return mixed The error context
+     */
+    public function get_err_context()
+    {
+        return KanojoX::$settings->show_error_context ? $this->err_context : null;
+    }
+    /**
+     * Sets the error context
+     * @param mixed $value The error context
+     * @return void
+     */
+    public function set_err_context($value)
+    {
+        return $this->err_context = $value;
+    }
     /**
      * Formats an exception error
      *
@@ -42,17 +61,27 @@ class ConnectionError
     public function get_exception_error()
     {
         $err_context = array();
-        foreach (KanojoX::$errors as &$error)
-            array_push(
-            $err_context,
-            array(NODE_ERROR => array(
+
+        foreach (KanojoX::$errors as &$error) {
+            $context = is_null($error->sql) ? array(
+                NODE_MSG => $error->message,
                 NODE_CODE => $error->code,
                 NODE_FILE => $error->file,
                 NODE_LINE => $error->line,
-                NODE_ERROR_CONTEXT => $error->err_context
-            ))
-        );
-        return array(NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+                NODE_ERROR_CONTEXT => $error->get_err_context()
+            ) : array(
+                NODE_CODE => $error->code,
+                NODE_FILE => $error->file,
+                NODE_LINE => $error->line,
+                NODE_ERROR_CONTEXT => $error->get_err_context(),
+                NODE_QUERY => $error->sql
+            );
+            array_push($err_context, array(NODE_ERROR => $context));
+        }
+        if (isset($this->sql))
+            return array(NODE_QUERY =>$this->sql, NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+        else
+            return array(NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
     }
 }
 ?>

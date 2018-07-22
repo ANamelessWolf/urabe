@@ -1,5 +1,5 @@
 <?php 
-
+include "UrabeSQLException.php";
 include "IKanojoX.php";
 include "HasamiUtils.php";
 include "ConnectionError.php";
@@ -18,7 +18,7 @@ abstract class KanojoX implements IKanojoX
 {
     /**
      * @var array $error 
-     * The last found error.
+     * The application current errors
      */
     public static $errors;
     /**
@@ -143,7 +143,7 @@ abstract class KanojoX implements IKanojoX
         $error->message = $err_msg;
         $error->file = $err_file;
         $error->line = $err_line;
-        $error->err_context = $err_context;
+        $error->set_err_context($err_context);
         array_push(KanojoX::$errors, $error);
     }
     /**
@@ -155,12 +155,15 @@ abstract class KanojoX implements IKanojoX
     public static function exception_handler($exception)
     {
         http_response_code(400);
+        $class = get_class($exception);
 
         $error = new ConnectionError();
         $error->code = $exception->getCode();
         $error->message = $exception->getMessage();
         $error->file = $exception->getFile();
         $error->line = $exception->getLine();
+        if ($class == CLASS_SQL_EXC)
+            $error->sql = $exception->sql;
 
         $response = new UrabeResponse();
         $response->error = $error->get_exception_error();
@@ -206,8 +209,9 @@ abstract class KanojoX implements IKanojoX
      * and waits for the result
      *
      * @param string $sql The SQL Statement
-     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
-     * @return stdClass A query result resource on success or FALSE on failure.
+     * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
+     * @throws Exception En Exception is raised if the connection is null
+     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
      */
     public function execute($sql, $variables = null)
     {

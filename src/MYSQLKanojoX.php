@@ -51,7 +51,8 @@ class MYSQLKanojoX extends KanojoX
             $username = $this->user_name;
             $passwd = $this->password;
             $this->connection = mysqli_connect($host, $username, $passwd, $dbname, $port);
-            mysql_set_charset(self::DEFAULT_CHAR_SET, $this->connection);
+            if ($this->connection)
+                $this->connection->set_charset(self::DEFAULT_CHAR_SET);
             return $this->connection;
 
         } catch (Exception $e) {
@@ -82,21 +83,19 @@ class MYSQLKanojoX extends KanojoX
      * and waits for the result
      *
      * @param string $sql The SQL Statement
-     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
-     * @return resource Returns a statement object or FALSE if an error occurred. 
+     * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
+     * @throws Exception En Exception is raised if the connection is null
+     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
      */
     public function execute($sql, $variables = null)
     {
         try {
-            if (!isset($this->connection))
+            if (!$this->connection)
                 throw new Exception(ERR_NOT_CONNECTED);
-            $statement = $this->parse($this->connection, $sql);
-
+            $statement = $this->parse($this->connection, $sql, $variables);
             if ($statement) {
-                if (isset($variables) && is_array($variables))
-                    $this->bind($statement, $variables);
                 $ok = $statement->execute();
-                return $ok ? $statement : $this->error($sql);
+                return $ok ? $ok : $this->error($sql);
             } else {
                 return $this->error($sql);
             }
@@ -112,29 +111,45 @@ class MYSQLKanojoX extends KanojoX
      *
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @throws Exception An Exception is thrown parsing the SQL statement or by connection error
      * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
      * */
     public function fetch_assoc($sql, $variables = null)
     {
-        $statement = $this->execute($sql, $variables);
+        $rows = array();
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
+        $statement = $this->parse($this->connection, $sql, $variables);
         $class = get_class($statement);
         if ($class == CLASS_ERR)
-            throw new Exception($statement->message, $statement->code);
+            throw (!is_null($statement->sql) ? new UrabeSQLException($statement) : new Exception($statement->message, $statement->code));
         else {
             array_push($this->statementsIds, $statement);
-            return $statement->fetch_assoc();
+            $ok = $statement->execute();
+            if ($ok) {
+                $result = $statement->get_result();
+                while ($row = $result->fetch_assoc())
+                    array_push($rows, $row);
+            } else
+                throw new UrabeSQLException($statement);
         }
+        return $rows;
     }
     /**
      * Prepares sql_text using connection and returns the statement identifier, 
      * which can be used with execute(). 
      *
      * @param string $sql The SQL text statement
-     * @return mysqli Returns a statement handle on success, or FALSE on error. 
+     * @return mysqli_stmt Returns a statement handle on success, or FALSE on error. 
      */
-    private function parse($link, $sql)
+    private function parse($link, $sql, $variables = null)
     {
-        return $this->connection->prepare($sql);
+        if (!$link)
+            throw new Exception(ERR_NOT_CONNECTED);
+        $statement = $link->prepare($sql);
+        if ($statement && isset($variables) && is_array($variables))
+            $this->bind($statement, $variables);
+        return $statement ? $statement : $this->error($sql);
     }
     /**
      * Binds a PHP variable to an Oracle placeholder

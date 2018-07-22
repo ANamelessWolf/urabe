@@ -21,14 +21,16 @@ return (object)array(
      */
     "handle_errors" => true,
     /**
+     * @var bool If sets to true and Urabe handles errors the error context is printed
+     */
+    "show_error_context" => true,
+    /**
      * @var bool If sets to true Urabe handles exceptions as defined in the KanojoX Class
      */
     "handle_exceptions" => true,
-        /**
+    /**
      * @var bool If sets to true and Urabe handles exceptions the stack trace will be added to the response
      */
-    "enable_stack_trace" => false,
+    "enable_stack_trace" => false
 );
-?>
-
 ?>

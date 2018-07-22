@@ -95,8 +95,9 @@ class PGKanojoX extends KanojoX
      * and waits for the result
      *
      * @param string $sql The SQL Statement
-     * @param array $variables The colon-prefixed bind variables placeholder used in the statement. 
-     * @return resource A query result resource on success or FALSE on failure.
+     * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
+     * @throws Exception En Exception is raised if the connection is null
+     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
      */
     public function execute($sql, $variables = null)
     {
