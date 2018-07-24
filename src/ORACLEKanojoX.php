@@ -197,13 +197,6 @@ class ORACLEKanojoX extends KanojoX
      * Prepares sql_text using connection and returns the statement identifier, 
      * which can be used with oci_execute(). 
      *
-     * @param string $sql The SQL text statement
-     * @return resource Returns a statement handle on success, or FALSE on error. 
-     */
-    /**
-     * Prepares sql_text using connection and returns the statement identifier, 
-     * which can be used with oci_execute(). 
-     *
      * @param resource $connection ORACLE active connection
      * @param string $sql The SQL text statement
      * @return resource Returns a statement handle on success, 

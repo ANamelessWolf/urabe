@@ -48,6 +48,9 @@ class PGKanojoX extends KanojoX
      */
     public function close()
     {
+        $this->free_result();
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
         return pg_close($this->connection);
     }
     /**
@@ -64,14 +67,14 @@ class PGKanojoX extends KanojoX
     /**
      * Get the last error message string of a connection
      *
-     * @param string|null $sql The last excecuted statement. Can be null
-     * @param ConnectionError $error If the error exists pass the erorr
+     * @param string|null $sql The last executed statement. Can be null
+     * @param ConnectionError $error If the error exists pass the error
      * @return ConnectionError The connection error 
      */
     public function error($sql, $error = null)
     {
         /**
-         * Posssible errors
+         * Possible errors
          * 0 = PGSQL_EMPTY_QUERY
          * 1 = PGSQL_COMMAND_OK
          * 2 = PGSQL_TUPLES_OK
@@ -118,22 +121,34 @@ class PGKanojoX extends KanojoX
     /**
      * Returns an associative array containing the next result-set row of a 
      * query. Each array entry corresponds to a column of the row. 
-     * This function is typically called in a loop until it returns FALSE, 
-     * indicating no more rows exist.
      *
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
-     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * @throws Exception An Exception is thrown parsing the SQL statement or by connection error
+     * @return array Returns an associative array. 
      * */
     public function fetch_assoc($sql, $variables = null)
     {
-        $statement = $this->execute($this->connection, $sql, $variables);
-        if (KanojoX::is_error($statement))
-            return $statement;
-        else {
-            array_push($this->statementsIds, $statement);
-            return pg_fetch_assoc($statement);
+        $rows = array();
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
+        if (isset($variables) && is_array($variables)) {
+            $statement = pg_prepare($this->connection, "", $sql);
+            $vars = array();
+            foreach ($variables as &$value)
+                array_push($vars, $value->variable);
+            $ok = pg_execute($this->connection, "", $vars);
+        } else
+            $ok = pg_query($this->connection, $sql);
+        //fetch result
+        if ($ok) {
+            while ($row = pg_fetch_assoc ($ok))
+                array_push($rows, $row);
+        } else {
+            $err = $this->error($sql, $this->get_error($statement));
+            throw new UrabeSQLException($err);
         }
+        return $rows;
     }
     /**
      * Gets the query for selecting the table definition
@@ -143,7 +158,7 @@ class PGKanojoX extends KanojoX
      */
     public function get_table_definition_query($table_name)
     {
-        $fields = PG_FIELD_COL_ORDER . ", " . PG_FIELD_COL_NAME . ", " + PG_FIELD_DATA_TP . ", " .
+        $fields = PG_FIELD_COL_ORDER . ", " . PG_FIELD_COL_NAME . ", " . PG_FIELD_DATA_TP . ", " .
             PG_FIELD_CHAR_LENGTH . ", " . PG_FIELD_NUM_PRECISION . ", " . PG_FIELD_NUM_SCALE;
         if (isset($this->schema)) {
             $schema = $this->schema;
@@ -152,5 +167,6 @@ class PGKanojoX extends KanojoX
             $sql = "SELECT $fields FROM information_schema.columns WHERE table_name = '$table_name'";
         return $sql;
     }
+
 }
 ?>
