@@ -25,6 +25,8 @@ class MYSQLKanojoX extends KanojoX
     public function close()
     {
         $this->free_result();
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
         return mysqli_close($this->connection);
     }
     /**

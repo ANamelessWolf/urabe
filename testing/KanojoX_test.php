@@ -12,18 +12,23 @@ include_once "../src/MYSQLKanojoX.php";
  * @copyright 2015-2020 Nameless Studios
  */
 //Test Response
+$result = new UrabeResponse();
 $response = (object)array(
-    "msg" => "",
-    "status" => true,
+    "fetch_assoc" => "",
+    "table_definition" => "",
     "error" => ""
 );
 //0: Reads the body
 $body = get_body_as_json();
 //1: Selects the driver connector
-if ($body->driver == "ORACLE")
+if ($body->driver == "ORACLE"){
     $kanojo = new ORACLEKanojoX();
-else if ($body->driver == "PG")
+    $kanojo->owner = $body->owner;
+}
+else if ($body->driver == "PG"){
     $kanojo = new PGKanojoX();
+    $kanojo->schema = $body->schema;
+}
 else if ($body->driver == "MYSQL")
     $kanojo = new MYSQLKanojoX();
 else {
@@ -33,13 +38,22 @@ else {
 if (isset($kanojo)) {
     $sql = $body->sql;
     //2: Initialize the connection data
-    $kanojo->init($body->connection);
+   // $kanojo->init($body->connection);
     //3: Connect to the Database
     $conn = $kanojo->connect();
+
     //4: Fetch the result associatively
     $row = $kanojo->fetch_assoc($sql);
-    $response = new UrabeResponse();
-    //5: Print test result
-    echo json_encode($response->get_response("Selection Test Result", $row, $sql));
+    $response->fetch_assoc = $result->get_response("Selection Test Result", $row, $sql);
+
+    // //5: Get table definition test
+    // $sql = $kanojo->get_table_definition_query($body->table_name);
+    // $row = $kanojo->fetch_assoc($sql);
+    // $response->table_definition = $result->get_response("Table definition", $row, $sql);
+    // //Close the connection
+    // $conn = $kanojo->close();
+        
+    //Print test result
+    echo json_encode($response);
 }
 ?>

@@ -76,6 +76,8 @@ class ORACLEKanojoX extends KanojoX
     public function close()
     {
         $this->free_result();
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
         return oci_close($this->connection);
     }
     /**
@@ -158,7 +160,7 @@ class ORACLEKanojoX extends KanojoX
         if (!$this->connection)
             throw new Exception(ERR_NOT_CONNECTED);
         $statement = $this->parse($this->connection, $sql, $variables);
-        $class = get_resource_type ($statement);
+        $class = get_resource_type($statement);
         if ($class == CLASS_ERR)
             throw (!is_null($statement->sql) ? new UrabeSQLException($statement) : new Exception($statement->message, $statement->code));
         else {
