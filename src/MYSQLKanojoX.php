@@ -3,7 +3,7 @@ include_once "KanojoX.php";
 /**
  * A MySQL Connection object
  * 
- * Kanojo means girlfriend in japanase and this class saves the connection data structure used to connect to
+ * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an MySQL database.
  * @version 1.0.0
  * @api Makoto Urabe
@@ -62,8 +62,8 @@ class MYSQLKanojoX extends KanojoX
     /**
      * Get the last error message string of a connection
      *
-     * @param string|null $sql The last excecuted statement. Can be null
-     * @param ConnectionError $error If the error exists pass the erorr
+     * @param string|null $sql The last executed statement. Can be null
+     * @param ConnectionError $error If the error exists pass the error
      * @return ConnectionError The connection error 
      */
     public function error($sql, $error = null)
@@ -106,13 +106,11 @@ class MYSQLKanojoX extends KanojoX
     /**
      * Returns an associative array containing the next result-set row of a 
      * query. Each array entry corresponds to a column of the row. 
-     * This function is typically called in a loop until it returns FALSE, 
-     * indicating no more rows exist.
      *
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
      * @throws Exception An Exception is thrown parsing the SQL statement or by connection error
-     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * @return array Returns an associative array. 
      * */
     public function fetch_assoc($sql, $variables = null)
     {
@@ -138,9 +136,10 @@ class MYSQLKanojoX extends KanojoX
     /**
      * Prepares sql_text using connection and returns the statement identifier, 
      * which can be used with execute(). 
-     *
+     * @param mysqli $link MySQL active connection
      * @param string $sql The SQL text statement
-     * @return mysqli_stmt Returns a statement handle on success, or FALSE on error. 
+     * @return mysqli_stmt Returns a statement handle on success, 
+     * or a connection Error. 
      */
     private function parse($link, $sql, $variables = null)
     {
