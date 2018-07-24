@@ -36,10 +36,10 @@ if (isset($kanojo)) {
     $kanojo->init($body->connection);
     //3: Connect to the Database
     $conn = $kanojo->connect();
-
-   $row = $kanojo->fetch_assoc($sql);
-  //  $response->error = $kanojo->get_last_error();
-    
-    echo json_encode($row);
+    //4: Fetch the result associatively
+    $row = $kanojo->fetch_assoc($sql);
+    $response = new UrabeResponse();
+    //5: Print test result
+    echo json_encode($response->get_response("Selection Test Result", $row, $sql));
 }
 ?>

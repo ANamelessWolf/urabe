@@ -1,8 +1,7 @@
 <?php
-
 /**
- * An Connection database error
- * 
+ * A connection database error
+ * Can be caused by a bad connection or bad request
  * @version 1.0.0
  * @api Makoto Urabe
  * @author A nameless wolf <anamelessdeath@gmail.com>

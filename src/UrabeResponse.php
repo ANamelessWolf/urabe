@@ -37,11 +37,28 @@ class UrabeResponse
      * Gets the response message for exception
      * @param string $msg The response message
      * @param stdClass|null $stack_trace The stack trace result, optional
-     * @return stdClass The response
+     * @return stdClass The response message
      */
     public function get_exception_response($msg, $stack_trace = null)
     {
         return (object)(array(NODE_MSG => $msg, NODE_RESULT => array(), NODE_SIZE => 0, NODE_ERROR => $this->error));
+    }
+    /**
+     * Gets the response message for a successful request
+     *
+     * @param string $msg The response message
+     * @param string $result The response result
+     * @param string $sql The SQL statement
+     * @return stdClass The response message
+     */
+    public function get_response($msg, $result, $sql = null)
+    {
+        $this->query = $sql;
+        $count = sizeof($result);
+        $response = array(NODE_MSG => $msg, NODE_RESULT => $result, NODE_SIZE => sizeof($result), NODE_ERROR => null);
+        if (isset($this->query) && KanojoX::$settings->add_query_to_response)
+            $response[NODE_QUERY] = $this->query;
+        return (object)($response);
     }
 }
 ?>

@@ -31,6 +31,11 @@ return (object)array(
     /**
      * @var bool If sets to true and Urabe handles exceptions the stack trace will be added to the response
      */
-    "enable_stack_trace" => false
+    "enable_stack_trace" => false,
+    /**
+     * @var bool If sets to true add SQL statement in Urabe response. This should be enable just for testing purpose,
+     * not recommendable for staging or production.
+     */
+    "add_query_to_response" => true
 );
 ?>

@@ -1,4 +1,13 @@
 <?php 
+/**
+ * This class wraps an ENUM definition, this idea was solve using the post of Brian Cline
+ * under the stack overflow platform
+ * @version 1.0.0
+ * @api Makoto Urabe
+ * @author A nameless wolf <anamelessdeath@gmail.com>
+ * @copyright 2015-2020 Nameless Studios
+ * @example location description https://stackoverflow.com/questions/254514/php-and-enumerations?answertab=active#tab-top
+ */
 abstract class Enum
 {
     private static $constCacheArray = null;
