@@ -149,14 +149,14 @@ abstract class KanojoX implements IKanojoX
     /**
      * Handles application exceptions
      *
-     * @param exception $exception The generated exeption
+     * @param exception $exception The generated exception
      * @return void
      */
     public static function exception_handler($exception)
     {
         http_response_code(400);
         $class = get_class($exception);
-
+        
         $error = new ConnectionError();
         $error->code = $exception->getCode();
         $error->message = $exception->getMessage();
@@ -165,12 +165,15 @@ abstract class KanojoX implements IKanojoX
         if ($class == CLASS_SQL_EXC)
             $error->sql = $exception->sql;
 
+
+
         $response = new UrabeResponse();
         $response->error = $error->get_exception_error();
-        echo json_encode($response->get_exception_response(
-            $exception->getMessage(),
-            KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
-        ));
+        
+         echo json_encode($response->get_exception_response(
+             $exception->getMessage(),
+             KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
+         ));
     }
     /*********************
      * Interface Methods *
@@ -196,8 +199,8 @@ abstract class KanojoX implements IKanojoX
     /**
      * Get the last error message string of a connection
      *
-     * @param string|null $sql The last excecuted statement. Can be null
-     * @param ConnectionError $error If the error exists pass the eror
+     * @param string|null $sql The last executed statement. Can be null
+     * @param ConnectionError $error If the error exists pass the error
      * @return ConnectionError The connection error 
      */
     public function error($sql, $error = null)

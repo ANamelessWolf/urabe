@@ -10,6 +10,7 @@
  */
 class ConnectionError
 {
+    const IGNORE_STMT_ORACLE = "statement";
     /**
      * @var int $code The last error code number.
      */
@@ -42,6 +43,12 @@ class ConnectionError
      */
     public function get_err_context()
     {
+        //resource field can not be serialized, it has to be removed to avoid problems echoing the response
+        $ignoreParams = array(self::IGNORE_STMT_ORACLE);
+        foreach ($ignoreParams as &$key)
+            if (array_key_exists($key, $this->err_context)) {
+            unset($this->err_context[$key]);
+        }
         return KanojoX::$settings->show_error_context ? $this->err_context : null;
     }
     /**
@@ -79,7 +86,7 @@ class ConnectionError
             array_push($err_context, array(NODE_ERROR => $context));
         }
         if (isset($this->sql))
-            return array(NODE_QUERY =>$this->sql, NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+            return array(NODE_QUERY => $this->sql, NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
         else
             return array(NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
     }

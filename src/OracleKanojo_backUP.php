@@ -38,23 +38,25 @@ class OracleKanojoX extends KanojoX implements IKanojoX
     public function parse($connection, $sql)
     {
         try {
-            if (!is_null($this->query) && strlen($this->query) > 0)
+            if (!is_null($sql) && strlen($sql) > 0)
                 return oci_parse($connection, $this->query);
             else
                 throw new Exception(ERR_EMPTY_QUERY);
         } catch (Exception $e) {
-            $this->error = sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage());
+            $this->error = sprintf(ERR_BAD_QUERY, $sql, $e->getMessage());
             return false;
         }
     }
     /**
-     * Returns the next row from a query as an associative array
+     * Returns an associative array containing the next result-set row of a 
+     * query. Each array entry corresponds to a column of the row. 
      *
-     * @param stdClass $connection A valid OCI8 statement identifier created by oci_parse() and executed by oci_execute(), 
-     * or a REF CURSOR statement identifier.
-     * @return array|bool Returns an associative array. If there are no more rows in the statement then FALSE is returned. 
-     */
-    public function fetch_asoc($statement)
+     * @param string $sql The SQL Statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @throws Exception An Exception is thrown parsing the SQL statement or by connection error
+     * @return array Returns an associative array. 
+     * */
+    public function fetch_asoc($sql, $variables = null)
     {
         try {
             $ok = oci_execute($statement);

@@ -97,16 +97,27 @@ class ORACLEKanojoX extends KanojoX
      */
     public function error($sql, $error = null)
     {
-        if (is_null($error)) {
-           //echo $this->connection;
-            $e = oci_error($this->connection);
-            $this->error = new ConnectionError();
-            $this->error->code = $e[self::ERR_CODE];
-            $this->error->message = $e[self::ERR_MSG];
-            $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
-            var_dump($e);
-        } else
+        if (is_null($error))
+            $this->error = $this->get_error($this->connection);
+        else
             $this->error = $error;
+        //If SQL error exist
+        $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
+        return $this->error;
+    }
+    /**
+     * Gets the error found in a ORACLE resource object could be a
+     * SQL statement error or a connection error.
+     *
+     * @param resource $resource The SQL statement or SQL connection
+     * @return ConnectionError The connection or transaction error 
+     */
+    private function get_error($resource)
+    {
+        $e = oci_error($resource);
+        $this->error = new ConnectionError();
+        $this->error->code = $e[self::ERR_CODE];
+        $this->error->message = $e[self::ERR_MSG];
         return $this->error;
     }
     /**
@@ -124,7 +135,6 @@ class ORACLEKanojoX extends KanojoX
             if (!isset($this->connection))
                 throw new Exception(ERR_NOT_CONNECTED);
             $statement = $this->parse($this->connection, $sql);
-            var_dump($this->connection);
             if (isset($variables) && is_array($variables))
                 $this->bind($statement, $variables);
             $ok = oci_execute($statement);
@@ -136,22 +146,33 @@ class ORACLEKanojoX extends KanojoX
     /**
      * Returns an associative array containing the next result-set row of a 
      * query. Each array entry corresponds to a column of the row. 
-     * This function is typically called in a loop until it returns FALSE, 
-     * indicating no more rows exist.
      *
      * @param string $sql The SQL Statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
-     * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
+     * @throws Exception An Exception is thrown parsing the SQL statement or by connection error
+     * @return array Returns an associative array. 
      * */
     public function fetch_assoc($sql, $variables = null)
     {
-        $statement = $this->execute($sql, $variables);
-        if ($this->is_error($statement))
-            return $statement;
+        $rows = array();
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
+        $statement = $this->parse($this->connection, $sql, $variables);
+        $class = get_resource_type ($statement);
+        if ($class == CLASS_ERR)
+            throw (!is_null($statement->sql) ? new UrabeSQLException($statement) : new Exception($statement->message, $statement->code));
         else {
             array_push($this->statementsIds, $statement);
-            return oci_fetch_assoc($statement);
+            $ok = oci_execute($statement);
+            if ($ok) {
+                while ($row = oci_fetch_assoc($statement))
+                    array_push($rows, $row);
+            } else {
+                $err = $this->error($sql, $this->get_error($statement));
+                throw new UrabeSQLException($err);
+            }
         }
+        return $rows;
     }
     /**
      * Gets the query for selecting the table definition
@@ -177,9 +198,23 @@ class ORACLEKanojoX extends KanojoX
      * @param string $sql The SQL text statement
      * @return resource Returns a statement handle on success, or FALSE on error. 
      */
-    private function parse($sql)
+    /**
+     * Prepares sql_text using connection and returns the statement identifier, 
+     * which can be used with oci_execute(). 
+     *
+     * @param resource $connection ORACLE active connection
+     * @param string $sql The SQL text statement
+     * @return resource Returns a statement handle on success, 
+     * or a connection Error if fails
+     */
+    private function parse($connection, $sql, $variables = null)
     {
-        return oci_parse($this->connection, $sql);
+        if (!$connection)
+            throw new Exception(ERR_NOT_CONNECTED);
+        $statement = oci_parse($connection, $sql);
+        if ($statement && isset($variables) && is_array($variables))
+            $this->bind($statement, $variables);
+        return $statement ? $statement : $this->error($sql);
     }
     /**
      * Binds a PHP variable to an Oracle placeholder
