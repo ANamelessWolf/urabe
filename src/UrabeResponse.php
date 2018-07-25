@@ -49,13 +49,30 @@ class UrabeResponse
      * @param string $msg The response message
      * @param string $result The response result
      * @param string $sql The SQL statement
-     * @return stdClass The response message
+     * @return object The response message
      */
     public function get_response($msg, $result, $sql = null)
     {
         $this->query = $sql;
         $count = sizeof($result);
         $response = array(NODE_MSG => $msg, NODE_RESULT => $result, NODE_SIZE => sizeof($result), NODE_ERROR => null);
+        if (isset($this->query) && KanojoX::$settings->add_query_to_response)
+            $response[NODE_QUERY] = $this->query;
+        return (object)($response);
+    }
+    /**
+     * Gets the response message for a successful executed query response
+     *
+     * @param string $succeed True if the execute query succeed
+     * @param int $affected_rows The number of affected rows after a successful query
+     * @param string $sql The SQL statement
+     * @return object The response message
+     */
+    public function get_execute_response($succeed, $affected_rows, $sql = null)
+    {
+        $this->query = $sql;
+        $count = sizeof($result);
+        $response = array(NODE_SUCCEED => $succeed, NODE_AFF_ROWS => $affected_rows, NODE_RESULT => array(), NODE_ERROR => null);
         if (isset($this->query) && KanojoX::$settings->add_query_to_response)
             $response[NODE_QUERY] = $this->query;
         return (object)($response);

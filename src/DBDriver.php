@@ -1,4 +1,5 @@
 <?php 
+require_once "Enum.php";
 /**
  * Database connection drivers supported by URABE API
  * The collection of enums that manages URABE API
@@ -10,15 +11,16 @@ abstract class DBDriver extends Enum
 {
     /**
      * @var string ORACLE
-     * Manage ORACLE connection with OCI8 Functions
+     * ORACLE driver connection with OCI Functions
      */
     const ORACLE = 0;
     /**
      * @var string PG
-     * Manage PG connection with libpq Library
+     * PG connection with libPQ Library
      */
     const PG = 1;
     /**
+     * @var string MYSQL
      * The mysqli extension allows you to access the 
      * functionality provided by MySQL 4.1 and above.
      */

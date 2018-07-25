@@ -1,5 +1,6 @@
 <?php 
 include_once "KanojoX.php";
+include_once "PGSQL_Result.php";
 /**
  * A PostgreSQL Connection object
  * 
@@ -12,6 +13,7 @@ include_once "KanojoX.php";
  */
 class PGKanojoX extends KanojoX
 {
+    const DEFT_STMT_NAME = "sql_statement";
     /**
      * @var string $schema The database schema used to filter the table definition
      */
@@ -73,17 +75,6 @@ class PGKanojoX extends KanojoX
      */
     public function error($sql, $error = null)
     {
-        /**
-         * Possible errors
-         * 0 = PGSQL_EMPTY_QUERY
-         * 1 = PGSQL_COMMAND_OK
-         * 2 = PGSQL_TUPLES_OK
-         * 3 = PGSQL_COPY_TO
-         * 4 = PGSQL_COPY_FROM
-         * 5 = PGSQL_BAD_RESPONSE
-         * 6 = PGSQL_NONFATAL_ERROR
-         * 7 = PGSQL_FATAL_ERROR
-         */
         if (is_null($error)) {
             $this->error = new ConnectionError();
             $this->error->code = pg_last_error($this->connection);
@@ -99,24 +90,29 @@ class PGKanojoX extends KanojoX
      *
      * @param string $sql The SQL Statement
      * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
-     * @throws Exception En Exception is raised if the connection is null
-     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
+     * @throws Exception En Exception is raised if the execution result fails
+     * @return object Returns the execute response on success or the connection error on failure. 
      */
     public function execute($sql, $variables = null)
     {
-        try {
-            if (isset($variables) && is_array($variables)) {
-                $result = pg_prepare($this->connection, "", $sql);
+        if (isset($variables) && is_array($variables)) {
+            $result = pg_prepare($this->connection, self::DEFT_STMT_NAME, $sql);
+            $sql = (object)(array(NODE_SQL => $sql, NODE_PARAMS => $variables));
+            if ($result) {
                 $vars = array();
                 foreach ($variables as &$value)
-                    array_push($vars, $value->variable);
-                $result = pg_execute($this->connection, "", $vars);
-            } else
-                $result = pg_query($this->connection, $sql);
-            return $result ? $result : $this->error($sql);
-        } catch (Exception $e) {
-            return $this->error(sprintf(ERR_BAD_QUERY, $this->query, $e->getMessage()));
+                    array_push($vars, $value);
+                $result = pg_execute($this->connection, self::DEFT_STMT_NAME, $vars);
+            }
+        } else {
+            $result = pg_send_query($this->connection, $sql);
+            $result = pg_get_result($this->connection);
         }
+        if (!$result || pg_result_status($result) != PGSQL_Result::PGSQL_COMMAND_OK) {
+            $err = $this->error($sql, $this->get_error($result == false ? null : $result, $sql));
+            throw new UrabeSQLException($err);
+        } else
+            return (new UrabeResponse())->get_execute_response(true, pg_affected_rows($result), $sql);
     }
     /**
      * Returns an associative array containing the next result-set row of a 
@@ -178,8 +174,8 @@ class PGKanojoX extends KanojoX
     private function get_error($resource, $sql)
     {
         $this->error = new ConnectionError();
-        $this->error->code = pg_result_status($resource);
-        $this->error->message = pg_last_error($resource);
+        $this->error->code = is_null($resource) ? PGSQL_Result::PGSQL_BAD_RESPONSE : pg_result_status($resource);
+        $this->error->message = pg_last_error($this->connection);
         $this->error->sql = $sql;
         return $this->error;
     }

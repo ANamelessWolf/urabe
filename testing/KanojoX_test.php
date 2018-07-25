@@ -16,7 +16,8 @@ $result = new UrabeResponse();
 $response = (object)array(
     "fetch_assoc" => "",
     "table_definition" => "",
-    "error" => ""
+    "execute_result_no_params" => "",
+    "execute_result_params" => ""
 );
 //0: Reads the body
 $body = get_body_as_json();
@@ -41,13 +42,22 @@ if (isset($kanojo)) {
     $conn = $kanojo->connect();
 
     //4: Fetch the result associatively
-    $row = $kanojo->fetch_assoc($sql);
-    $response->fetch_assoc = $result->get_response("Selection Test Result", $row, $sql);
+  //  $row = $kanojo->fetch_assoc($sql);
+   // $response->fetch_assoc = $result->get_response("Selection Test Result", $row, $sql);
 
      //5: Get table definition test
-    $sql = $kanojo->get_table_definition_query($body->table_name);
-    $row = $kanojo->fetch_assoc($sql);
-    $response->table_definition = $result->get_response("Table definition", $row, $sql);
+    //$sql = $kanojo->get_table_definition_query($body->table_name);
+    //$row = $kanojo->fetch_assoc($sql);
+    //$response->table_definition = $result->get_response("Table definition", $row, $sql);
+
+    //6: Test execute method
+    $sql = $body->update_sql_no_params;
+   // $result = $kanojo->execute($sql);
+    //$response->execute_result_no_params = $result;
+
+    $sql = $body->update_sql_params;
+    $result = $kanojo->execute($sql, array(249088.66, '1'));
+    $response->execute_result_params = $result;
      //Close the connection
     $conn = $kanojo->close();
         

@@ -50,7 +50,7 @@ const ERR_BAD_QUERY = 'Bad query: %s';
 const ERR_EMPTY_QUERY = 'The query is empty or null';
 /**
  * @var string ERR_BAD_TABLE
- * The error message sent when the given table does not matchs its service.
+ * The error message sent when the given table does not match's its service.
  */
 const ERR_BAD_TABLE = 'The table %s does not match the selected service.';
 /**
@@ -132,7 +132,7 @@ const ERR_NULL_BODY = 'An error occurred reading the message body, the body does
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
  */
-const ERR_INVALID_SERVICE = 'No service especified';
+const ERR_INVALID_SERVICE = 'No service specified';
 /**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
@@ -190,17 +190,32 @@ const NODE_MSG = 'message';
  */
 const NODE_QUERY = 'query';
 /**
- * @var string NODE_QUERY_RESULT
- * The node name that saves the transaction query result
+ * @var string NODE_SQL
+ * The node name that saves the SQL statement
  */
-const NODE_QUERY_RESULT = 'query_result';
+const NODE_SQL = 'sql';
 /**
  * @var string NODE_ERROR
  * The node name that saves the transaction error
  */
 const NODE_ERROR = 'error';
 /**
- * @var string NODE_ERROR
+ * @var string NODE_SUCCEED
+ * The node name that stores the query succeed status
+ */
+const NODE_SUCCEED = 'succeed';
+/**
+ * @var string NODE_AFF_ROWS
+ * The node name that stores the number of affected rows
+ */
+const NODE_AFF_ROWS = 'affected_rows';
+/**
+ * @var string NODE_QUERY_RESULT
+ * The node name that saves the transaction query result
+ */
+const NODE_QUERY_RESULT = 'query_result';
+/**
+ * @var string NODE_ERROR_CONTEXT
  * The node name that saves the error context
  */
 const NODE_ERROR_CONTEXT = 'err_context';
@@ -229,6 +244,11 @@ const NODE_FILE = 'file';
  * The node name that saves the file line
  */
 const NODE_LINE = 'line';
+/**
+ * @var string NODE_PARAMS
+ * The node name that saves variables parameters
+ */
+const NODE_PARAMS = 'parameters';
 /****************************************
  ************ URL PARAMS KEYS ************
  *****************************************/
