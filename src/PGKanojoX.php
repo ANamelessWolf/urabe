@@ -142,10 +142,10 @@ class PGKanojoX extends KanojoX
             $ok = pg_query($this->connection, $sql);
         //fetch result
         if ($ok) {
-            while ($row = pg_fetch_assoc ($ok))
+            while ($row = pg_fetch_assoc($ok))
                 array_push($rows, $row);
         } else {
-            $err = $this->error($sql, $this->get_error($statement));
+            $err = $this->error($sql, $this->get_error($this->connection, $sql));
             throw new UrabeSQLException($err);
         }
         return $rows;
@@ -166,6 +166,22 @@ class PGKanojoX extends KanojoX
         } else
             $sql = "SELECT $fields FROM information_schema.columns WHERE table_name = '$table_name'";
         return $sql;
+    }
+    /**
+     * Gets the error found in a ORACLE resource object could be a
+     * SQL statement error or a connection error.
+     *
+     * @param string $sql The SQL statement
+     * @param resource $resource The SQL connection
+     * @return ConnectionError The connection or transaction error 
+     */
+    private function get_error($resource, $sql)
+    {
+        $this->error = new ConnectionError();
+        $this->error->code = pg_result_status($resource);
+        $this->error->message = pg_last_error($resource);
+        $this->error->sql = $sql;
+        return $this->error;
     }
 
 }

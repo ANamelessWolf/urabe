@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This class represents a SQL exception
  * @version 1.0.0
@@ -19,7 +20,10 @@ class UrabeSQLException extends Exception
      */
     public function __construct($error)
     {
-        parent::__construct(sprintf(ERR_BAD_QUERY, $error->message), $error->code);
+        $search = array("\t", "\n", "\r", "   ", "  ", "\\n");
+        $replace = array("", " ", " ", "", "", " ");
+        $msg = str_replace($search, $replace, $error->message);
+        parent::__construct(sprintf(ERR_BAD_QUERY, $msg), $error->code);
         $this->sql = $error->sql;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * A connection database error
  * Can be caused by a bad connection or bad request
@@ -10,6 +11,7 @@
 class ConnectionError
 {
     const IGNORE_STMT_ORACLE = "statement";
+    const IGNORE_STMT_PG = "resource";
     /**
      * @var int $code The last error code number.
      */
@@ -43,7 +45,7 @@ class ConnectionError
     public function get_err_context()
     {
         //resource field can not be serialized, it has to be removed to avoid problems echoing the response
-        $ignoreParams = array(self::IGNORE_STMT_ORACLE);
+        $ignoreParams = array(self::IGNORE_STMT_ORACLE, self::IGNORE_STMT_PG);
         foreach ($ignoreParams as &$key)
             if (array_key_exists($key, $this->err_context)) {
             unset($this->err_context[$key]);
