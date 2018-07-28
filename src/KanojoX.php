@@ -169,7 +169,11 @@ abstract class KanojoX implements IKanojoX
 
         $response = new UrabeResponse();
         $response->error = $error->get_exception_error();
-        
+        $err =$response->get_exception_response(
+            $exception->getMessage(),
+            KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
+        );
+
          echo json_encode($response->get_exception_response(
              $exception->getMessage(),
              KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null

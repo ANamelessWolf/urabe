@@ -129,11 +129,15 @@ class PGKanojoX extends KanojoX
         if (!$this->connection)
             throw new Exception(ERR_NOT_CONNECTED);
         if (isset($variables) && is_array($variables)) {
-            $statement = pg_prepare($this->connection, "", $sql);
-            $vars = array();
-            foreach ($variables as &$value)
-                array_push($vars, $value->variable);
-            $ok = pg_execute($this->connection, "", $vars);
+            $result = pg_prepare($this->connection, self::DEFT_STMT_NAME, $sql);
+            $sql = (object)(array(NODE_SQL => $sql, NODE_PARAMS => $variables));
+            if ($result) {
+                $vars = array();
+                foreach ($variables as &$value)
+                    array_push($vars, $value);
+                $ok = pg_execute($this->connection, self::DEFT_STMT_NAME, $vars);
+            } else
+                $ok = false;
         } else
             $ok = pg_query($this->connection, $sql);
         //fetch result
@@ -141,7 +145,7 @@ class PGKanojoX extends KanojoX
             while ($row = pg_fetch_assoc($ok))
                 array_push($rows, $row);
         } else {
-            $err = $this->error($sql, $this->get_error($this->connection, $sql));
+            $err = $this->error($sql, $this->get_error($ok == false ? null : $result, $sql));
             throw new UrabeSQLException($err);
         }
         return $rows;

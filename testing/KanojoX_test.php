@@ -3,6 +3,18 @@
 include_once "../src/ORACLEKanojoX.php";
 include_once "../src/PGKanojoX.php";
 include_once "../src/MYSQLKanojoX.php";
+function test_fetch_assoc_no_params($kanojo, $sql)
+{
+    $row = $kanojo->fetch_assoc($sql);
+    $result = $result->get_response("KanojoX fetch_assoc Test with no params", $row, $sql);
+    return $result;
+}
+function test_fetch_assoc_with_params($kanojo, $sql, $params)
+{
+    $row = $kanojo->fetch_assoc($sql, $params);
+    $result = $result->get_response("KanojoX fetch_assoc Test with params", $row, $sql);
+    return $result;
+}
 /**
  * This file test the functionality for the class KanojoX
  *  
@@ -14,7 +26,8 @@ include_once "../src/MYSQLKanojoX.php";
 //Test Response
 $result = new UrabeResponse();
 $response = (object)array(
-    "fetch_assoc" => "",
+    "fetch_assoc_params" => "",
+    "fetch_assoc_no_params" => "",
     "table_definition" => "",
     "execute_result_no_params" => "",
     "execute_result_params" => ""
@@ -44,24 +57,26 @@ if (isset($kanojo)) {
     //4: Fetch the result associatively
   //  $row = $kanojo->fetch_assoc($sql);
    // $response->fetch_assoc = $result->get_response("Selection Test Result", $row, $sql);
-
+    $response->fetch_assoc_params = test_fetch_assoc_with_params($kanojo, $body->sql_params, array(1));
      //5: Get table definition test
     //$sql = $kanojo->get_table_definition_query($body->table_name);
     //$row = $kanojo->fetch_assoc($sql);
     //$response->table_definition = $result->get_response("Table definition", $row, $sql);
 
     //6: Test execute method
-    $sql = $body->update_sql_no_params;
+   // $sql = $body->update_sql_no_params;
    // $result = $kanojo->execute($sql);
     //$response->execute_result_no_params = $result;
 
-    $sql = $body->update_sql_params;
-    $result = $kanojo->execute($sql, array(249088.66, '1'));
-    $response->execute_result_params = $result;
+    //$sql = $body->update_sql_params;
+    //$result = $kanojo->execute($sql, array(249088.66, '1'));
+   // $response->execute_result_params = $result;
      //Close the connection
     $conn = $kanojo->close();
         
     //Print test result
     echo json_encode($response);
+
+
 }
 ?>

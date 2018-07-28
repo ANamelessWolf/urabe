@@ -46,10 +46,12 @@ class ConnectionError
     {
         //resource field can not be serialized, it has to be removed to avoid problems echoing the response
         $ignoreParams = array(self::IGNORE_STMT_ORACLE, self::IGNORE_STMT_PG);
+        var_dump($this->err_context);
         foreach ($ignoreParams as &$key)
             if (array_key_exists($key, $this->err_context)) {
             unset($this->err_context[$key]);
         }
+        var_dump($this->err_context);
         return KanojoX::$settings->show_error_context ? $this->err_context : null;
     }
     /**

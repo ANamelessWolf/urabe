@@ -64,7 +64,7 @@ class QueryResult
         }
     }
     /**
-     * Prepare an Oracle sentence to be excecuted
+     * Prepare an Oracle sentence to be executed
      *
      * @param resource $sentence The Oracle sentence
      * @param MysteriousParser $row_parser Defines the row parsing task. 
