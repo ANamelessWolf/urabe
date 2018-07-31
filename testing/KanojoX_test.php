@@ -5,12 +5,14 @@ include_once "../src/PGKanojoX.php";
 include_once "../src/MYSQLKanojoX.php";
 function test_fetch_assoc_no_params($kanojo, $sql)
 {
+    $result = new UrabeResponse();
     $row = $kanojo->fetch_assoc($sql);
     $result = $result->get_response("KanojoX fetch_assoc Test with no params", $row, $sql);
     return $result;
 }
 function test_fetch_assoc_with_params($kanojo, $sql, $params)
 {
+    $result = new UrabeResponse();
     $row = $kanojo->fetch_assoc($sql, $params);
     $result = $result->get_response("KanojoX fetch_assoc Test with params", $row, $sql);
     return $result;

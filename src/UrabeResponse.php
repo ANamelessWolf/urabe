@@ -41,7 +41,36 @@ class UrabeResponse
      */
     public function get_exception_response($msg, $stack_trace = null)
     {
-        return (object)(array(NODE_MSG => $msg, NODE_RESULT => array(), NODE_SIZE => 0, NODE_ERROR => $this->error));
+        return $this->format_exception_response($msg, $this->error, $stack_trace);
+    }
+    /**
+     * Gets the response message for exception
+     * @param Exception $exc The executed exception
+     * @param string|null $stack_trace The stack trace result, optional
+     * @return object The response message
+     */
+    public function get_simple_exception_response($exc, $stack_trace = null)
+    {
+        $error = array(NODE_CODE => $exc->getCode(), NODE_FILE => $exc->getFile(), NODE_LINE => $exc->getLine());
+        return $this->format_exception_response($exc->getMessage(), $error, $stack_trace);
+    }
+    /**
+     * Formats the Urabe exception response
+     *
+     * @param string $msg The exception message
+     * @param string $error The exception error definition
+     * @param string $stack_trace If allowed in application settings the error $stack_trace
+     * @return object The response message
+     */
+    private function format_exception_response($msg, $error, $stack_trace = null)
+    {
+        if (KanojoX::$settings->hide_exception_error)
+            $error = (object)(array(NODE_MSG => $msg, NODE_RESULT => array(), NODE_SIZE => 0, NODE_ERROR => null));
+        else
+            $error = (object)(array(NODE_MSG => $msg, NODE_RESULT => array(), NODE_SIZE => 0, NODE_ERROR => $error));
+        if (!is_null($stack_trace))
+            $error->{NODE_STACK} = $stack_trace;
+        return $error;
     }
     /**
      * Gets the response message for a successful request

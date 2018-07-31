@@ -156,7 +156,7 @@ abstract class KanojoX implements IKanojoX
     {
         http_response_code(400);
         $class = get_class($exception);
-        
+
         $error = new ConnectionError();
         $error->code = $exception->getCode();
         $error->message = $exception->getMessage();
@@ -169,15 +169,24 @@ abstract class KanojoX implements IKanojoX
 
         $response = new UrabeResponse();
         $response->error = $error->get_exception_error();
-        $err =$response->get_exception_response(
+        $err = $response->get_exception_response(
             $exception->getMessage(),
             KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
         );
 
-         echo json_encode($response->get_exception_response(
-             $exception->getMessage(),
-             KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
-         ));
+        $exc_response = $response->get_exception_response(
+            $exception->getMessage(),
+            KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
+        );
+        //If encoding fails means error context has resource objects that can not be encoded,
+        //in that case will try the simple exception response
+        $exc_response = json_encode($exc_response);
+        if (!$exc_response)
+            $exc_response = json_encode($response->get_simple_exception_response(
+            $exception,
+            KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
+        ));
+        echo $exc_response;
     }
     /*********************
      * Interface Methods *

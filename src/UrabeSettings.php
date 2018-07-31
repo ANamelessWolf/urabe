@@ -36,6 +36,11 @@ return (object)array(
      * @var bool If sets to true add SQL statement in Urabe response. This should be enable just for testing purpose,
      * not recommendable for staging or production.
      */
-    "add_query_to_response" => true
+    "add_query_to_response" => true,
+    /**
+     * @var bool If sets to true hides the error code. This should be enable just for testing purpose,
+     * not recommendable for staging or production.
+     */
+    "hide_exception_error" => false
 );
 ?>

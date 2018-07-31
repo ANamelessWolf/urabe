@@ -245,6 +245,11 @@ const NODE_FILE = 'file';
  */
 const NODE_LINE = 'line';
 /**
+ * @var string NODE_STACK
+ * The node name that saves the exception stack trace
+ */
+const NODE_STACK = 'stack_trace';
+/**
  * @var string NODE_PARAMS
  * The node name that saves variables parameters
  */
