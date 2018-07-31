@@ -131,13 +131,16 @@ class PGKanojoX extends KanojoX
         if (isset($variables) && is_array($variables)) {
             $result = pg_prepare($this->connection, self::DEFT_STMT_NAME, $sql);
             $sql = (object)(array(NODE_SQL => $sql, NODE_PARAMS => $variables));
+
             if ($result) {
                 $vars = array();
                 foreach ($variables as &$value)
                     array_push($vars, $value);
                 $ok = pg_execute($this->connection, self::DEFT_STMT_NAME, $vars);
-            } else
-                $ok = false;
+            } else {
+                $err = $this->error($sql, $this->get_error($result == false ? null : $result, $sql));                
+                throw new UrabeSQLException($err);
+            }
         } else
             $ok = pg_query($this->connection, $sql);
         //fetch result
