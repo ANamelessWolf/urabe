@@ -164,9 +164,6 @@ abstract class KanojoX implements IKanojoX
         $error->line = $exception->getLine();
         if ($class == CLASS_SQL_EXC)
             $error->sql = $exception->sql;
-
-
-
         $response = new UrabeResponse();
         $response->error = $error->get_exception_error();
         $err = $response->get_exception_response(
@@ -180,6 +177,7 @@ abstract class KanojoX implements IKanojoX
         );
         //If encoding fails means error context has resource objects that can not be encoded,
         //in that case will try the simple exception response
+        
         $exc_response = json_encode($exc_response);
         if (!$exc_response)
             $exc_response = json_encode($response->get_simple_exception_response(
