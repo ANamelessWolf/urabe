@@ -97,13 +97,13 @@ class MYSQLKanojoX extends KanojoX
             $statement = $this->parse($this->connection, $sql, $variables);
             $class = get_class($statement);
             if ($class == CLASS_ERR)
-                throw (!is_null($statement->sql) ? new UrabeSQLException($statement) : new Exception($statement->message, $statement->code));
+                throw (!is_null($statement->sql) ? new UrabeSQLException($this->error($sql)) : new Exception($statement->error, $statement->errno));
             else {
                 $ok = $statement->execute();
                 if ($ok)
-                    return (new UrabeResponse())->get_execute_response(true, $statement->affected_rows, $sql);
+                    return (new UrabeResponse())->get_execute_response(true, $statement->error, $sql);
                 else
-                    throw new UrabeSQLException($statement);
+                    throw new UrabeSQLException($this->error($sql));
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -126,7 +126,7 @@ class MYSQLKanojoX extends KanojoX
         $statement = $this->parse($this->connection, $sql, $variables);
         $class = get_class($statement);
         if ($class == CLASS_ERR)
-            throw (!is_null($statement->sql) ? new UrabeSQLException($statement) : new Exception($statement->message, $statement->code));
+            throw (!is_null($statement->sql) ? new UrabeSQLException($this->error($sql)) : new Exception($statement->error, $statement->errno));
         else {
             array_push($this->statementsIds, $statement);
             $ok = $statement->execute();
@@ -135,7 +135,7 @@ class MYSQLKanojoX extends KanojoX
                 while ($row = $result->fetch_assoc())
                     array_push($rows, $row);
             } else
-                throw new UrabeSQLException($statement);
+                throw new UrabeSQLException($this->error($sql));
         }
         return $rows;
     }
