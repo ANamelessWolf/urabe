@@ -42,7 +42,7 @@ function test_fetch_assoc_with_params($kanojo, $body)
 {
     $result = new UrabeResponse();
     $sql = $body->sql_params;
-    $params = array(1);
+    $params = $body->params;
     $row = $kanojo->fetch_assoc($sql, $params);
     $result = $result->get_response("KanojoX fetch assoc test with params", $row, $sql);
     return $result;
@@ -90,7 +90,7 @@ function test_execute_with_params($kanojo, $body)
 {
     $result = new UrabeResponse();
     $sql = $body->update_sql_params;
-    $params = array(249088.66, '1');
+    $params = $body->params;
     $result = $kanojo->execute($sql, $params);
     return $result;
 }
@@ -103,11 +103,11 @@ function test_execute_with_params($kanojo, $body)
 function test_get_available_tests()
 {
     $functions = get_defined_functions();
-    $functions =$functions["user"];
+    $functions = $functions["user"];
     $test_func = array();
-    for ($i = 0; $i < sizeof($functions); $i++) { 
-       if (substr($functions[$i], 0, 5) == TEST_VAR_NAME . "_")
-            array_push($test_func, $functions[$i]);
+    for ($i = 0; $i < sizeof($functions); $i++) {
+        if (substr($functions[$i], 0, 5) == TEST_VAR_NAME . "_")
+            array_push($test_func, str_replace(array("test_"), array(), $functions[$i]));
     }
     $response = array("msg" => "Available functions", "tests" => $test_func, "size" => sizeof($test_func));
     return $response;

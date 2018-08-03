@@ -86,8 +86,8 @@ class MYSQLKanojoX extends KanojoX
      *
      * @param string $sql The SQL Statement
      * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
-     * @throws Exception En Exception is raised if the connection is null
-     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
+     * @throws Exception En Exception is raised if the execution result fails
+     * @return object Returns the execute response on success or the connection error on failure. 
      */
     public function execute($sql, $variables = null)
     {
@@ -95,11 +95,15 @@ class MYSQLKanojoX extends KanojoX
             if (!$this->connection)
                 throw new Exception(ERR_NOT_CONNECTED);
             $statement = $this->parse($this->connection, $sql, $variables);
-            if ($statement) {
+            $class = get_class($statement);
+            if ($class == CLASS_ERR)
+                throw (!is_null($statement->sql) ? new UrabeSQLException($statement) : new Exception($statement->message, $statement->code));
+            else {
                 $ok = $statement->execute();
-                return $ok ? $ok : $this->error($sql);
-            } else {
-                return $this->error($sql);
+                if ($ok)
+                    return (new UrabeResponse())->get_execute_response(true, $statement->affected_rows, $sql);
+                else
+                    throw new UrabeSQLException($statement);
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
@@ -161,17 +165,40 @@ class MYSQLKanojoX extends KanojoX
      */
     private function bind($statement, $variables)
     {
-        foreach ($variable as &$value) {
-            if (is_int($value->variable))
+        $format = "";
+        $parameters = array();
+        foreach ($variables as &$value) {
+            if (is_int($value))
                 $tp = "i";
-            else if (is_double($value->variable))
+            else if (is_double($value))
                 $tp = "d";
-            else if (is_string($value->variable))
+            else if (is_string($value))
                 $tp = "s";
             else
                 $tp = "b";
-            return $stmt->bind_param($tp, $value->variable);
+            $format .= $tp;
         }
+        array_push($parameters, $format);
+        foreach ($variables as &$value)
+            array_push($parameters, $value);
+        return call_user_func_array(array($statement, 'bind_param'), $this->refValues($parameters));
+    }
+    /**
+     * Converts an array in to a referenced values
+     *
+     * @param array $arr The array to referenced
+     * @return array The referenced values
+     */
+    function refValues($arr)
+    {
+        if (strnatcmp(phpversion(), '5.3') >= 0) //Reference is required for PHP 5.3+
+        {
+            $refs = array();
+            foreach ($arr as $key => $value)
+                $refs[$key] = &$arr[$key];
+            return $refs;
+        }
+        return $arr;
     }
     /**
      * Gets the query for selecting the table definition
@@ -181,7 +208,7 @@ class MYSQLKanojoX extends KanojoX
      */
     public function get_table_definition_query($table_name)
     {
-        $fields = MYSQL_FIELD_COL_ORDER . ", " . MYSQL_FIELD_COL_NAME . ", " + MYSQL_FIELD_DATA_TP . ", " .
+        $fields = MYSQL_FIELD_COL_ORDER . ", " . MYSQL_FIELD_COL_NAME . ", " . MYSQL_FIELD_DATA_TP . ", " .
             MYSQL_FIELD_CHAR_LENGTH . ", " . MYSQL_FIELD_NUM_PRECISION . ", " . MYSQL_FIELD_NUM_SCALE;
         if (isset($this->schema)) {
             $schema = $this->schema;
