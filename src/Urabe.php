@@ -4,12 +4,12 @@ include_once "PGKanojoX.php";
 include_once "MYSQLKanojoX.php";
 include_once "FieldDefinition.php";
 include_once "MysteriousParser.php";
-include_once "QueryResult.php";
+
 /**
  * A Database connection manager
  * 
  * Urabe is the main protagonist in the Nazo no Kanojo X, this class manage and wraps all transactions to the database.
- * Given the Kanojo profile can connect to ORACLE, PG and MySQL
+ * Given the Kanojo profile Urabe should be able to connect with ORACLE, PG and MySQL
  * @version 1.0.0
  * @api Makoto Urabe
  * @author A nameless wolf <anamelessdeath@gmail.com>
@@ -24,12 +24,6 @@ class Urabe
     private $connector;
 
     /**
-     * @var string $database_name 
-     * The database name.
-     */
-    public $database_name;
-
-    /**
      * @var string $is_connected 
      * Check if there is an active connection to the database.
      */
@@ -39,6 +33,7 @@ class Urabe
      * __construct
      *
      * Initialize a new instance of the Urabe Database manager.
+     * The connection is opened in the constructor should be closed using close method.
      * @param KanojoX $connector The database connector.
      */
     public function __construct($connector)
