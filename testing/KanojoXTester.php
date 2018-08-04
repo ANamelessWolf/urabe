@@ -13,18 +13,21 @@ $response = new UrabeResponse();
 $result = (object)array();
 //0: Reads the body
 $body = get_body_as_json();
-//1: Selects the driver connector
-$kanojo = pick_connector($body->driver);
-//2: Initialize the connection data
-$kanojo->init($body->connection);
-//3: Connect to the Database
-$conn = $kanojo->connect();
+if (isset($body)) {
+    //1: Selects the driver connector
+    $kanojo = pick_connector($body->driver);
+    //2: Initialize the connection data
+    $kanojo->init($body->connection);
+    //3: Connect to the Database
+    $conn = $kanojo->connect();
+} else
+    $kanojo = null;
 //4: Pick a test
 $test = TEST_VAR_NAME . "_" . $_GET[TEST_VAR_NAME];
 //5: Test
 $result->{$_GET[TEST_VAR_NAME]} = $test($kanojo, $body);
 //6: Close the connection
-$conn = $kanojo->close();
+$conn = isset($kanojo) ? $kanojo->close() : null;
 //7: Print result
 echo json_encode($result);
 ?>
