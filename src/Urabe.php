@@ -115,10 +115,10 @@ class Urabe
         $query_result = new QueryResult();
         $query_result->query = $query;
         if ($this->is_connected) {
-            $stid = $query_result->oci_parse($this->connection);
-            array_push($stid);
-            oci_execute($stid);
-            $query_result->query_result = oci_fetch_all($stid, $query_result->result, 0, 1);
+            $stmtId = $query_result->oci_parse($this->connection);
+            array_push($stmtId);
+            oci_execute($stmtId);
+            $query_result->query_result = oci_fetch_all($stmtId, $query_result->result, 0, 1);
             if ($query_result->query_result)
                 $result = (string)reset($query_result->result)[0];
         } else
@@ -137,9 +137,9 @@ class Urabe
         $query_result = new QueryResult();
         $query_result->query = $query;
         if ($this->is_connected) {
-            $stid = $query_result->oci_parse($this->connection);
-            array_push($stid);
-            $query_result->query_result = $query_result->fetch($stid, $row_parser);
+            $stmtId = $query_result->oci_parse($this->connection);
+            array_push($stmtId);
+            $query_result->query_result = $query_result->fetch($stmtId, $row_parser);
             if ($query_result->query_result)
                 $result = reset($query_result->result);
         } else
@@ -183,10 +183,10 @@ class Urabe
         $query_result->query = $query;
         try {
             if ($this->is_connected) {
-                $stid = $query_result->oci_parse($this->connection);
-                array_push($stid);
-                if ($stid)
-                    $query_result->query_result = oci_execute($stid);
+                $stmtId = $query_result->oci_parse($this->connection);
+                array_push($stmtId);
+                if ($stmtId)
+                    $query_result->query_result = oci_execute($stmtId);
                 else
                     throw new Exception($query_result->error); //An error is found
             } else
