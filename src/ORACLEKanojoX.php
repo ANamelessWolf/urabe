@@ -168,7 +168,7 @@ class ORACLEKanojoX extends KanojoX
             $ok = oci_execute($statement);
             if ($ok) {
                 while ($row = oci_fetch_assoc($statement))
-                    array_push($rows, $row);
+                    $this->parser->parse($rows, $row);
             } else {
                 $err = $this->error($sql, $this->get_error($statement));
                 throw new UrabeSQLException($err);

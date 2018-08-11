@@ -133,7 +133,7 @@ class MYSQLKanojoX extends KanojoX
             if ($ok) {
                 $result = $statement->get_result();
                 while ($row = $result->fetch_assoc())
-                    array_push($rows, $row);
+                    $this->parser->parse($rows, $row);
             } else
                 throw new UrabeSQLException($this->error($sql));
         }
