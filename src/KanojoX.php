@@ -4,6 +4,7 @@ include "IKanojoX.php";
 include "HasamiUtils.php";
 include "ConnectionError.php";
 include "UrabeResponse.php";
+include "MysteriousParser.php";
 /**
  * Database connection model
  * 
@@ -16,6 +17,12 @@ include "UrabeResponse.php";
  */
 abstract class KanojoX implements IKanojoX
 {
+    /**
+     * Defines how the data is parsed while the result is fetch associatively
+     *
+     * @var MysteriousParser The selection data parser
+     */
+    public $parser;
     /**
      * @var array $error 
      * The application current errors
@@ -63,12 +70,22 @@ abstract class KanojoX implements IKanojoX
     public function __construct()
     {
         $this->statementsIds = array();
+        $this->parser = new MysteriousParser();
         KanojoX::$errors = array();
         KanojoX::$settings = require "UrabeSettings.php";
         if (KanojoX::$settings->handle_errors)
             set_error_handler('KanojoX::error_handler');
         if (KanojoX::$settings->handle_errors)
             set_exception_handler('KanojoX::exception_handler');
+    }
+    /**
+     * Destruct the Kanojo Instance and try to close and free memory if
+     * is connected and had statement ids.
+     */
+    function __destruct()
+    {
+        if ($this->connection)
+            $this->close();
     }
     /**
      * Initialize the class with a JSON object
@@ -177,7 +194,7 @@ abstract class KanojoX implements IKanojoX
         );
         //If encoding fails means error context has resource objects that can not be encoded,
         //in that case will try the simple exception response
-        
+
         $exc_response = json_encode($exc_response);
         if (!$exc_response)
             $exc_response = json_encode($response->get_simple_exception_response(
@@ -218,6 +235,7 @@ abstract class KanojoX implements IKanojoX
     {
         throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "error", "KanojoX"));
     }
+
     /**
      * Sends a request to execute a prepared statement with given parameters, 
      * and waits for the result
@@ -248,7 +266,6 @@ abstract class KanojoX implements IKanojoX
     /**
      * Frees the memory associated with a result
      *
-     * @param stdClass $statement The statement result
      * @return void
      */
     public function free_result()
