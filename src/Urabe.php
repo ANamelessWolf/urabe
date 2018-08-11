@@ -51,6 +51,48 @@ class Urabe
         } else
             throw new Exception(ERR_BAD_CONNECTION);
     }
+
+    /**
+     * Execute an SQL selection query and parse the data as defined in the parser. 
+     * If the parser is null uses the parser defined in the connector object KanojoX::parser
+     *
+     * @param string $sql The SQL statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @param MysteriousParser $row_parser The row parser. 
+     * @return UrabeResponse The query result as a JSON String or a query result.
+     */
+    public function select($sql, $variables = null, $row_parser = null)
+    {
+        if ($this->is_connected) {
+            $response = new UrabeResponse();
+            //1: Select row parsing method
+            if (isset($row_parser) && is_callable($row_parser))
+                $this->connector->parser = $row_parser;
+            //2: Executes the query and fetches the rows as an associative array
+            $result = $this->connector->fetch_assoc($sql, $variables);
+            //3: Formats response
+            $result = $response->get_response("Selection succeed", $result, $sql);
+            return $result;
+        } else
+            throw new Exception($this->connector->error);
+    }
+
+
+    /**
+     * Gets the table definition on an array
+     *
+     * @param string $table_name The name of the table
+     * @throws Exception An exception is thrown when the table doesn't exists.
+     * @return FieldDefinition[] The row definition of the table fields.
+     */
+    public function get_table_definition($table_name)
+    {
+        $result = $this->select($this->connector->get_table_definition_query($table_name), null, false);
+        if ($result->query_result)
+            return $result;
+        else
+            return array();
+    }
     /**
      * Gets the database connection from the current
      * Kanojo object connector
@@ -61,47 +103,8 @@ class Urabe
     {
         return $this->connector->connector;
     }
-    /**
-     * Gets the table definition on an array
-     *
-     * @param string $table_name The name of the table
-     * @throws Exception An exception is thrown when the table doesn't exists.
-     * @return FieldDefinition[] The row definition of the table fields.
-     */
-    function get_table_definition($table_name)
-    {
-        $result = $this->select($this->connector->get_table_definition_query($table_name), null, false);
-        if ($result->query_result)
-            return $result;
-        else
-            return array();
-    }
-    /**
-     * Gets a JSON object from an Oracle query. 
-     *
-     * @param string $query The query string. 
-     * @param MysteriousParser $row_parser Defines the row parsing task. 
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
-     */
-    function select($query, $row_parser = null, $encode = true)
-    {
-        $query_result = new QueryResult();
-        $query_result->query = $query;
-        try {
-            if ($this->is_connected) {
-                $query_result->query_result = $this->connector->fetch_assoc($sql, null);
-            } else
-                throw new Exception($this->connector->error);
-        } catch (Exception $e) {
-            $query_result->error = $e->getMessage();
-        }
-        if ($encode)
-            return $query_result->encode();
-        else
-            return $query_result;
-    }
+
+
     /**
      * Gets the first value found on the first column. 
      *
