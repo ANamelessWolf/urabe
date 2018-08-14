@@ -217,5 +217,23 @@ class MYSQLKanojoX extends KanojoX
             $sql = "SELECT $fields FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_NAME` = '$table_name'";
         return $sql;
     }
+    /**
+     * Gets the table definition parser for the MySQL connector
+     *
+     * @return array The table definition fields as an array of FieldDefinition
+     */
+    public function get_table_definition_parser()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_parser', 'MySQLKanojoX'));
+    }
+    /**
+     * Gets the table definition mapper for the MySQL connector
+     *
+     * @return array The table mapper as KeyValued<String,String> array
+     */
+    public function get_table_definition_mapper()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_mapper', 'MySQLKanojoX'));
+    }
 }
 ?>

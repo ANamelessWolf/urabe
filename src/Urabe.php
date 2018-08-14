@@ -59,6 +59,7 @@ class Urabe
      * @param string $sql The SQL statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
      * @param MysteriousParser $row_parser The row parser. 
+     * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
      * @return UrabeResponse The query result as a JSON String or a query result.
      */
     public function select($sql, $variables = null, $row_parser = null)
@@ -71,7 +72,7 @@ class Urabe
             //2: Executes the query and fetches the rows as an associative array
             $result = $this->connector->fetch_assoc($sql, $variables);
             //3: Formats response
-            $result = $response->get_response("Selection succeed", $result, $sql);
+            $result = $response->get_response(INF_SELECT, $result, $sql);
             return $result;
         } else
             throw new Exception($this->connector->error);
@@ -79,7 +80,7 @@ class Urabe
 
 
     /**
-     * Gets the table definition on an array
+     * Gets the table definition
      *
      * @param string $table_name The name of the table
      * @throws Exception An exception is thrown when the table doesn't exists.
@@ -87,11 +88,10 @@ class Urabe
      */
     public function get_table_definition($table_name)
     {
-        $result = $this->select($this->connector->get_table_definition_query($table_name), null, false);
-        if ($result->query_result)
-            return $result;
-        else
-            return array();
+        $parser = new MysteriousParser($this->connector->get_table_definition_parser());
+        $parser->column_map = $this->connector->get_table_definition_mapper();
+        $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
+        return $result;
     }
     /**
      * Gets the database connection from the current

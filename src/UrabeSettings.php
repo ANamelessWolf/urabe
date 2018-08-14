@@ -1,5 +1,6 @@
 <?php
 include "Warai.php";
+include "WaraiMessages_en.php";
 /**
  * Urabe application settings
  *

@@ -194,6 +194,40 @@ class ORACLEKanojoX extends KanojoX
         return $sql;
     }
     /**
+     * Gets the table definition parser for the ORACLE connector
+     *
+     * @return array The table definition fields as an array of FieldDefinition
+     */
+    public function get_table_definition_parser()
+    {
+        $fields = array(
+            ORACLE_FIELD_COL_ORDER => new FieldDefinition(0, ORACLE_FIELD_COL_ORDER, PARSE_AS_INT),
+            ORACLE_FIELD_COL_NAME => new FieldDefinition(1, ORACLE_FIELD_COL_NAME, PARSE_AS_STRING),
+            ORACLE_FIELD_DATA_TP => new FieldDefinition(2, ORACLE_FIELD_DATA_TP, PARSE_AS_STRING),
+            ORACLE_FIELD_CHAR_LENGTH =>  new FieldDefinition(3, ORACLE_FIELD_CHAR_LENGTH, PARSE_AS_INT),
+            ORACLE_FIELD_NUM_PRECISION => new FieldDefinition(4, ORACLE_FIELD_NUM_PRECISION, PARSE_AS_INT),
+            ORACLE_FIELD_NUM_SCALE => new FieldDefinition(5, ORACLE_FIELD_NUM_SCALE, PARSE_AS_INT)
+        );
+        return $fields;
+    }
+    /**
+     * Gets the table definition mapper for the database connector
+     *
+     * @return array The table mapper as KeyValued<String,String> array
+     */
+    public function get_table_definition_mapper()
+    {
+        $map = array(
+            ORACLE_FIELD_COL_ORDER => TAB_DEF_INDEX,
+            ORACLE_FIELD_COL_NAME => TAB_DEF_NAME,
+            ORACLE_FIELD_DATA_TP => TAB_DEF_TYPE,
+            ORACLE_FIELD_CHAR_LENGTH => TAB_DEF_CHAR_LENGTH,
+            ORACLE_FIELD_NUM_PRECISION => TAB_DEF_NUM_PRECISION,
+            ORACLE_FIELD_NUM_SCALE => TAB_DEF_NUM_SCALE
+        );
+        return $map;
+    }
+    /**
      * Prepares sql_text using connection and returns the statement identifier, 
      * which can be used with oci_execute(). 
      *

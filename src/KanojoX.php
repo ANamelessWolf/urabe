@@ -282,6 +282,24 @@ abstract class KanojoX implements IKanojoX
     {
         throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "get_table_definition_query", "KanojoX"));
     }
+    /**
+     * Gets the table definition parser for the database connector
+     *
+     * @return array The table definition fields as an array of FieldDefinition
+     */
+    public function get_table_definition_parser()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_parser', 'KanojoX'));
+    }
+    /**
+     * Gets the table definition mapper for the database connector
+     *
+     * @return array The table mapper as KeyValued<String,String> array
+     */
+    public function get_table_definition_mapper()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_mapper', 'KanojoX'));
+    }
 }
 
 ?>

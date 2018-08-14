@@ -172,6 +172,24 @@ class PGKanojoX extends KanojoX
         return $sql;
     }
     /**
+     * Gets the table definition parser for the PG connector
+     *
+     * @return array The table definition fields as an array of FieldDefinition
+     */
+    public function get_table_definition_parser()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_parser', 'PGKanojoX'));
+    }
+    /**
+     * Gets the table definition mapper for the PG connector
+     *
+     * @return array The table mapper as KeyValued<String,String> array
+     */
+    public function get_table_definition_mapper()
+    {
+        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_mapper', 'PGKanojoX'));
+    }
+    /**
      * Gets the error found in a ORACLE resource object could be a
      * SQL statement error or a connection error.
      *

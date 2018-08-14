@@ -3,27 +3,15 @@
 /**
  * Field Definition Class
  * 
- * This class encapsulates a table field definition. 
- * Each table field is associated to a column name and the column data type.
- * This class treats the database fields types in three types; text, date and numeric.
- * @api Makoto Urabe Oracle
+ * This class encapsulates a table column definition and format it values to JSON field value
+ * Each table field is associated to a column and stores its index and data type.
+ * 
+ * @api Makoto Urabe
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
 class FieldDefinition
 {
-    /**
-     * @var string INTEGER_FORMAT
-     * The format that saves the JSON data with a number format.
-     */
-    const INTEGER_FORMAT = '"%s" : %s';
-    /**
-     * @var string STRING_FORMAT
-     * The format that saves the JSON data with a date format.
-     * Saves the date in JSON format and in the database format.
-     */
-    const DATE_FORMAT = '"%s" : "%s", "%s_db" : "%s"';
-
     /**
      * @var int The column index
      */
@@ -33,17 +21,9 @@ class FieldDefinition
      */
     public $column_name;
     /**
-     * @var string The column alias used in the JSON key value pair.
-     * By default the data alias is the column name
-     */
-    public $data_alias;
-
-    /**
      * @var string The column data type
      */
     public $data_type;
-
-
     /**
      * Initialize a new instance of a Field Definition class
      *
@@ -66,65 +46,14 @@ class FieldDefinition
      */
     public function get_value($value)
     {
-        $integer_types = array("LONG", "ROWID", "UROWID");
-        $float_types = array("FLOAT", "NUMBER");
-        if (in_array($this->data_type, $integer_types))
-            return is_null($value) ? 0 : intval($value);
-        else if (in_array($this->data_type, $float_types))
-            return is_null($value) ? 0.0 : floatval($value);
-        //Not defined fields are treated as strings
-        else
-            return is_null($value) ? "" : $value;
-    }
-    /**
-     * Verify if the current data type is a date type
-     * @param string $data_type The field data type
-     */
-    function is_date()
-    {
-        $condition = $this->data_type == "DATE" ||
-            strpos($this->data_type, "TIMESTAMP") ||
-            strpos($this->data_type, "INTERVAL DAY") ||
-            strpos($this->data_type, "INTERVAL YEAR");
-        return $condition;
-    }
-    /**
-     * Gets the table definition parser
-     *
-     * @return MysteriousParser Table definition parser
-     */
-    public static function get_table_def_parser()
-    {
-        $fields = array();
-        array_push($fields, new FieldDefinition(FIELD_COL_NAME, "STRING"));
-        array_push($fields, new FieldDefinition(FIELD_DATA_TP, "STRING"));
-        array_push($fields, new FieldDefinition(FIELD_DATA_LEN, "LONG"));
-        return new MysteriousParser($fields);
-    }
-    /**
-     * Gets the table definition from a Mysterious Parser result
-     *
-     * @param stdClass[] $result The Mysterious Parser result
-     * @return FieldDefinition[] The Table definition
-     */
-    public static function parse_result($result)
-    {
-        $fields = array();
-        foreach ($result->fields as &$row)
-            array_push($fields, new FieldDefinition($row->{FIELD_COL_NAME}, $row->{FIELD_DATA_TP}));
-        return $fields;
-    }
-    /**
-     * Gets a JSON String from a collection of Fields Definitions
-     *
-     * @param FieldDefinition[] $fields_array A collection of fields to be encoded as a JSON String
-     * @return string The JSON string
-     */
-    public static function encode_json($fields_array)
-    {
-        $fields = new stdClass();
-        $fields->{NODE_FIELDS} = $fields_array;
-        return json_encode($fields);
+        if ($this->data_type == PARSE_AS_STRING)
+            return strval($value);
+        else if ($this->data_type == PARSE_AS_INT)
+            return intval($value);
+        else if ($this->data_type == PARSE_AS_NUMBER)
+            return doubleval($value);
+        else if ($this->data_type == PARSE_AS_DATE)
+            return $value;
     }
 }
 ?>

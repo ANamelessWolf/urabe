@@ -282,6 +282,63 @@ const PRETTY_PRINT_DARK = 'Dark';
  * The parameter key that specifies a light theme with pretty print
  */
 const PRETTY_PRINT_LIGHT = 'Light';
+/***************************
+ ****** Parsing Types ******
+ ***************************/
+/**
+ * @var string ORACLE_FIELD_COL_ORDER
+ * The field name that stores the column name
+ */
+const PARSE_AS_STRING = 'String';
+/**
+ * Parse the value as an integer
+ */
+const PARSE_AS_INT = 'Integer';
+/**
+ * Parse the value as long
+ */
+const PARSE_AS_LONG = 'Long';
+/**
+ * Parse the value as number
+ */
+const PARSE_AS_NUMBER = 'Number';
+/**
+ * Parse the value as date
+ */
+const PARSE_AS_DATE = 'Date';
+/************************************
+ ****** Table definition nodes ******
+ ************************************/
+/**
+ * @var string TAB_DEF_INDEX
+ * The field name that stores the column index
+ */
+const TAB_DEF_INDEX = 'column_index';
+/**
+ * @var string TAB_DEF_NAME
+ * The field name that stores the column name
+ */
+const TAB_DEF_NAME = 'column_name';
+/**
+ * @var string TAB_DEF_TYPE
+ * The field name that stores the column data type
+ */
+const TAB_DEF_TYPE = 'data_type';
+/**
+ * @var string TAB_DEF_CHAR_LENGTH
+ * The field name that stores the column max number of character length
+ */
+const TAB_DEF_CHAR_LENGTH = 'char_max_length';
+/**
+ * @var string TAB_DEF_NUM_PRECISION
+ * The field name that stores the column number precision
+ */
+const TAB_DEF_NUM_PRECISION = 'numeric_precision';
+/**
+ * @var string TAB_DEF_NUM_SCALE
+ * The field name that stores the column number scale
+ */
+const TAB_DEF_NUM_SCALE = 'numeric_scale';
 /******************************************
  ************ FIELD NAMES *****************
  *****************************************/

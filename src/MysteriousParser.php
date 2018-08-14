@@ -1,5 +1,5 @@
 <?php
-include_once "FieldDefinition.php";
+
 /**
  * Mysterious parser class
  * 
@@ -12,9 +12,21 @@ include_once "FieldDefinition.php";
 class MysteriousParser
 {
     /**
-     * @var FieldDefinition[] The table fields definition.
+     * @var DBDriver The database driver
+     */
+    public $driver;
+    /**
+     * @var array The table fields definition as an array of FieldDefinition.
      */
     public $table_definition;
+    /**
+     * @var array Defines how the columns are mapped to the message response, if null
+     * the columns maintains the database column names. The values are passed as a key value pair, where the
+     * first value is the database column name and the second the message field name.
+     * This values are case sensitive
+     */
+    public $column_map;
+
     /**
      * Defines the result parsing method, this function receives a row and
      * an array where the data should be putted.
@@ -30,13 +42,16 @@ class MysteriousParser
      */
     public function __construct($table_definition = null)
     {
-        if (isset($table_definition))
+        if (isset($table_definition)) {
             $this->table_definition = $table_definition;
-        $this->parse_method = function ($parser, &$result, $row) {
+            $this->parse_method = function ($parser, &$result, $row) {
+                $this->parse_with_field_definition($result, $row);
+            };
+        } else
+            $this->parse_method = function ($parser, &$result, $row) {
             array_push($result, $row);
         };
     }
-
     /**
      * Check if a field name is defined on the table definition
      *
@@ -47,11 +62,13 @@ class MysteriousParser
     {
         return array_key_exists($field_name, $this->table_definition);
     }
+
     /**
-     * Gets the row parsed
-     * 
-     * @param resource $sentence The Oracle sentence
-     * @return mixed[] The parsed row
+     * Parse the fetch assoc result by the parse_method callback definition
+     *
+     * @param array $result The result row to parse
+     * @param array $row The associative array to parse with a new format
+     * @return void
      */
     public function parse(&$result, $row)
     {
@@ -73,6 +90,26 @@ class MysteriousParser
         // return $result;
     }
     /**
+     * Parse the data using the field definition, if a column map is set the result keys are mapped
+     * to the given value
+     *
+     * @param array $result The result row to parse
+     * @param array $row The associative array to parse with a new format
+     * @return void
+     */
+    public function parse_with_field_definition(&$result, $row)
+    {
+        foreach ($row as $column_name => $column_value) {
+            $result = array();
+            $key = $column_name;
+            $value = $this->table_definition[$column_name]->get_value();
+            if (isset($this->column_map) && array_key_exists($column_name, $row))
+                $key = $column_name;
+            array_push($result, $row);
+        }
+    }
+
+    /**
      * Creates a Mysterious parser from a JSON string
      *
      * @param string $json_string The JSON string
@@ -86,5 +123,6 @@ class MysteriousParser
             array_push($fields, new FieldDefinition($field->field_name, $field->data_type));
         return new MysteriousParser($fields);
     }
+
 }
 ?>

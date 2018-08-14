@@ -58,11 +58,23 @@ interface IKanojoX
      */
     public function free_result();
     /**
-     * Gets the query for selecting the table definition
+     * Gets the table definition query for the database connector
      *
      * @param string $table_name The table name
      * @return string The table definition selection query
      */
     public function get_table_definition_query($table_name);
+    /**
+     * Gets the table definition parser for the database connector
+     *
+     * @return array The table definition fields as an array of FieldDefinition
+     */
+    public function get_table_definition_parser();
+    /**
+     * Gets the table definition mapper for the database connector
+     *
+     * @return array The table mapper as KeyValued<String,String> array
+     */
+    public function get_table_definition_mapper();
 }
 ?>
