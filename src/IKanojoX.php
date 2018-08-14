@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Connetion functionality
+ * Connection functionality
  * Implements a database connection functionality wraps most used
  * PHP database connector functions
  * @api Makoto Urabe DB Manager
@@ -25,8 +25,8 @@ interface IKanojoX
     /**
      * Get the last error message string of a connection
      *
-     * @param string|null $sql The last excecuted statement. Can be null
-     * @param ConnectionError $error If the error exists pass the eror
+     * @param string|null $sql The last executed statement. Can be null
+     * @param ConnectionError $error If the error exists pass the error
      * @return ConnectionError The connection error 
      */
     public function error($sql, $error);
