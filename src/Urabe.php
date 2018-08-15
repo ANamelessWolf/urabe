@@ -67,7 +67,7 @@ class Urabe
         if ($this->is_connected) {
             $response = new UrabeResponse();
             //1: Select row parsing method
-            if (isset($row_parser) && is_callable($row_parser))
+            if (isset($row_parser) && is_callable($row_parser->parse_method))
                 $this->connector->parser = $row_parser;
             //2: Executes the query and fetches the rows as an associative array
             $result = $this->connector->fetch_assoc($sql, $variables);
@@ -78,55 +78,24 @@ class Urabe
             throw new Exception($this->connector->error);
     }
 
-
     /**
-     * Gets the table definition
+     * Gets the first value found on the first row and firs column.
+     * If no values are selected a default value is returned
      *
-     * @param string $table_name The name of the table
-     * @throws Exception An exception is thrown when the table doesn't exists.
-     * @return FieldDefinition[] The row definition of the table fields.
+     * @param string $sql The SQL statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @param string $default_val The default value
+     * @return string The selected value taken from the first row and first column
      */
-    public function get_table_definition($table_name)
-    {
-        $parser = new MysteriousParser($this->connector->get_table_definition_parser());
-        $parser->column_map = $this->connector->get_table_definition_mapper();
-        $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
-        return $result;
-    }
-    /**
-     * Gets the database connection from the current
-     * Kanojo object connector
-     *
-     * @return stdClass The database connection
-     */
-    private function get_db_connection()
-    {
-        return $this->connector->connector;
-    }
-
-
-    /**
-     * Gets the first value found on the first column. 
-     *
-     * @param string $query The query string. 
-     * @param string $default_val The default value to return as a string value.
-     * @return string The first value.
-     */
-    function select_one($query, $default_val = "")
-    {
-        $result = $default_val;
-        $query_result = new QueryResult();
-        $query_result->query = $query;
-        if ($this->is_connected) {
-            $stmtId = $query_result->oci_parse($this->connection);
-            array_push($stmtId);
-            oci_execute($stmtId);
-            $query_result->query_result = oci_fetch_all($stmtId, $query_result->result, 0, 1);
-            if ($query_result->query_result)
-                $result = (string)reset($query_result->result)[0];
+    public function select_one($sql, $variables = null, $default_val = null)
+    {        
+        $result = $this->connector->fetch_assoc($sql, $variables);
+        if (sizeof($result) > 0) {
+            $result = $result[0];
+            $columns = array_keys($result);
+            return sizeof($columns) > 0 ? strval($result[$columns[0]]) : $default_val;
         } else
-            $this->error = $this->connection->error;
-        return $result;
+            return $default_val;
     }
     /**
      * Select all values taken from the first selected column.
@@ -150,6 +119,20 @@ class Urabe
         return $result;
     }
     /**
+     * Gets the database connection from the current
+     * Kanojo object connector
+     *
+     * @return stdClass The database connection
+     */
+    private function get_db_connection()
+    {
+        return $this->connector->connector;
+    }
+
+
+
+
+    /**
      * Gets the table names from the current schema
      *
      * @return string[] The table names inside a string array.
@@ -171,6 +154,20 @@ class Urabe
     function select_all($table_name, $row_parser = null, $encode = true)
     {
         return $this->select(sprintf('SELECT * FROM `%s`', $table_name), $row_parser, $encode);
+    }
+    /**
+     * Gets the table definition
+     *
+     * @param string $table_name The name of the table
+     * @throws Exception An exception is thrown when the table doesn't exists.
+     * @return FieldDefinition[] The row definition of the table fields.
+     */
+    public function get_table_definition($table_name)
+    {
+        $parser = new MysteriousParser($this->connector->get_table_definition_parser());
+        $parser->column_map = $this->connector->get_table_definition_mapper();
+        $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
+        return $result;
     }
     /**
      * Executes a query

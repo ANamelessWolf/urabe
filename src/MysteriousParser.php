@@ -39,6 +39,7 @@ class MysteriousParser
      *
      * Initialize a new instance of the Mysterious parser.
      * @param FieldDefinition[] $table_definition The table fields definition.
+     * When table definition is presented the fetched data is parsed using the parse_with_field_definition function 
      */
     public function __construct($table_definition = null)
     {
@@ -99,15 +100,29 @@ class MysteriousParser
      */
     public function parse_with_field_definition(&$result, $row)
     {
+        $newRow = array();
         foreach ($row as $column_name => $column_value) {
-            $result = array();
-            $key = $column_name;
-            $value = $this->table_definition[$column_name]->get_value();
-            if (isset($this->column_map) && array_key_exists($column_name, $row))
-                $key = $column_name;
-            array_push($result, $row);
+            $key = $this->get_column_name($column_name);
+            $value = $this->table_definition[$column_name]->get_value($column_value);
+            $newRow[$key] = $value;
         }
+        array_push($result, $newRow);
     }
+    /**
+     * Gets the column name from the column_map array if is defined, otherwise
+     * the column_name stays as the value selected
+     *
+     * @param string $column_name The column name
+     * @return string The column name, same or mapped name
+     */
+    private function get_column_name($column_name)
+    {
+        if (isset($this->column_map) && array_key_exists($column_name, $this->column_map))
+            return $this->column_map[$column_name];
+        else
+            return $column_name;
+    }
+
 
     /**
      * Creates a Mysterious parser from a JSON string

@@ -46,7 +46,9 @@ class FieldDefinition
      */
     public function get_value($value)
     {
-        if ($this->data_type == PARSE_AS_STRING)
+        if (is_null($value))
+            return null;
+        else if ($this->data_type == PARSE_AS_STRING)
             return strval($value);
         else if ($this->data_type == PARSE_AS_INT)
             return intval($value);

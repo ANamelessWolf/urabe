@@ -26,4 +26,31 @@ function test_select($urabe, $body)
     $result->message = "Urabe test selection query with default parser";
     return $result;
 }
+/**
+ * This function is an example for testing the table definition selection
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The selection result as a web service response
+ */
+function test_get_table_definition($urabe, $body)
+{
+    $result = $urabe->get_table_definition($body->table_name);
+    $result->message = "Urabe test get table definition";
+    return $result;
+}
+/**
+ * This function is an example for testing a SQL selection query that returns one
+ * value. The first row and first column
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return string Returns the selected value
+ */
+function test_select_one($urabe, $body)
+{
+    $sql = $body->sql_simple;
+    $result = $urabe->select_one($sql);
+    return $result;
+}
 ?>
