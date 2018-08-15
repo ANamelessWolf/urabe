@@ -53,4 +53,19 @@ function test_select_one($urabe, $body)
     $result = $urabe->select_one($sql);
     return $result;
 }
+/**
+ * This function is an example for testing a SQL selection query that returns the values from
+ * the first selected column.
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return mixed[] Returns the selected values
+ */
+function test_select_items($urabe, $body)
+{
+    $sql = $body->sql_simple;
+    $result = $urabe->select_items($sql);
+    return $result;
+}
+
 ?>

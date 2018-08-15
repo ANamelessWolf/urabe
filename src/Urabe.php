@@ -88,7 +88,7 @@ class Urabe
      * @return string The selected value taken from the first row and first column
      */
     public function select_one($sql, $variables = null, $default_val = null)
-    {        
+    {
         $result = $this->connector->fetch_assoc($sql, $variables);
         if (sizeof($result) > 0) {
             $result = $result[0];
@@ -98,25 +98,25 @@ class Urabe
             return $default_val;
     }
     /**
-     * Select all values taken from the first selected column.
+     * Select all rows and returns just the values from the first selected column.
+     * Used to select list of elements, no associatively
      *
-     * @param string $query The query string. 
+     * @param string $sql The SQL statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
      * @return mixed[] The first column values inside an array.
      */
-    function select_items($query)
+    public function select_items($sql)
     {
-        $result = array();
-        $query_result = new QueryResult();
-        $query_result->query = $query;
-        if ($this->is_connected) {
-            $stmtId = $query_result->oci_parse($this->connection);
-            array_push($stmtId);
-            $query_result->query_result = $query_result->fetch($stmtId, $row_parser);
-            if ($query_result->query_result)
-                $result = reset($query_result->result);
-        } else
-            $this->error = $this->connection->error;
-        return $result;
+        $result = $this->connector->fetch_assoc($sql, $variables);
+        $values = array();
+        if (sizeof($result) > 0) {
+            $columns = array_keys($result[0]);
+            $sel_column = sizeof($columns) > 0 ? $columns[0] : null;
+            if (isset($sel_column))
+                for ($i = 0; $i < sizeof($result); $i++)
+                array_push($values, $result[$i][$sel_column]);
+        }
+        return $values;
     }
     /**
      * Gets the database connection from the current
