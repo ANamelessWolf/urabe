@@ -90,8 +90,8 @@ class PGKanojoX extends KanojoX
      *
      * @param string $sql The SQL Statement
      * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
-     * @throws Exception En Exception is raised if the execution result fails
-     * @return object Returns the execute response on success or the connection error on failure. 
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
     public function execute($sql, $variables = null)
     {
@@ -102,17 +102,19 @@ class PGKanojoX extends KanojoX
                 $vars = array();
                 foreach ($variables as &$value)
                     array_push($vars, $value);
-                $result = pg_execute($this->connection, self::DEFT_STMT_NAME, $vars);
+                $statement = pg_execute($this->connection, self::DEFT_STMT_NAME, $vars);
             }
         } else {
             $result = pg_send_query($this->connection, $sql);
-            $result = pg_get_result($this->connection);
+            $statement = pg_get_result($this->connection);
         }
-        if (!$result || pg_result_status($result) != PGSQL_Result::PGSQL_COMMAND_OK) {
-            $err = $this->error($sql, $this->get_error($result == false ? null : $result, $sql));
+        if (!$statement || pg_result_status($statement) != PGSQL_Result::PGSQL_COMMAND_OK) {
+            $err = $this->error($sql, $this->get_error($statement == false ? null : $statement, $sql));
             throw new UrabeSQLException($err);
-        } else
-            return (new UrabeResponse())->get_execute_response(true, pg_affected_rows($result), $sql);
+        } else{
+            array_push($this->statementsIds, $statement);
+            return (new UrabeResponse())->get_execute_response(true, pg_affected_rows($statement), $sql);
+        }
     }
     /**
      * Returns an associative array containing the next result-set row of a 

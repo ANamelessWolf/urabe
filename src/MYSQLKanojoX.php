@@ -86,27 +86,24 @@ class MYSQLKanojoX extends KanojoX
      *
      * @param string $sql The SQL Statement
      * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
-     * @throws Exception En Exception is raised if the execution result fails
-     * @return object Returns the execute response on success or the connection error on failure. 
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
     public function execute($sql, $variables = null)
     {
-        try {
-            if (!$this->connection)
-                throw new Exception(ERR_NOT_CONNECTED);
-            $statement = $this->parse($this->connection, $sql, $variables);
-            $class = get_class($statement);
-            if ($class == CLASS_ERR)
-                throw (!is_null($statement->sql) ? new UrabeSQLException($this->error($sql)) : new Exception($statement->error, $statement->errno));
-            else {
-                $ok = $statement->execute();
-                if ($ok)
-                    return (new UrabeResponse())->get_execute_response(true, $statement->error, $sql);
-                else
-                    throw new UrabeSQLException($this->error($sql));
-            }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage());
+        if (!$this->connection)
+            throw new Exception(ERR_NOT_CONNECTED);
+        $statement = $this->parse($this->connection, $sql, $variables);
+        $class = get_class($statement);
+        if ($class == CLASS_ERR)
+            throw (!is_null($statement->sql) ? new UrabeSQLException($this->error($sql)) : new Exception($statement->error, $statement->errno));
+        else {
+            $ok = $statement->execute();
+            if ($ok) {
+                array_push($this->statementsIds, $statement);
+                return (new UrabeResponse())->get_execute_response(true, $statement->affected_rows, $sql);
+            } else
+                throw new UrabeSQLException($this->error($sql));
         }
     }
     /**

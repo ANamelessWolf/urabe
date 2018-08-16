@@ -107,7 +107,7 @@ class ORACLEKanojoX extends KanojoX
         $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
         return $this->error;
     }
-    
+
     /**
      * Gets the error found in a ORACLE resource object could be a
      * SQL statement error or a connection error.
@@ -129,26 +129,23 @@ class ORACLEKanojoX extends KanojoX
      *
      * @param string $sql The SQL Statement
      * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
-     * @throws Exception En Exception is raised if the connection is null
-     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
     public function execute($sql, $variables = null)
     {
-        try {
-            if (!isset($this->connection))
-                throw new Exception(ERR_NOT_CONNECTED);
-            $statement = $this->parse($this->connection, $sql);
-            if (isset($variables) && is_array($variables))
-                $this->bind($statement, $variables);
-            $ok = oci_execute($statement);
-            if ($ok)
-                return $ok;
-            else {
-                $err = $this->error($sql, $this->get_error($statement));
-                throw new UrabeSQLException($err);
-            }
-        } catch (Exception $e) {
-            throw new Exception(sprintf(ERR_BAD_QUERY, $sql, $e->getMessage()));
+        if (!isset($this->connection))
+            throw new Exception(ERR_NOT_CONNECTED);
+        $statement = $this->parse($this->connection, $sql);
+        if (isset($variables) && is_array($variables))
+            $this->bind($statement, $variables);
+        $ok = oci_execute($statement);
+        if ($ok) {
+            array_push($this->statementsIds, $statement);
+            return (new UrabeResponse())->get_execute_response(true, oci_num_rows($statement), $sql);
+        } else {
+            $err = $this->error($sql, $this->get_error($statement));
+            throw new UrabeSQLException($err);
         }
     }
     /**

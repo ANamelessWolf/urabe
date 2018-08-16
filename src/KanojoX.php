@@ -65,6 +65,12 @@ abstract class KanojoX implements IKanojoX
      */
     public $connection;
     /**
+     * Returns the number of affected rows
+     *
+     * @var int The number of affected rows
+     */
+    public $affected_rows;
+    /**
      * Initialize a new instance of the connection object
      */
     public function __construct()
@@ -173,7 +179,6 @@ abstract class KanojoX implements IKanojoX
     {
         http_response_code(400);
         $class = get_class($exception);
-
         $error = new ConnectionError();
         $error->code = $exception->getCode();
         $error->message = $exception->getMessage();
@@ -242,8 +247,8 @@ abstract class KanojoX implements IKanojoX
      *
      * @param string $sql The SQL Statement
      * @param array|null $variables The colon-prefixed bind variables placeholder used in the statement, can be null.
-     * @throws Exception En Exception is raised if the connection is null
-     * @return boolean|ConnectionError Returns TRUE on success or the connection error on failure. 
+     * @throws Exception This method is not implemented in the abstract class
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
     public function execute($sql, $variables = null)
     {

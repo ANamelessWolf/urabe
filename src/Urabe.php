@@ -159,19 +159,16 @@ class Urabe
     }
 
     /**
-     * Execute an SQL selection query and parse the data as defined in the parser. 
-     * If the parser is null uses the parser defined in the connector object KanojoX::parser
+     * This function is an alias of KanojoX::execute()
      *
      * @param string $sql The SQL statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
-     * @param MysteriousParser $row_parser The row parser. 
-     * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
-     * @return UrabeResponse The query result as a JSON String or a query result.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    public function query($sql, $variables, $encode = true)
+    public function query($sql, $variables)
     {
-        $result = $this->connector->execute($sql, $variables);
-        return $result;
+        return $this->connector->execute($sql, $variables);
     }
     /**
      * Performs an insertion query to the current scheme

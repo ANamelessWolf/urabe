@@ -22,7 +22,7 @@ class UrabeSQLException extends Exception
     {
         $search = array("\t", "\n", "\r", "   ", "  ", "\\n");
         $replace = array("", " ", " ", "", "", " ");
-        $msg = str_replace($search, $replace, $error->message);
+        $msg = str_replace($search, $replace, $error->message);        
         $msg = sprintf(ERR_BAD_QUERY, $msg);
         parent::__construct($msg, $error->code);
         $this->sql = $error->sql;
