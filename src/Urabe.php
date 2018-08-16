@@ -119,42 +119,19 @@ class Urabe
         return $values;
     }
     /**
-     * Gets the database connection from the current
-     * Kanojo object connector
+     * Selects all rows from a given table name, Calling select_all() is identical to calling select() with 
+     * $sql = SELECT * FROM table_name
      *
-     * @return stdClass The database connection
+     * @param string $table_name The name of the table
+     * @param MysteriousParser $row_parser The row parser. 
+     * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
+     * @return UrabeResponse The query result as a JSON String or a query result.
      */
-    private function get_db_connection()
+    public function select_all($table_name, $row_parser = null)
     {
-        return $this->connector->connector;
+        return $this->select(sprintf('SELECT * FROM `%s`', $table_name), null, $row_parser);
     }
 
-
-
-
-    /**
-     * Gets the table names from the current schema
-     *
-     * @return string[] The table names inside a string array.
-     */
-    function select_table_names()
-    {
-        $query = "SELECT DISTINCT OBJECT_NAME FROM USER_OBJECTS WHERE OBJECT_TYPE = 'TABLE'";
-        return $this->select_items($query);
-    }
-    /**
-     * Gets a JSON object from an Oracle query, that selects all fields
-     * from the table.
-     *
-     * @param MysteriousParser $row_parser Defines the row parsing task. 
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
-     */
-    function select_all($table_name, $row_parser = null, $encode = true)
-    {
-        return $this->select(sprintf('SELECT * FROM `%s`', $table_name), $row_parser, $encode);
-    }
     /**
      * Gets the table definition
      *
@@ -169,35 +146,32 @@ class Urabe
         $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
         return $result;
     }
+
     /**
-     * Executes a query
+     * Gets the database connection from the current
+     * Kanojo object connector
      *
-     * @param string $query The query string. 
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
+     * @return stdClass The database connection
      */
-    public function query($query, $encode = true)
+    private function get_db_connection()
     {
-        $query_result = new QueryResult();
-        $query_result->query = $query;
-        try {
-            if ($this->is_connected) {
-                $stmtId = $query_result->oci_parse($this->connection);
-                array_push($stmtId);
-                if ($stmtId)
-                    $query_result->query_result = oci_execute($stmtId);
-                else
-                    throw new Exception($query_result->error); //An error is found
-            } else
-                throw new Exception($this->connection->error);
-        } catch (Exception $e) {
-            $query_result->error = $e->getMessage();
-        }
-        if ($encode)
-            return $query_result->encode();
-        else
-            return $query_result;
+        return $this->connector->connector;
+    }
+
+    /**
+     * Execute an SQL selection query and parse the data as defined in the parser. 
+     * If the parser is null uses the parser defined in the connector object KanojoX::parser
+     *
+     * @param string $sql The SQL statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
+     * @param MysteriousParser $row_parser The row parser. 
+     * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
+     * @return UrabeResponse The query result as a JSON String or a query result.
+     */
+    public function query($sql, $variables, $encode = true)
+    {
+        $result = $this->connector->execute($sql, $variables);
+        return $result;
     }
     /**
      * Performs an insertion query to the current scheme

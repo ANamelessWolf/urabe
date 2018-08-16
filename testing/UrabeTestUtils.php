@@ -68,4 +68,9 @@ function test_select_items($urabe, $body)
     return $result;
 }
 
+function test_query($urabe, $body)
+{
+    $sql = $body->update_sql;
+    return $urabe->query($sql);
+}
 ?>

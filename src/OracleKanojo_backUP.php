@@ -80,9 +80,11 @@ class OracleKanojoX extends KanojoX implements IKanojoX
      *
      * @return array The last error found
      */
-    protected function get_error()
+    protected function get_error($resource)
     {
-        return oci_error();
+        $err = oci_error($resource);
+        var_dump($err);
+        return $err;
     }
 
     /**

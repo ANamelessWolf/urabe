@@ -107,6 +107,7 @@ class ORACLEKanojoX extends KanojoX
         $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
         return $this->error;
     }
+    
     /**
      * Gets the error found in a ORACLE resource object could be a
      * SQL statement error or a connection error.
@@ -140,7 +141,12 @@ class ORACLEKanojoX extends KanojoX
             if (isset($variables) && is_array($variables))
                 $this->bind($statement, $variables);
             $ok = oci_execute($statement);
-            return $ok ? $statement : $this->error($sql);
+            if ($ok)
+                return $ok;
+            else {
+                $err = $this->error($sql, $this->get_error($statement));
+                throw new UrabeSQLException($err);
+            }
         } catch (Exception $e) {
             throw new Exception(sprintf(ERR_BAD_QUERY, $sql, $e->getMessage()));
         }
@@ -204,7 +210,7 @@ class ORACLEKanojoX extends KanojoX
             ORACLE_FIELD_COL_ORDER => new FieldDefinition(0, ORACLE_FIELD_COL_ORDER, PARSE_AS_INT),
             ORACLE_FIELD_COL_NAME => new FieldDefinition(1, ORACLE_FIELD_COL_NAME, PARSE_AS_STRING),
             ORACLE_FIELD_DATA_TP => new FieldDefinition(2, ORACLE_FIELD_DATA_TP, PARSE_AS_STRING),
-            ORACLE_FIELD_CHAR_LENGTH =>  new FieldDefinition(3, ORACLE_FIELD_CHAR_LENGTH, PARSE_AS_INT),
+            ORACLE_FIELD_CHAR_LENGTH => new FieldDefinition(3, ORACLE_FIELD_CHAR_LENGTH, PARSE_AS_INT),
             ORACLE_FIELD_NUM_PRECISION => new FieldDefinition(4, ORACLE_FIELD_NUM_PRECISION, PARSE_AS_INT),
             ORACLE_FIELD_NUM_SCALE => new FieldDefinition(5, ORACLE_FIELD_NUM_SCALE, PARSE_AS_INT)
         );
