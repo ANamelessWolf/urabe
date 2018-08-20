@@ -199,14 +199,34 @@ abstract class KanojoX implements IKanojoX
         );
         //If encoding fails means error context has resource objects that can not be encoded,
         //in that case will try the simple exception response
-
+        $sql = $exc_response->error[NODE_QUERY];
         $exc_response = json_encode($exc_response);
-        if (!$exc_response)
-            $exc_response = json_encode($response->get_simple_exception_response(
-            $exception,
-            KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
-        ));
+
+        if (!$exc_response) {
+            $exc_response = $response->get_simple_exception_response(
+                $exception,
+                KanojoX::$settings->enable_stack_trace ? $exception->getTraceAsString() : null
+            );
+            if (KanojoX::$settings->add_query_to_response)
+                $exc_response->{NODE_SQL} = $sql;
+            $exc_response->{NODE_SUCCEED} = false;
+            $exc_response = json_encode($exc_response);
+        }
         echo $exc_response;
+    }
+    /*********************
+     **** SQL Parsing ****
+     *********************/
+    /**
+     * Gets the placeholders format for the original prepared query string. 
+     * The number of elements in the array must match the number of placeholders. 
+     *
+     * @param int $index The place holder index if needed
+     * @return string The place holder at the given position
+     */
+    public function get_param_place_holder($index = null)
+    {
+        return '?';
     }
     /*********************
      * Interface Methods *

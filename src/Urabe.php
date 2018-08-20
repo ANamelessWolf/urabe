@@ -168,70 +168,68 @@ class Urabe
      */
     public function query($sql, $variables)
     {
-        return $this->connector->execute($sql, $variables);
+        return $response = $this->connector->execute($sql, $variables);
     }
     /**
-     * Performs an insertion query to the current scheme
+     * Performs an insertion query into a table
      *
      * @param string $table_name The table name.
-     * @param string[] $fields The insertion field names.
-     * @param mixed[] $values The values to insert.
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
+     * @param array $values The values to insert as key value pair array. 
+     * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    function insert($table_name, $fields, $values, $encode = true)
+    function insert($table_name, $values)
     {
-        $query_format = "INSERT INTO `%s` (%s) VALUES (%s)";
-        $max = count($fields);
-        $fields_str = "";
-        $values_str = "";
-        for ($i = 0; $i < $max; $i++) {
-            $fields_str .= '`' . $fields[$i] . '`, ';
-            $values_str .= $this->format_value($values[$i]) . ', ';
-        }
-        $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
-        $values_str = substr($values_str, 0, strlen($values_str) - 2);
-        $query = sprintf($query_format, $table_name, $fields_str, $values_str);
-        return $this->query($query, $encode);
-    }
-    /**
-     * Performs an insertion query to the current schema, inserting more than
-     * one value.
-     *
-     * @param string $table_name The table name.
-     * @param string[] $fields The insertion field names.
-     * @param mixed[][] $array_values The collection of values to insert.
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
-     */
-    function insert_bulk($table_name, $fields, $array_values, $encode = true)
-    {
-        $query_format = "INSERT INTO `%s` (%s) %s";
-        $fields_count = count($fields);
-        $array_length = count($array_values);
-        $fields_str = "";
-        $values_str = "";
-        $values_coll = array();
-        for ($i = 0; $i < $fields_count; $i++) {
-            $fields_str .= '`' . $fields[$i] . '`, ';
-            for ($j = 0; $j < $array_length; $j++) {
-                if ($i == 0)
-                    array_push($values_coll, "SELECT " . $this->format_value($array_values[$j][$i]) . ", ");
-                else if ($i < ($fields_count - 1))
-                    $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . ", ";
-                else
-                    $values_coll[$j] .= $this->format_value($array_values[$j][$i]) . " FROM DUAL UNION ALL ";
+        $query_format = "INSERT INTO " . $table_name . " (%s) VALUES (%s)";
+        $columns = array();
+        $insert_values = array();
+        $params = array();
+        //Build prepare statement
+        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
+            foreach ($values[$i] as $column => $value) {
+                array_push($columns, $column);
+                array_push($insert_values, $this->connector->get_param_place_holder(++$index));
+                array_push($params, $value);
             }
         }
-        $cut_length = strlen(" FROM DUAL UNION ALL ");
-        $fields_str = substr($fields_str, 0, strlen($fields_str) - 2);
-        foreach ($values_coll as &$value)
-            $values_str .= $value;
-        $values_str = substr($values_str, 0, strlen($values_str) - $cut_length);
-        $query = sprintf($query_format, $table_name, $fields_str, $values_str);
-        return $this->query($query, $encode);
+        $columns = implode(', ', $columns);
+        $insert_values = implode(', ', $insert_values);
+        $sql = sprintf($query_format, $columns, $insert_values);
+        $response = $this->query($sql, $params);
+        return $response;
+    }
+    /**
+     * Performs a bulk insertion query into a table
+     *
+     * @param string $table_name The table name.
+     * @param array $values The values to insert as key value pair array. 
+     * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    function insert_bulk($table_name, $columns, $values)
+    {
+        $query_format = "INSERT INTO " . $table_name . " (%s) VALUES %s";
+        $value_format = "(%s)";
+        $insert_rows = array();
+        $params = array();
+        $index = 0;
+        //Build prepare statement
+        for ($i = 0; $i < sizeof($values); $i++) {
+            $insert_values = array();
+            for ($c = 0; $c < sizeof($columns); $c++) {
+                array_push($insert_values, $this->connector->get_param_place_holder(++$index));
+                array_push($params, $values[$i]->{$columns[$c]});
+            }
+            array_push($insert_rows, sprintf($value_format, implode(', ', $insert_values)));
+        }
+        
+        $columns = implode(', ', $columns);
+        $insert_rows = implode(', ', $insert_rows);
+        $sql = sprintf($query_format, $columns, $insert_rows);
+        $response = $this->query($sql, $params);
+        return $response;
     }
     /**
      * Performs an update query on the database by defining a condition

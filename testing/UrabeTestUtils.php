@@ -67,10 +67,46 @@ function test_select_items($urabe, $body)
     $result = $urabe->select_items($sql);
     return $result;
 }
-
+/**
+ * This functions is an example for testing an execute SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of affected rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
 function test_query($urabe, $body)
 {
     $sql = $body->update_sql;
     return $urabe->query($sql);
 }
+/**
+ * This functions is an example for testing an insert SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of inserted rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_insert($urabe, $body)
+{
+    $insert_params = $body->insert_params;
+    $table_name = $body->insert_table;
+    return $urabe->insert($table_name, $insert_params);
+}
+/**
+ * This functions is an example for testing an insert bulk SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of inserted rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_insert_bulk($urabe, $body)
+{
+    $bulk = $body->insert_bulk;
+    $table_name = $body->insert_table;
+    return $urabe->insert_bulk($table_name, $bulk->columns, $bulk->values);
+}
+
 ?>

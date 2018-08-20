@@ -65,7 +65,17 @@ class PGKanojoX extends KanojoX
         foreach ($this->statementsIds as &$statementId)
             pg_free_result($statementId);
     }
-
+    /**
+     * Gets the placeholders format for the original prepared query string. 
+     * The number of elements in the array must match the number of placeholders. 
+     *
+     * @param int $index The place holder index if needed
+     * @return string The place holder at the given position
+     */
+    public function get_param_place_holder($index = null)
+    {
+        return '$' . $index;
+    }
     /**
      * Get the last error message string of a connection
      *
@@ -77,8 +87,8 @@ class PGKanojoX extends KanojoX
     {
         if (is_null($error)) {
             $this->error = new ConnectionError();
-            $this->error->code = pg_last_error($this->connection);
-            $this->error->message = pg_result_status($this->connection);
+            $this->error->message = pg_last_error($this->connection);
+            $this->error->code = pg_result_status($this->connection);
             $this->error->sql = $sql;
         } else
             $this->error = $error;
@@ -100,10 +110,12 @@ class PGKanojoX extends KanojoX
             $sql = (object)(array(NODE_SQL => $sql, NODE_PARAMS => $variables));
             if ($result) {
                 $vars = array();
-                foreach ($variables as &$value)
-                    array_push($vars, $value);
-                $statement = pg_execute($this->connection, self::DEFT_STMT_NAME, $vars);
+                $statement = pg_execute($this->connection, self::DEFT_STMT_NAME, $variables);
+            } else {
+                $err = $this->error($sql, $this->get_error($result == false ? null : $result, $sql));
+                throw new UrabeSQLException($err);
             }
+
         } else {
             $result = pg_send_query($this->connection, $sql);
             $statement = pg_get_result($this->connection);
@@ -111,7 +123,7 @@ class PGKanojoX extends KanojoX
         if (!$statement || pg_result_status($statement) != PGSQL_Result::PGSQL_COMMAND_OK) {
             $err = $this->error($sql, $this->get_error($statement == false ? null : $statement, $sql));
             throw new UrabeSQLException($err);
-        } else{
+        } else {
             array_push($this->statementsIds, $statement);
             return (new UrabeResponse())->get_execute_response(true, pg_affected_rows($statement), $sql);
         }
