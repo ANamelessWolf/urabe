@@ -21,7 +21,7 @@ include_once "../src/Urabe.php";
  */
 function test_select($urabe, $body)
 {
-    $sql = $body->sql_simple;
+    $sql = $body->sql_select;
     $result = $urabe->select($sql);
     $result->message = "Urabe test selection query with default parser";
     return $result;
@@ -91,7 +91,7 @@ function test_query($urabe, $body)
 function test_insert($urabe, $body)
 {
     $insert_params = $body->insert_params;
-    $table_name = $body->insert_table;
+    $table_name = $body->table_name;
     return $urabe->insert($table_name, $insert_params);
 }
 /**
@@ -105,8 +105,87 @@ function test_insert($urabe, $body)
 function test_insert_bulk($urabe, $body)
 {
     $bulk = $body->insert_bulk;
-    $table_name = $body->insert_table;
+    $table_name = $body->table_name;
     return $urabe->insert_bulk($table_name, $bulk->columns, $bulk->values);
 }
-
+/**
+ * This functions is an example for testing an update SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of affected rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_update($urabe, $body)
+{
+    $values = $body->update_params;
+    $column_name = $body->column_name;
+    $column_value = $body->column_value;
+    $table_name = $body->table_name;
+    return $urabe->update($table_name, $values, "$column_name = $column_value");
+}
+/**
+ * This functions is an example for testing an update SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of affected rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_update_by_field($urabe, $body)
+{
+    $values = $body->update_params;
+    $column_name = $body->column_name;
+    $column_value = $body->column_value;
+    $table_name = $body->table_name;
+    return $urabe->update_by_field($table_name, $values, $column_name, $column_value);
+}
+/**
+ * This functions is an example for testing a delete SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of affected rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_delete($urabe, $body)
+{
+    $table_name = $body->table_name;
+    $column_name = $body->column_name;
+    $column_value = $body->column_value;
+    return $urabe->delete($table_name, "$column_name = $column_value");
+}
+/**
+ * This functions is an example for testing a delete SQL statement. The
+ * test returns a flag indicating if the result succeed and the number of affected rows
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_delete_by_field($urabe, $body)
+{
+    $table_name = $body->table_name;
+    $column_name = $body->column_name;
+    $column_value = $body->column_value;
+    return $urabe->delete_by_field($table_name, $column_name, $column_value);
+}
+/**
+ * This function list all available tests
+ *
+ * @param KanojoX $kanojo The database connector
+ * @return UrabeResponse The selection result as a web service response
+ */
+function test_get_available_tests()
+{
+    $functions = get_defined_functions();
+    $functions = $functions["user"];
+    $test_func = array();
+    for ($i = 0; $i < sizeof($functions); $i++) {
+        if (substr($functions[$i], 0, 5) == TEST_VAR_NAME . "_")
+            array_push($test_func, str_replace(array("test_"), array(), $functions[$i]));
+    }
+    $response = array("msg" => "Available functions", "tests" => $test_func, "size" => sizeof($test_func));
+    return $response;
+}
 ?>

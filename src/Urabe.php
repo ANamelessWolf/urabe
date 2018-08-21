@@ -3,7 +3,6 @@ include_once "ORACLEKanojoX.php";
 include_once "PGKanojoX.php";
 include_once "MYSQLKanojoX.php";
 include_once "FieldDefinition.php";
-include_once "MysteriousParser.php";
 
 /**
  * A Database connection manager
@@ -22,13 +21,11 @@ class Urabe
      * Defines the database connector
      */
     private $connector;
-
     /**
      * @var string $is_connected 
      * Check if there is an active connection to the database.
      */
     public $is_connected;
-
     /**
      * __construct
      *
@@ -51,7 +48,6 @@ class Urabe
         } else
             throw new Exception(ERR_BAD_CONNECTION);
     }
-
     /**
      * Execute an SQL selection query and parse the data as defined in the parser. 
      * If the parser is null uses the parser defined in the connector object KanojoX::parser
@@ -77,7 +73,6 @@ class Urabe
         } else
             throw new Exception($this->connector->error);
     }
-
     /**
      * Gets the first value found on the first row and firs column.
      * If no values are selected a default value is returned
@@ -131,7 +126,6 @@ class Urabe
     {
         return $this->select(sprintf('SELECT * FROM `%s`', $table_name), null, $row_parser);
     }
-
     /**
      * Gets the table definition
      *
@@ -146,18 +140,17 @@ class Urabe
         $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
         return $result;
     }
-
     /**
-     * Gets the database connection from the current
-     * Kanojo object connector
+     * Check if a table exists on the database
      *
-     * @return stdClass The database connection
+     * @param string $table_name The name of the table
+     * @return bool The query result
      */
-    private function get_db_connection()
+    public function table_exists($table_name)
     {
-        return $this->connector->connector;
+        $result = $this->select($this->connector->get_table_definition_query($table_name), null, null);
+        return $result->size > 0;
     }
-
     /**
      * This function is an alias of KanojoX::execute()
      *
@@ -166,7 +159,7 @@ class Urabe
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
      * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    public function query($sql, $variables)
+    public function query($sql, $variables = null)
     {
         return $response = $this->connector->execute($sql, $variables);
     }
@@ -179,7 +172,7 @@ class Urabe
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
      * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    function insert($table_name, $values)
+    public function insert($table_name, $values)
     {
         $query_format = "INSERT INTO " . $table_name . " (%s) VALUES (%s)";
         $columns = array();
@@ -208,7 +201,7 @@ class Urabe
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
      * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    function insert_bulk($table_name, $columns, $values)
+    public function insert_bulk($table_name, $columns, $values)
     {
         $query_format = "INSERT INTO " . $table_name . " (%s) VALUES %s";
         $value_format = "(%s)";
@@ -224,7 +217,7 @@ class Urabe
             }
             array_push($insert_rows, sprintf($value_format, implode(', ', $insert_values)));
         }
-        
+
         $columns = implode(', ', $columns);
         $insert_rows = implode(', ', $insert_rows);
         $sql = sprintf($query_format, $columns, $insert_rows);
@@ -232,140 +225,97 @@ class Urabe
         return $response;
     }
     /**
-     * Performs an update query on the database by defining a condition
+     * Performs an update query 
      *
      * @param string $table_name The table name.
-     * @param string[] $fields The field names to update.
-     * @param mixed[] $values The values to update.
-     * @param string $condition The condition to match
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
+     * @param array $values The values to update as key value pair array. 
+     * Column names as keys and update values as associated value, place holders can not be identifiers only values.
+     * @param string $condition The condition to match, this condition should not use place holders.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    function update($table_name, $fields, $values, $condition, $encode = true)
+    public function update($table_name, $values, $condition)
     {
-        $query = 'UPDATE ' . $table_name . ' SET ';
-        for ($i = 0; $i < $max; $i++) {
-            $query .= '`' . $fields[$i] . '`= ';
-            if (gettype($values[$i]) == 'integer' || gettype($values[$i]) == 'double')
-                $query .= $values[$i] . ", ";
-            else
-                $query .= "'" . $values[$i] . "', ";
+        $query_format = "UPDATE $table_name SET %s WHERE %s";
+        $set_format = "%s = %s";
+        $update_values = array();
+        $params = array();
+        //Build prepare statement
+        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
+            foreach ($values[$i] as $column => $value) {
+                array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
+                array_push($params, $value);
+            }
         }
-        $query = substr($query, 0, strlen($query) - 2);
-        $query .= ' WHERE ' . $condition;
+        $update_values = implode(', ', $insert_values);
+        $sql = sprintf($query_format, $update_values, $condition);
+        $response = $this->query($sql, $params);
+        return $response;
+    }
+    /**
+     * Performs an update query by defining a condition
+     * where the $column_name has to be equal to the given $column_value.
+     *
+     * @param string $table_name The table name.
+     * @param array $values The values to update as key value pair array. 
+     * Column names as keys and update values as associated value, place holders can not be identifiers only values.
+     * @param string $column_name The column name used in the condition.
+     * @param string $column_value The column value used in the condition.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    public function update_by_field($table_name, $values, $column_name, $column_value)
+    {
+        $query_format = "UPDATE $table_name SET %s WHERE $column_name = %s";
+        $set_format = "%s = %s";
+        $update_values = array();
+        $params = array();
+        //Build prepare statement
+        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
+            foreach ($values[$i] as $column => $value) {
+                array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
+                array_push($params, $value);
+            }
+        }
+        array_push($params, $column_value);
+        $update_values = implode(', ', $insert_values);
+        $sql = sprintf($query_format, $update_values, $this->connector->get_param_place_holder(++$index));
+        $response = $this->query($sql, $params);
+        return $response;
+    }
+    /**
+     * Performs a deletion query by defining a condition
+     * where the $column_name has to be equal to the given $column_value.
+     *
+     * @param string $table_name The table name.
+     * @param string $condition The condition to match, this condition should not use place holders.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    public function delete($table_name, $condition)
+    {
+        $sql = "DELETE FROM $table_name WHERE $condition";
         return $this->query($query);
     }
     /**
-     * Performs an update query on the database by defining a condition
-     * where the $field has to be equal to the $value.
+     * Performs a deletion query by defining a condition
+     * where the $column_name has to be equal to the given $column_value.
      *
      * @param string $table_name The table name.
-     * @param string[] $fields The fields names used on the update.
-     * @param mixed[] $values The values to update.
-     * @param string $field The field name used on the condition.
-     * @param string $value The field value used on the condition.
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
+     * Column names as keys and update values as associated value, place holders can not be identifiers only values.
+     * @param string $column_name The column name used in the condition.
+     * @param string $column_value The column value used in the condition.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    function update_by_field($table_name, $fields, $values, $field, $value, $encode = true)
+    public function delete_by_field($table_name, $column_name, $column_value)
     {
-        return $this->update($query, $fields, $values, $this->create_field_condition($field, $value), $encode);
-    }
-    /**
-     * Performs a delete query on the database by defining a condition
-     *
-     * @param string $table_name The table name.
-     * @param string $condition The condition to match
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
-     */
-    function delete($table_name, $condition, $encode = true)
-    {
+        $sql = "DELETE FROM $table_name WHERE $column_name = %s";
+        $sql = sprintf($query_format, $this->connector->get_param_place_holder(1));
         $query = 'DELETE FROM ' . $table_name . ' WHERE ' . $condition;
-        return $this->query($query, $encode);
-    }
-    /**
-     * Performs a delete query on the database by defining a condition
-     * where the $field has to be equal to the $value.
-     *
-     * @param string $table_name The table name.
-     * @param string $field The field name used on the condition.
-     * @param string $value The field value used on the condition.
-     * @param boolean $encode True if the value is returned as encoded JSON string, otherwise
-     * the result is returned as a query result
-     * @return QueryResult|string The query result as a JSON String or a query result.
-     */
-    function delete_by_field($table_name, $field, $value, $encode = true)
-    {
-        return $this->delete($table_name, $this->create_field_condition($field, $value), $encode);
-    }
-
-    /**
-     * Close the connection to the database
-     * @return void
-     */
-    public function close()
-    {
-        if (isset($this->connector))
-            $this->connector->close();
-    }
-    /**
-     * Check if a table exists on the database
-     *
-     * @param string $table_name The name of the table
-     * @return bool The query result
-     */
-    public function table_exists($table_name)
-    {
-        $query = "SELECT DISTINCT OBJECT_NAME FROM USER_OBJECTS WHERE OBJECT_TYPE = 'TABLE' AND OBJECT_NAME = " . "'" . $table_name . "'";
-        return sizeof($this->select_items($query)) > 0;
-    }
-    /**
-     * Test the current connection
-     * 
-     * Test the current connection an gets a message with current connection status.
-     * @return string The result message
-     */
-    public function test_connection()
-    {
-        if ($this->is_connected)
-            return "Connected..." . oci_client_version();
-        else
-            return "Not Connected..." . $this->error;
-    }
-    /**
-     * Gets the format string from a given value
-     *
-     * @param object $value The value to format.
-     * @return string Gets the format value.
-     */
-    private function format_value($value)
-    {
-        if (is_numeric($value))
-            return strval($value);
-        else if (is_null($value))
-            return "NULL";
-        else
-            return sprintf("'%s'", $value);
-    }
-    /**
-     * Creates a condition where a field name must be equals to a value
-     *
-     * @param string $field The field name
-     * @param mixed $value The field value
-     * @return string The SQL condition
-     */
-    private function create_field_condition($field, $value)
-    {
-        $condition = $field . ' = ';
-        if (gettype($value) == 'integer' || gettype($value) == 'double')
-            $condition .= $value;
-        else
-            $condition .= "'" . $value . "'";
-        return $condition;
-    }
+        $variables = array();
+        array_push($column_value);
+        return $this->query($query, $variables);
+    }    
 }
 ?>
