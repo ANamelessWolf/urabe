@@ -43,20 +43,20 @@ class ORACLEKanojoX extends KanojoX
      */
     public function connect()
     {
-        try {
-            $host = $this->host;
-            $port = $this->port;
-            $dbname = $this->db_name;
-            $username = $this->user_name;
-            $passwd = $this->password;
-            if (!isset($host) || strlen($host) == 0)
-                $host = "127.0.0.1";
-            $connString = $this->buildConnectionString($host, $dbname, $port);
-            $this->connection = oci_connect($username, $passwd, $connString, self::DEFAULT_CHAR_SET);
+        //try {
+        $host = $this->host;
+        $port = $this->port;
+        $dbname = $this->db_name;
+        $username = $this->user_name;
+        $passwd = $this->password;
+        if (!isset($host) || strlen($host) == 0)
+            $host = "127.0.0.1";
+        $connString = $this->buildConnectionString($host, $dbname, $port);
+        $this->connection = oci_connect($username, $passwd, $connString, self::DEFAULT_CHAR_SET);
+        if ($this->connection)
             return $this->connection;
-        } catch (Exception $e) {
-            return $this->error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
-        }
+        else 
+            throw new Exception(ERR_BAD_CONNECTION);
     }
     /**
      * This function builds a connection string to connect to ORACLE

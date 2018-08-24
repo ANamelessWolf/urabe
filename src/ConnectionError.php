@@ -71,28 +71,32 @@ class ConnectionError
      */
     public function get_exception_error()
     {
-        $err_context = array();
+        if (KanojoX::$settings->show_error_details) {
+            $err_context = array();
+            if (KanojoX::$settings->show_error_context)
+                foreach (KanojoX::$errors as &$error) {
+                $context = is_null($error->sql) ? array(
+                    NODE_MSG => $error->message,
+                    NODE_CODE => $error->code,
+                    NODE_FILE => $error->file,
+                    NODE_LINE => $error->line,
+                    NODE_ERROR_CONTEXT => $error->get_err_context()
+                ) : array(
+                    NODE_CODE => $error->code,
+                    NODE_FILE => $error->file,
+                    NODE_LINE => $error->line,
+                    NODE_ERROR_CONTEXT => $error->get_err_context(),
+                    NODE_QUERY => $error->sql
+                );
+                array_push($err_context, array(NODE_ERROR => $context));
+            }
 
-        foreach (KanojoX::$errors as &$error) {
-            $context = is_null($error->sql) ? array(
-                NODE_MSG => $error->message,
-                NODE_CODE => $error->code,
-                NODE_FILE => $error->file,
-                NODE_LINE => $error->line,
-                NODE_ERROR_CONTEXT => $error->get_err_context()
-            ) : array(
-                NODE_CODE => $error->code,
-                NODE_FILE => $error->file,
-                NODE_LINE => $error->line,
-                NODE_ERROR_CONTEXT => $error->get_err_context(),
-                NODE_QUERY => $error->sql
-            );
-            array_push($err_context, array(NODE_ERROR => $context));
-        }
-        if (isset($this->sql))
-            return array(NODE_QUERY => $this->sql, NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
-        else
-            return array(NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+            if (isset($this->sql))
+                return array(NODE_QUERY => $this->sql, NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+            else
+                return array(NODE_CODE => $this->code, NODE_FILE => $this->file, NODE_LINE => $this->line, NODE_ERROR_CONTEXT => $err_context);
+        } else
+            return null;
     }
 }
 ?>

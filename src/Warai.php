@@ -77,7 +77,7 @@ const ERR_BODY_NOT_ARRAY = 'The body must be an array.';
  * @var string ERR_BAD_CONNECTION
  * The error message sent when the connection is not valid.
  */
-const ERR_BAD_CONNECTION = 'The database connection is not valid.\n%s';
+const ERR_BAD_CONNECTION = 'Invalid database connection';
 /**
  * @var string ERR_CONNECTION
  * The error message sent when the connection to the database is closed.

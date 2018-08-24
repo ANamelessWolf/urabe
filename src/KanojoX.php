@@ -1,6 +1,5 @@
 <?php 
 include "UrabeSQLException.php";
-include "IKanojoX.php";
 include "HasamiUtils.php";
 include "ConnectionError.php";
 include "UrabeResponse.php";
@@ -15,7 +14,7 @@ include "MysteriousParser.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-abstract class KanojoX implements IKanojoX
+abstract class KanojoX
 {
     /**
      * Defines how the data is parsed while the result is fetch associatively
@@ -96,7 +95,9 @@ abstract class KanojoX implements IKanojoX
     /**
      * Initialize the class with a JSON object
      *
-     * @param stdClass $body_json The request body as JSON object
+     * @param object $body_json The request body as JSON object
+     * @throws Exception An Exception is raised when the body is null or missed one or more of the 
+     * following variables: host, user_name, password, port, db_name
      * @return void
      */
     public function init($body_json)
@@ -112,29 +113,7 @@ abstract class KanojoX implements IKanojoX
         } else
             throw new Exception(ERR_BODY_IS_NULL);
     }
-    /**
-     * Creates a connection object to or returns false if the connection fails.
-     * Errors are save on $this->error property
-     * @param string $params The connection parameters
-     * @param boolean $throw_warnings if true warnings are thrown as exceptions errors
-     * @return bool|resource The connection object or false if the connection could not be created
-     */
-    public function create_connection($params = null, $throw_warnings)
-    {
-        try {
-            if ($throw_warnings)
-                set_error_handler('KanojoX::error_handler');
-            $conn = $this->init_connection($params);
-            if (!$conn) {
-                $err = $this->get_error();
-                $this->error = $err['message'];
-            }
-            return $conn;
-        } catch (Exception $e) {
-            $this->error = $e->getMessage();
-            return false;
-        }
-    }
+
     /**
      * Gets the last executed error
      *
@@ -228,9 +207,9 @@ abstract class KanojoX implements IKanojoX
     {
         return '?';
     }
-    /*********************
-     * Interface Methods *
-     *********************/
+    /************************
+     * Shared functionality *
+     ************************/
     /**
      * Closes a connection
      *
@@ -243,7 +222,7 @@ abstract class KanojoX implements IKanojoX
     /**
      * Open a Database connection
      *
-     * @return stdClass The database connection object
+     * @return object The database connection object
      */
     public function connect()
     {
