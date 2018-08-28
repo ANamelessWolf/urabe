@@ -1,5 +1,5 @@
 
-# Using KanojoX as a database connector
+# KanojoX, Urabe database connector
 
 `KanojoX` acts as **Urabe** core, it wraps most common functions of a database and unifies them allowing to work transparently between database without changing our code.
 
