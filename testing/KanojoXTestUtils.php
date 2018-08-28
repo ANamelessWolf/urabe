@@ -95,10 +95,20 @@ function test_execute_with_params($kanojo, $body)
     return $result;
 }
 /**
- * This function list all available tests
+ * This function is an example for testing an error triggering and managing errors using KanojoX
  *
  * @param KanojoX $kanojo The database connector
+ * @param object $body The request body decoded as an object from JSON data
  * @return UrabeResponse The selection result as a web service response
+ */
+function test_send_error($kanojo, $body)
+{
+    trigger_error('Trigger Error', E_USER_WARNING);
+    return $kanojo->get_last_error();
+}
+/**
+ * This function list all available tests
+ *
  */
 function test_get_available_tests()
 {

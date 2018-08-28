@@ -15,7 +15,7 @@ $result = (object)array();
 $body = get_body_as_json();
 if (isset($body)) {
     //1: Selects the driver connector
-    $kanojo = pick_connector($body->driver);
+    $kanojo = pick_connector($body->driver, $body);
     //2: Initialize the connection data
     $kanojo->init($body->connection);
     //3: Connect to the Database

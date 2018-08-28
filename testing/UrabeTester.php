@@ -13,7 +13,7 @@ $result = (object)array();
 $body = get_body_as_json();
 if (isset($body)) {
     //1: Creates a Kanojo Object and initialize it
-    $kanojo = pick_connector($body->driver);
+    $kanojo = pick_connector($body->driver, $body);
     $kanojo->init($body->connection);
     //2: Open Urabe connector
     $urabe = new Urabe($kanojo);

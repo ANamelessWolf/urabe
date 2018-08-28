@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file contains functions that help to test Urabe project
  *  
@@ -18,10 +19,11 @@ const TEST_VAR_NAME = "test";
  * Picks a Kanojo database connecter depending on the given driver
  *
  * @param string $driver The driver name; ORACLE|PG|MYSQL
+ * @param mixed $body The request body
  * @throws Exception An exception is thrown if the driver is not supported
  * @return KanojoX The database connector
  */
-function pick_connector($driver)
+function pick_connector($driver, $body)
 {
     if ($driver == "ORACLE") {
         $kanojo = new ORACLEKanojoX();
