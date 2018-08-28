@@ -36,8 +36,8 @@ class UrabeResponse
     /**
      * Gets the response message for exception
      * @param string $msg The response message
-     * @param stdClass|null $stack_trace The stack trace result, optional
-     * @return stdClass The response message
+     * @param object|null $stack_trace The stack trace result, optional
+     * @return object The response message
      */
     public function get_exception_response($msg, $stack_trace = null)
     {

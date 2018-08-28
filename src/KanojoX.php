@@ -49,7 +49,7 @@ abstract class KanojoX
      */
     public $user_name;
     /**
-     * @var string|NULL $password The password can be null.
+     * @var string $password The connection password 
      */
     public $password = "";
     /**
@@ -215,19 +215,13 @@ abstract class KanojoX
      *
      * @return bool Returns TRUE on success or FALSE on failure.
      */
-    public function close()
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "close", "KanojoX"));
-    }
+    abstract public function close();
     /**
      * Open a Database connection
      *
      * @return object The database connection object
      */
-    public function connect()
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "connect", "KanojoX"));
-    }
+    abstract public function connect();
     /**
      * Get the last error message string of a connection
      *
@@ -235,11 +229,7 @@ abstract class KanojoX
      * @param ConnectionError $error If the error exists pass the error
      * @return ConnectionError The connection error 
      */
-    public function error($sql, $error = null)
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "error", "KanojoX"));
-    }
-
+    abstract public function error($sql, $error = null);
     /**
      * Sends a request to execute a prepared statement with given parameters, 
      * and waits for the result
@@ -249,10 +239,7 @@ abstract class KanojoX
      * @throws Exception This method is not implemented in the abstract class
      * @return UrabeResponse Returns the service response formatted as an executed response
      */
-    public function execute($sql, $variables = null)
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "execute", "KanojoX"));
-    }
+    abstract public function execute($sql, $variables = null);
     /**
      * Returns an associative array containing the next result-set row of a 
      * query. Each array entry corresponds to a column of the row. 
@@ -263,47 +250,32 @@ abstract class KanojoX
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
      * @return array Returns an associative array. If there are no more rows in the statement then the connection error is returned.
      * */
-    public function fetch_assoc($sql, $variables)
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "fetch_assoc", "KanojoX"));
-    }
+    abstract public function fetch_assoc($sql, $variables);
     /**
      * Frees the memory associated with a result
      *
      * @return void
      */
-    public function free_result()
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "free_result", "KanojoX"));
-    }
+    abstract public function free_result();
     /**
      * Gets the query for selecting the table definition
      *
      * @param string $table_name The table name
      * @return string The table definition selection query
      */
-    public function get_table_definition_query($table_name)
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, "get_table_definition_query", "KanojoX"));
-    }
+    abstract public function get_table_definition_query($table_name);
     /**
      * Gets the table definition parser for the database connector
      *
      * @return array The table definition fields as an array of FieldDefinition
      */
-    public function get_table_definition_parser()
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_parser', 'KanojoX'));
-    }
+    abstract function get_table_definition_parser();
     /**
      * Gets the table definition mapper for the database connector
      *
      * @return array The table mapper as KeyValued<String,String> array
      */
-    public function get_table_definition_mapper()
-    {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_mapper', 'KanojoX'));
-    }
+    abstract function get_table_definition_mapper();
 }
 
 ?>
