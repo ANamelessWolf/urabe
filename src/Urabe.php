@@ -98,9 +98,9 @@ class Urabe
      *
      * @param string $sql The SQL statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
-     * @return mixed[] The first column values inside an array.
+     * @return array The first column values inside an array.
      */
-    public function select_items($sql)
+    public function select_items($sql, $variables = null)
     {
         $result = $this->connector->fetch_assoc($sql, $variables);
         $values = array();
