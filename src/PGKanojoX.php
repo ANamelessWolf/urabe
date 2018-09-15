@@ -192,7 +192,15 @@ class PGKanojoX extends KanojoX
      */
     public function get_table_definition_parser()
     {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_parser', 'PGKanojoX'));
+        $fields = array(
+            PG_FIELD_COL_ORDER => new FieldDefinition(0, PG_FIELD_COL_ORDER, PARSE_AS_INT),
+            PG_FIELD_COL_NAME => new FieldDefinition(1, PG_FIELD_COL_NAME, PARSE_AS_STRING),
+            PG_FIELD_DATA_TP => new FieldDefinition(2, PG_FIELD_DATA_TP, PARSE_AS_STRING),
+            PG_FIELD_CHAR_LENGTH => new FieldDefinition(3, PG_FIELD_CHAR_LENGTH, PARSE_AS_INT),
+            PG_FIELD_NUM_PRECISION => new FieldDefinition(4, PG_FIELD_NUM_PRECISION, PARSE_AS_INT),
+            PG_FIELD_NUM_SCALE => new FieldDefinition(5, PG_FIELD_NUM_SCALE, PARSE_AS_INT)
+        );
+        return $fields;
     }
     /**
      * Gets the table definition mapper for the PG connector
@@ -201,7 +209,15 @@ class PGKanojoX extends KanojoX
      */
     public function get_table_definition_mapper()
     {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_mapper', 'PGKanojoX'));
+        $map = array(
+            PG_FIELD_COL_ORDER => TAB_DEF_INDEX,
+            PG_FIELD_COL_NAME => TAB_DEF_NAME,
+            PG_FIELD_DATA_TP => TAB_DEF_TYPE,
+            PG_FIELD_CHAR_LENGTH => TAB_DEF_CHAR_LENGTH,
+            PG_FIELD_NUM_PRECISION => TAB_DEF_NxUM_PRECISION,
+            PG_FIELD_NUM_SCALE => TAB_DEF_NUM_SCALE
+        );
+        return $map;
     }
     /**
      * Gets the error found in a ORACLE resource object could be a

@@ -4,7 +4,7 @@ include_once "Urabe.php";
 include_once "ParameterCollection.php";
 include_once "HasamiWrapper.php";
 /**
- * Hasami RESTful Service Class
+ * Hasami Restful Service Class
  *
  * Creates and manage a simple REST service that makes a transaction to an Oracle database.
  * @version 1.0.0

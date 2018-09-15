@@ -4,6 +4,7 @@ include "HasamiUtils.php";
 include "ConnectionError.php";
 include "UrabeResponse.php";
 include "MysteriousParser.php";
+include "WebServiceContent.php";
 /**
  * Database connection model
  * 

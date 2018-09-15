@@ -124,7 +124,7 @@ class Urabe
      */
     public function select_all($table_name, $row_parser = null)
     {
-        return $this->select(sprintf('SELECT * FROM `%s`', $table_name), null, $row_parser);
+        return $this->select(sprintf('SELECT * FROM %s', $table_name), null, $row_parser);
     }
     /**
      * Gets the table definition

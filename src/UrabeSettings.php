@@ -21,7 +21,7 @@ return (object)array(
      * @var bool If sets to true Urabe handles errors as defined in the KanojoX Class
      */
     "handle_errors" => true,
-        /**
+    /**
      * @var bool If sets to true Urabe handles exceptions as defined in the KanojoX Class
      */
     "handle_exceptions" => true,
@@ -46,6 +46,11 @@ return (object)array(
      * @var bool If sets to true hides the error code. This should be enable just for testing purpose,
      * not recommendable for staging or production.
      */
-    "hide_exception_error" => false
+    "hide_exception_error" => false,
+    /**
+    * @var bool If sets to true, url parameters are extracted in pairs. Where the first parameter is the key and the
+    * second the value.
+    */
+    "url_params_in_pairs" => true,
 );
 ?>
