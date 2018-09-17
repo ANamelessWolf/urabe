@@ -1,100 +1,86 @@
 <?php
-include_once "Warai.php";
 include_once "Urabe.php";
-include_once "ParameterCollection.php";
-include_once "HasamiWrapper.php";
 /**
  * Hasami Restful Service Class
- *
- * Creates and manage a simple REST service that makes a transaction to an Oracle database.
+ * This class creates and manage a simple REST service that makes a transaction to supported database or
+ * execute a defined action
+ * 
  * @version 1.0.0
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class HasamiRESTfulService
+class HasamiRestfulService
 {
     /**
-     * @var HasamiWrapper Access the Oracle web service wrapper
-     */
-    public $service;
-    /**
-     * @var ParameterCollection The web service parameter collection
-     */
-    public $parameters;
-    /**
-     * The request body as a a JSON object
+     * The web service request content
      *
-     * @var stdclass The body as JSON object
+     * @var WebServiceContent The web service content
      */
-    public $body;
+    public $data;
     /**
-     * @var callback Defines the service task
-     * (HasamiRESTfulService $service): string
+     * @var Urabe The database manager
+     */
+    public $urabe;
+    /**
+     * @var HasamiWrapper The Web service manager
+     */
+    public $wrapper;
+    /**
+     * @var callback|string Defines the service task, when the service is a callback the method
+     * has to be defined as follows.
+     * function UrabeResponse (WebServiceContent $data, Urabe $urabe);
+     * When the service task is given as a string the action is directly called from the defined wrapper
      */
     public $service_task;
     /**
      * __construct
      *
-     * Initialize a new instance of the Hasami RESTful service class.
+     * Initialize a new instance of the Hasami Restful service class.
      * 
-     * @param HasamiWrapper $service The web service wrapper
-     * @param stdClass $body The JSON body
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
      */
-    public function __construct($service, $body = null)
+    public function __construct($data = null, $urabe = null)
     {
-        $this->service = $service;
-        $this->body = $body;
-        $this->parameters = $service->parameters;
+        $this->data = $data;
+        $this->urabe = $urabe;
     }
     /**
-     * Extract the values from the body in the same order that the $table_fields are defined.
-     * @param string[] $table_fields The name of the values keys to extract.
-     * @return string[] The stored values.
+     * This function validates that the body contains all the given fields.
+     * The fields may refer to the column names and must match name and case
+     * @param array $fields The fields that must be contained in the body, as an array of strings
+     * @throws Exception An Exception is thrown if the body is null or the body does not contains all fields
+     * @return void
      */
-    public function extract_values($table_fields)
+    public function validate_body($fields)
     {
         if (is_null($body))
             throw new Exception(ERR_BODY_IS_NULL);
         $values = array();
-        foreach ($table_fields as &$field_name) {
+        foreach ($fields as &$field_name) {
             if (property_exists($body, $field_name))
                 array_push($values, $body->$field_name);
         }
-        if (count($table_fields) != count($values))
-            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, CAP_EXTRACT, $this->concat_fields($table_fields)));
-        return $values;
+        if (count($fields) != count($values))
+            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, CAP_EXTRACT, implode(', ', $fields)));
     }
     /**
      * Gets the service response
-     *
-     * @return stdClass The web server response
+     * @throws Exception An Exception is thrown when the service task is not defined or an error occurs 
+     * during the callback
+     * @return UrabeResponse The web service response
      */
     public function get_response()
     {
-        try {
-            if (is_string($this->service_task))
-                $result = $this->service->{$this->service_task}($this);
-            else if (!is_null($this->service_task))
-                $result = call_user_func_array($this->service_task, array($this));
-            else
-                throw new Exception(ERR_BAD_RESPONSE);
-        } catch (Exception $e) {
-            $result = error_response($e->getMessage());
-        }
+        if (is_null($this->service_task))
+            throw new Exception(ERR_INVALID_SERVICE_TASK);
+        else if (is_string($this->service_task))
+            $result = $this->wrapper->{$this->service_task}($data, $urabe);
+        else if (!is_null($this->service_task))
+            $result = call_user_func_array($this->service_task, array($data, $urabe));
+        else
+            throw new Exception(ERR_BAD_RESPONSE);
         return $result;
-    }
-    /**
-     * Concatenate a collection of fields with comas
-     *
-     * @param string[]|int[] $fields The fields to concatenate
-     * @return string The fields concatenated
-     */
-    protected function concat_fields($fields)
-    {
-        $str = "";
-        foreach ($fields as &$value)
-            $str .= $value . ", ";
-        return substr($str, 0, strlen($str) - 2);
     }
 }

@@ -171,6 +171,18 @@ function test_delete_by_field($urabe, $body)
     return $urabe->delete_by_field($table_name, $column_name, $column_value);
 }
 /**
+ * This functions is an example for testing the sql place holders formatter
+ *
+ * @param Urabe $urabe The database data manager
+ * @param object $body The request body decoded as an object from JSON data
+ * @return UrabeResponse The execute result as a web service response
+ */
+function test_format_sql_place_holders($urabe, $body)
+{
+    $sql = $body->sql_common;
+    return $urabe->format_sql_place_holders($sql);
+}
+/**
  * This function list all available tests
  *
  * @param KanojoX $kanojo The database connector

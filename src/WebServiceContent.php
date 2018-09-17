@@ -1,6 +1,8 @@
 <?php
+
 /**
- * This class obtains the web service content from GET variables, URL parameters and POST body
+ * This class obtains the web service content from GET variables, URL parameters, POST body
+ * and the request method
  * @version 1.0.0
  * @api Makoto Urabe
  * @author A nameless wolf <anamelessdeath@gmail.com>
@@ -24,7 +26,11 @@ class WebServiceContent
      */
     public $body;
     /**
-     * @var object The web service request method string value
+     * @var object Use this variable to insert extra data needed when executing a service operation
+     */
+    public $extra;
+    /**
+     * @var string The web service request method
      */
     public $method;
 
@@ -49,6 +55,19 @@ class WebServiceContent
         $this->body = json_decode($this->body);
         //The Request method
         $this->method = $_SERVER['REQUEST_METHOD'];
+        //Initialize $extra as an empty object
+        $this->extra = (object)array();
+    }
+    /**
+     * This function check if the given variable name is defined in the current
+     * web service GET variable
+     * 
+     * @param string $var_name The variable name
+     * @return true Returns true when the variable is defined
+     */
+    public function in_GET_variables($var_name)
+    {
+        return in_array($var_name, $this->get_variables);
     }
 
     /**

@@ -8,38 +8,86 @@ include_once "ParameterCollection.php";
 
 /**
  * A Hasami Wrapper is a web service wrapper Class
- * This class encapsulate and manage webservice verbose PUT, POST, DELETE and GET
+ * This class encapsulate and manage web service verbose PUT, POST, DELETE and GET
  * @version 1.0.0
  * @api Makoto Urabe Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class HasamiWrapper
+class HasamiWrapper implements IHasami
 {
     /**
-     * @var string Gets the request HTTP verbose name; POST, GET, PUT, and DELETE. 
+     * The web service request content
+     *
+     * @var WebServiceContent The web service content
      */
-    public $method;
+    private $request_data;
     /**
-     * @var stdClass The body message
+     * @var Urabe The database manager
      */
-    public $body;
-    /**
-     * @var bool Determines if the access to the service is allowed
-     */
-    public $access_is_allowed;
-    /**
-     * @var Urabe The Oracle Connector
-     */
-    public $connector;
-        /**
-     * @var MysteriousParser The query result parser
-     */
-    public $parser;
+    private $urabe;
     /**
      * @var string The table name
      */
-    public $table_name;
+    private $table_name;
+    /**
+     * @var string The default column filter name
+     */
+    public $column_filter_name;
+
+    /**
+     * Gets the database manager
+     *
+     * @return Urabe The database manager
+     */
+    public function get_urabe()
+    {
+        return $this->urabe;
+    }
+    /**
+     * Gets the web service request content
+     *
+     * @return WebServiceContent Returns the web service content
+     */
+    public function get_request_data()
+    {
+        return $this->request_data;
+    }
+    /**
+     * Gets the table name 
+     *
+     * @return string Returns the table name
+     */
+    public function get_table_name()
+    {
+        return $this->table_name;
+    }
+    /**
+     * Gets the column name used as default filter
+     *
+     * @return string Returns the column name
+     */
+    public function get_default_filter_column_name()
+    {
+        return $this->column_filter_name;
+    }
+
+    /**
+     * @var GETService Defines the GET web service request
+     */
+    public $GET;
+    /**
+     * @var boolean If sets to true the service allows GET requests
+     * By default the service allows GET requests
+     */
+    public $enable_GET;
+
+
+    /**
+     * @var MysteriousParser The query result parser
+     */
+    public $parser;
+
     /**
      * @var FieldDefintion[] The table fields definitions
      */
@@ -62,10 +110,7 @@ class HasamiWrapper
      * The database name used when performing queries.
      */
     public $database_name;
-    /**
-     * @var GETService The webservice GET action
-     */
-    public $GET;
+
     /**
      * __construct
      *
@@ -139,50 +184,68 @@ class HasamiWrapper
     public function get_response($pretty_print = false)
     {
         try {
+
             if (!$this->access_is_allowed) {
                 http_response_code(403);
                 throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
             }
-            switch ($this->method) {
+
+            //Update callback if costume action is found
+            if ($this->request_data->in_GET_variables(CAP_URABE_ACTION))
+                $this->{$this->request_data->method}->service_task = $this->request_data->get_variables[CAP_URABE_ACTION];
+            //Gets the web service response
+            $result = $this->get_service_response($this->request_data->method);
+            //Prints result with HTML format or just a plain JSON string
+            return $pretty_print ? pretty_print_format($result) : json_encode($result);
+        } catch (Exception $e) {
+            throw new Exception(ERR_SERVICE_RESPONSE . $e->getMessage(), $e->getCode());
+        }
+    }
+
+
+    /**
+     * Gets the web service response 
+     * @param string $request_method The request method verbose
+     * @throws Exception An exception is raised if an error occurred executing the web request
+     * @return UrabeResponse The web service response
+     */
+    private function get_service_response($request_method)
+    {
+        try {
+            switch ($request_method) {
                 case 'GET':
-                    $result = $this->get_restful_service_responcer($this->GET, $this->enable_GET);
-                    http_response_code(200);
+                    $result = $this->execute_response($this->GET, $this->enable_GET);
                     break;
-            // case 'PUT':
-            //     $result = $this->get_server_response($this->PUT, $this->enable_PUT);
-            //     break;
-            // case 'POST':
-            //     $result = $this->get_server_response($this->POST, $this->enable_POST);
-            //     break;
-            // case 'DELETE':
-            //     $result = $this->get_server_response($this->DELETE, $this->enable_DELETE);
-            //     break;
+    // case 'PUT':
+    //     $result = $this->get_server_response($this->PUT, $this->enable_PUT);
+    //     break;
+    // case 'POST':
+    //     $result = $this->get_server_response($this->POST, $this->enable_POST);
+    //     break;
+    // case 'DELETE':
+    //     $result = $this->get_server_response($this->DELETE, $this->enable_DELETE);
+    //     break;
             }
         } catch (Exception $e) {
-            $result = get_error_response($e, "", $this->response_is_encoded);
+            throw new Exception($e->getMessage(), $e->getCode());
         }
-        if ($pretty_print)
-            return pretty_print_format($this->response_is_encoded ? json_decode($result) : $result, null, true);
-        else
-            return $result;
     }
+
     /**
      * Gets the web service response if the service is enabled
      *
-     * @param HasamiRESTfulService $restful_service The RESTfull service
-     * @param bool $is_enable True if the service is enabled
-     * @return QueryResult|string The web service response
+     * @param HasamiRestfulService $service The Restful service
+     * @param bool $is_available True if the service is available, false if is restricted
+     * @return UrabeResponse The web service response
      */
-    private function get_restful_service_responcer($restful_service, $is_enable)
+    private function execute_response($service, $is_available)
     {
-        try {
-            if (!$is_enable) {
-                http_response_code(403);
-                throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
-            } else
-                $result = $restful_service->get_response();
-        } catch (Exception $e) {
-            $result = get_error_response($e, "", $this->response_is_encoded);
+        if ($is_available) {
+            http_response_code(200);
+            $result = $service->get_response();
+        } else {
+            http_response_code(403);
+            throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
         }
         return $result;
     }

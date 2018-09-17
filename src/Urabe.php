@@ -56,7 +56,7 @@ class Urabe
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement.
      * @param MysteriousParser $row_parser The row parser. 
      * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
-     * @return UrabeResponse The query result as a JSON String or a query result.
+     * @return UrabeResponse The SQL selection result
      */
     public function select($sql, $variables = null, $row_parser = null)
     {
@@ -316,6 +316,27 @@ class Urabe
         $variables = array();
         array_push($column_value);
         return $this->query($query, $variables);
-    }    
+    }
+    /**
+     * Formats the bindable parameters place holders in to
+     * the current driver place holder format
+     *
+     * @param string $sql The sql statement
+     * @return string Returns the formatted sql statement
+     */
+    public function format_sql_place_holders($sql)
+    {
+        $matches = array();
+        preg_match_all("/@\d+/", $sql, $matches);
+        $search = array();
+        $replace = array();
+        for ($i = 0; $i < sizeof($matches[0]); $i++)
+            if (!in_array($matches[0][$i], $search)) {
+            $index = intval(str_replace('@', '', $matches[0][$i]));
+            array_push($search, $matches[0][$i]);
+            array_push($replace, $this->connector->get_param_place_holder($index));
+        }
+        return str_replace($search, $replace, $sql);
+    }
 }
 ?>

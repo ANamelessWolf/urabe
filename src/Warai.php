@@ -134,10 +134,20 @@ const ERR_NULL_BODY = 'An error occurred reading the message body, the body does
  */
 const ERR_INVALID_SERVICE = 'No service specified';
 /**
+ * @var string ERR_INVALID_SERVICE_TASK
+ * The error message sent when trying to get a service response with no task
+ */
+const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current service';
+/**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
  */
 const ERR_SERVICE_RESTRICTED = 'This service can not be access via the verbose %s';
+/**
+ * @var string ERR_SERVICE_RESPONSE
+ * The error message sent when an exception occurred during a web request
+ */
+const ERR_SERVICE_RESPONSE = 'Error executing the service. ';
 /**
  * @var string ERR_TASK_UNDEFINED
  * The error message sent when the task is missing or not Defined.
@@ -166,6 +176,11 @@ const CAP_INSERT = 'Insert';
  * String caption for Extract.
  */
 const CAP_EXTRACT = 'Extract';
+/**
+ * @var string CAP_URABE_ACTION
+ * GET variable name used to defined a web service costume call back action
+ */
+const CAP_URABE_ACTION = 'urabeAction';
 /***************************************
  ************** JSON NODES *************
  ***************************************/
@@ -339,6 +354,16 @@ const TAB_DEF_NUM_PRECISION = 'numeric_precision';
  * The field name that stores the column number scale
  */
 const TAB_DEF_NUM_SCALE = 'numeric_scale';
+/**
+ * @var string TAB_NAME
+ * The field name that stores the name of the table
+ */
+const TAB_NAME = 'table_name';
+/**
+ * @var string TAB_COL_FILTER
+ * The column name used as filter in the selection data
+ */
+const TAB_COL_FILTER = 'column_filter';
 /******************************************
  ************ FIELD NAMES *****************
  *****************************************/
