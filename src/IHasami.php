@@ -28,6 +28,18 @@ interface IHasami
      */
     public function get_table_name();
     /**
+     * Gets the table INSERT column names
+     *
+     * @return array Returns the column names in an array of strings
+     */
+    public function get_insert_columns();
+    /**
+     * Gets the column name used as primary key
+     *
+     * @return string Returns the column name
+     */
+    public function get_primary_key_column_name();
+    /**
      * Gets the column name used as default filter
      *
      * @return string Returns the column name

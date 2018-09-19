@@ -21,19 +21,29 @@ class HasamiWrapper implements IHasami
      *
      * @var WebServiceContent The web service content
      */
-    private $request_data;
+    protected $request_data;
     /**
      * @var Urabe The database manager
      */
-    private $urabe;
+    protected $urabe;
+
+    /**
+     * @var array The table fields definitions
+     */
+    protected $table_definition;
+
     /**
      * @var string The table name
      */
-    private $table_name;
+    protected $table_name;
     /**
      * @var string The default column filter name
      */
-    public $column_filter_name;
+    protected $column_filter_name;
+    /**
+     * @var string Gets or sets the name of the table primary key field name.
+     */
+    protected $primary_key;
 
     /**
      * Gets the database manager
@@ -71,6 +81,30 @@ class HasamiWrapper implements IHasami
     {
         return $this->column_filter_name;
     }
+    /**
+     * Gets the column name used as primary key
+     *
+     * @return string Returns the column name
+     */
+    public function get_primary_key_column_name()
+    {
+        return $this->primary_key;
+    }
+    /**
+     * Gets the table INSERT column names
+     * By default the insertion columns are all the columns from the table definition
+     * except by the primary key column
+     *
+     * @return array Returns the column names in an array of strings
+     */
+    public function get_insert_columns()
+    {
+        return array_map(function ($item) {
+            if ($item->column_name != $this->primary_key)
+                return $item->column_name;
+        }, $this->table_definition);
+    }
+
 
     /**
      * @var GETService Defines the GET web service request
@@ -88,10 +122,7 @@ class HasamiWrapper implements IHasami
      */
     public $parser;
 
-    /**
-     * @var FieldDefintion[] The table fields definitions
-     */
-    public $table_fields;
+
     /**
      * @var ParameterCollection The web service parameter collection
      */
@@ -101,10 +132,8 @@ class HasamiWrapper implements IHasami
      * JSON string otherwise is returned as QueryResult object
      */
     public $response_is_encoded;
-    /**
-     * @var string Gets or sets the name of the table primary key field name.
-     */
-    public $primary_key;
+
+
     /**
      * @var string $database_name 
      * The database name used when performing queries.
@@ -144,6 +173,17 @@ class HasamiWrapper implements IHasami
         if (method_exists($this, "GETServiceTask"))
             $this->GET->service_task = "GETServiceTask";
     }
+
+    /**
+     * Gets the table definition querying the database with the active connection
+     * The table definition is stored in HasamiWrapper::table_definition property
+     * @return void
+     */
+    public function get_table_definition()
+    {
+        $this->table_definition = $this->urabe->get_table_definition($this->table_name);
+    }
+
     /**
      * Initialize the body object extracting the data from the file contents 
      * php://input

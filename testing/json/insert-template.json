@@ -1,0 +1,77 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#/insert-template-example.json",
+    "type": "object",
+    "title": "Body content",
+    "description": "The web service request body is used as root element",
+    "properties": {
+        "insert_values": {
+            "$id": "#/properties/insert_values",
+            "type": "object",
+            "title": "The insert values",
+            "description": "The values to insert are passed as a key value pair array.",
+            "properties": {
+                "columns": {
+                    "$id": "#/properties/insert_values/properties/columns",
+                    "type": "array",
+                    "title": "The column names",
+                    "description": "The name of the columns used in the INSERT.",
+                    "items": {
+                        "$id": "#/properties/insert_values/properties/columns/items",
+                        "type": "string",
+                        "title": "Column name",
+                        "examples": [
+                            "id",
+                            "user_name",
+                            "registration_date"
+                        ],
+                        "pattern": "^[a-zA-Z_$0-9]"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                },
+                "values": {
+                    "$id": "#/properties/insert_values/properties/values",
+                    "type": "array",
+                    "title": "The values to insert",
+                    "description": "The values to insert defined by rows with column key paired value.",
+                    "items": {
+                        "$id": "#/properties/insert_values/properties/values/items",
+                        "type": "object",
+                        "title": "Column with paired value",
+                        "patternProperties": {
+                            "^[a-zA-Z_$0-9]+": {
+                                "type": [
+                                    "integer",
+                                    "number",
+                                    "string",
+                                    "boolean",
+                                    "null"
+                                ]
+                            }
+                        },
+                        "examples": [
+                            {
+                                "id": 1,
+                                "user_name": "Mike",
+                                "registration_date": "12-2018"
+                            },                            {
+                                "id": 2,
+                                "user_name": "Mike Second",
+                                "registration_date": "11-2018"
+                            }
+                        ],
+                        "minItems": 1
+                    }
+                }
+            },
+            "required": [
+                "columns",
+                "values"
+            ]
+        }
+    },
+    "required": [
+        "insert_values"
+    ]
+}

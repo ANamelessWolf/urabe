@@ -89,10 +89,15 @@ const ERR_CONNECTION_CLOSED = 'The connection to the database is closed.';
  */
 const ERR_NOT_CONNECTED = 'No connection to the database, did you use connect()?';
 /**
- * @var string ERR_INCOMPLETE_BODY
- * The error message sent when the the body is missing data.
+ * @var string ERR_INCOMPLETE_DATA
+ * The error message sent when the the node is missing data.
  */
-const ERR_INCOMPLETE_BODY = 'The body does not contain enough data to %s. Needed fields [%s].';
+const ERR_INCOMPLETE_DATA = 'The node %s does not contain enough data. Needed values [%s].';
+/**
+ * @var string ERR_INCOMPLETE_BODY
+ * The error message sent when the the body doesn't has a property
+ */
+const ERR_INCOMPLETE_BODY = 'The property %s was not found in the body.';
 /**
  * @var string ERR_INCOMPLETE_BODY_CONDITION
  * The error message sent when the the condition fields are missing on the body.
@@ -364,6 +369,11 @@ const TAB_NAME = 'table_name';
  * The column name used as filter in the selection data
  */
 const TAB_COL_FILTER = 'column_filter';
+/**
+ * @var string TAB_INS_COLS
+ * The name of the field that stores the name of the columns to insert
+ */
+const TAB_INS_COLS = 'ins_columns';
 /******************************************
  ************ FIELD NAMES *****************
  *****************************************/
