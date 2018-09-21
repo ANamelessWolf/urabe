@@ -1,6 +1,6 @@
 <?php
 include_once "TestUtils.php";
-include_once "../src/Urabe.php";
+include_once "../../src/Urabe.php";
 /**
  * This file defines the tests available for testing the 
  * Urabe class
