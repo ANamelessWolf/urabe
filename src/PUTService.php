@@ -33,6 +33,31 @@ class PUTService extends HasamiRestfulService
         };
     }
     /**
+     * Wraps the insert function from urabe
+     * @param string $table_name The table name.
+     * @param object $values The values to insert as key value pair array. 
+     * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    public function insert($table_name, $values)
+    {
+        return $this->urabe->insert($table_name, $values);
+    }
+    /**
+     * Wraps the insert_bulk function from urabe
+     *
+     * @param string $table_name The table name.
+     * @param array $values The values to insert as key value pair array. 
+     * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    public function insert_bulk($table_name, $columns, $values)
+    {
+        return $this->urabe->insert_bulk($table_name, $columns, $values);
+    }
+    /**
      * Defines the default PUT action, by default selects all data from the wrapper table name that match the
      * column filter. Insert values are sent in the body as defined in the insert JSON documentation
      * @param WebServiceContent $data The web service content
@@ -46,20 +71,16 @@ class PUTService extends HasamiRestfulService
             $table_name = $data->extra->{TAB_NAME};
             $ins_columns = $data->extra->{TAB_INS_COLS};
             //Validate column data
-            $this->validate_columns($data->body, 'insert');
-            if (property_exists($data->body->insert->values) && is_array($data->body->insert->values)) {
-                $columns = $data->body->insert->columns;
-                $values = $data->body->insert->values;
-                if (count($values) == 1)
-                    $urabe->insert($data->body->insert);
-            } else
-                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, 'insert', 'values'));
-
-            if ($data->in_GET_variables($col_name)) {
-                $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $col_name = @1");
-                return $urabe->select($sql, array($col_name));
-            } else
-                return $urabe->select_all($table_name);
+            $this->validate_columns('insert_values', $ins_columns);
+            //Validate values
+            if (property_exists($this->data->body->insert_values, NODE_VAL))
+                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_VAL));
+            //Build insert query
+            if (is_array($this->data->body->insert_values->values))
+                $response = $this->urabe->insert_bulk($table_name, $this->data->body->columns, $this->data->body->insert_values->values);
+            else
+                $response = $this->urabe->insert($table_name, $this->data->body->insert_values->values);
+            return $response;
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());
         }

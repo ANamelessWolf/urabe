@@ -34,6 +34,22 @@ class GETService extends HasamiRestfulService
     }
 
     /**
+     * Wraps the select function from urabe place holders are passed with @index.
+     * Once the SQL selection statement is executed the data is parsed as defined in the given parser. 
+     * If the parser is null uses the parser defined in the connector object KanojoX::parser
+     *
+     * @param string $sql The SQL statement
+     * @param array $variables The colon-prefixed bind variables placeholder used in the statement, @1..@n
+     * @param MysteriousParser $row_parser The row parser. 
+     * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
+     * @return UrabeResponse The SQL selection result
+     */
+    public function select($sql, $variables = null, $row_parser = null)
+    {
+        return $this->urabe->select($sql, $variables);
+    }
+
+    /**
      * Defines the default GET action, by default selects all data from the wrapper table name that match the
      * column filter. If the column filter name is not given in the GET variables this function selects
      * all data from the table
@@ -55,22 +71,6 @@ class GETService extends HasamiRestfulService
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());
         }
-    }
-
-    /**
-     * Wraps the select function from urabe place holders are passed with @index.
-     * Once the SQL selection statement is executed the data is parsed as defined in the given parser. 
-     * If the parser is null uses the parser defined in the connector object KanojoX::parser
-     *
-     * @param string $sql The SQL statement
-     * @param array $variables The colon-prefixed bind variables placeholder used in the statement, @1..@n
-     * @param MysteriousParser $row_parser The row parser. 
-     * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
-     * @return UrabeResponse The SQL selection result
-     */
-    public function select($sql, $variables = null, $row_parser = null)
-    {
-        return $this->urabe->select($sql, $variables);
     }
 
 }

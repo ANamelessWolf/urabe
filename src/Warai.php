@@ -274,6 +274,18 @@ const NODE_STACK = 'stack_trace';
  * The node name that saves variables parameters
  */
 const NODE_PARAMS = 'parameters';
+/**
+ * @var string NODE_COLS
+ * The node name that stores an array of column names
+ */
+const NODE_COLS = 'columns';
+/**
+ * @var string NODE_VAL
+ * The node name that stores an array of column names paired with its values
+ */
+const NODE_VAL = 'values';
+
+
 /****************************************
  ************ URL PARAMS KEYS ************
  *****************************************/

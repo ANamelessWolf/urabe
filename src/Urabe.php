@@ -167,7 +167,7 @@ class Urabe
      * Performs an insertion query into a table
      *
      * @param string $table_name The table name.
-     * @param array $values The values to insert as key value pair array. 
+     * @param object $values The values to insert as key value pair array. 
      * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
      * @return UrabeResponse Returns the service response formatted as an executed response
@@ -179,12 +179,10 @@ class Urabe
         $insert_values = array();
         $params = array();
         //Build prepare statement
-        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
-            foreach ($values[$i] as $column => $value) {
-                array_push($columns, $column);
-                array_push($insert_values, $this->connector->get_param_place_holder(++$index));
-                array_push($params, $value);
-            }
+        foreach ($values as $column => $value) {
+            array_push($columns, $column);
+            array_push($insert_values, $this->connector->get_param_place_holder(++$index));
+            array_push($params, $value);
         }
         $columns = implode(', ', $columns);
         $insert_values = implode(', ', $insert_values);

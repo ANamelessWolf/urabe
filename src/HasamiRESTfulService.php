@@ -66,6 +66,29 @@ class HasamiRestfulService
             throw new Exception(sprintf(ERR_INCOMPLETE_BODY, CAP_EXTRACT, implode(', ', $fields)));
     }
     /**
+     * This method validates the columns contained in the given node.
+     * It's expected that the body contains the passed node and the node contain a columns property
+     * @param string $property_name The name of the property that contains the columns property in the body
+     * @param array $obligatory_columns An array of column names that must exists in the columns property
+     * @throws Exception An Exception is thrown if the body is null or the body does not contains all fields
+     * @return void 
+     */
+    public function validate_columns($property_name, $obligatory_columns)
+    {
+        if (is_null($this->data->body))
+            throw new Exception(ERR_BODY_IS_NULL);
+        if (property_exists($this->data->body, $property_name))
+            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, $property_name));
+        if (property_exists($this->data->body->{$property_name}, NODE_COLS))
+            throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_COLS));
+        $columns = $this->data->body->{$property_name}->{NODE_COLS};
+        //Columns must contain all obligatory columns
+        foreach ($obligatory_columns as &$column)
+            if (!in_array($column, $columns))
+            throw new Exception(sprintf(ERR_INCOMPLETE_DATA, NODE_COLS, implode(', ', $obligatory_columns)));
+    }
+
+    /**
      * Gets the service response
      * @throws Exception An Exception is thrown when the service task is not defined or an error occurs 
      * during the callback
