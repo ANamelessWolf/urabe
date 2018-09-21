@@ -1,8 +1,8 @@
 <?php
-include_once("HasamiWrapper.php");
-include_once("QueryResult.php");
-include_once("JsonPrettyPrint.php");
-include_once("JsonPrettyPrintLight.php");
+// include_once("HasamiWrapper.php");
+// include_once("QueryResult.php");
+// include_once("JsonPrettyPrint.php");
+// include_once("JsonPrettyPrintLight.php");
 /******************************************
  ************ Default queries *************
  *****************************************/
@@ -119,4 +119,17 @@ function open_json_file($file_path)
     } else
         return false;
 }
+/**
+ * From the current request body create a JSON object
+ *
+ * @return stdClass The JSON body
+ */
+function get_body_as_json()
+{
+    $body = file_get_contents('php://input');
+    $body = json_decode($body);
+    return $body;
+}
+
+
 ?>

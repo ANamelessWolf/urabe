@@ -1,0 +1,89 @@
+<?php
+include_once "HasamiRestfulService.php";
+
+/**
+ * PUT Service Class
+ * This class defines a restful service with a request verbose PUT. 
+ * This method is often used to insert data to the database. 
+ * @version 1.0.0
+ * @api Makoto Urabe
+ * @author A nameless wolf <anamelessdeath@gmail.com>
+ * @copyright 2015-2020 Nameless Studios
+ */
+class PUTService extends HasamiRestfulService
+{
+    /**
+     * __construct
+     *
+     * Initialize a new instance of the PUT Service class.
+     * A default service task is defined as a callback using the function PUTService::default_PUT_action
+     * 
+     * @param IHasami $wrapper The web service wrapper
+     */
+    public function __construct($wrapper)
+    {
+        $data = $wrapper->get_request_data();
+        $data->extra->{TAB_NAME} = $wrapper->get_table_name();
+        $data->extra->{TAB_INS_COLS} = $wrapper->get_insert_columns();
+        $urabe = $wrapper->get_urabe();
+        parent::__construct($data, $urabe);
+        $this->wrapper = $wrapper;
+        $this->service_task = function ($data, $urabe) {
+            return $this->default_PUT_action($data, $urabe);
+        };
+    }
+    /**
+     * Wraps the insert function from urabe
+     * @param string $table_name The table name.
+     * @param object $values The values to insert as key value pair array. 
+     * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    public function insert($table_name, $values)
+    {
+        return $this->urabe->insert($table_name, $values);
+    }
+    /**
+     * Wraps the insert_bulk function from urabe
+     *
+     * @param string $table_name The table name.
+     * @param array $values The values to insert as key value pair array. 
+     * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
+     * @throws Exception An Exception is raised if the connection is null or executing a bad query
+     * @return UrabeResponse Returns the service response formatted as an executed response
+     */
+    public function insert_bulk($table_name, $columns, $values)
+    {
+        return $this->urabe->insert_bulk($table_name, $columns, $values);
+    }
+    /**
+     * Defines the default PUT action, by default selects all data from the wrapper table name that match the
+     * column filter. Insert values are sent in the body as defined in the insert JSON documentation
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @throws Exception An Exception is thrown if the response can be processed correctly
+     * @return UrabeResponse The server response
+     */
+    protected function default_PUT_action($data, $urabe)
+    {
+        try {
+            $table_name = $data->extra->{TAB_NAME};
+            $ins_columns = $data->extra->{TAB_INS_COLS};
+            //Validate column data
+            $this->validate_columns('insert_values', $ins_columns);
+            //Validate values
+            if (property_exists($this->data->body->insert_values, NODE_VAL))
+                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_VAL));
+            //Build insert query
+            if (is_array($this->data->body->insert_values->values))
+                $response = $this->urabe->insert_bulk($table_name, $this->data->body->columns, $this->data->body->insert_values->values);
+            else
+                $response = $this->urabe->insert($table_name, $this->data->body->insert_values->values);
+            return $response;
+        } catch (Exception $e) {
+            throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());
+        }
+    }
+}
+?>
