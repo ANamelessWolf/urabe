@@ -1,20 +1,29 @@
 {
-    "fields": [
-      {
-        "field_name": "ID_REVIT",
-        "data_type": "LONG"
-      },
-      {
-        "field_name": "AREA",
-        "data_type": "VARCHAR"
-      },
-      {
-        "field_name": "COMPONENTE",
-        "data_type": "VARCHAR"
-      },
-      {
-        "field_name": "CANTIDAD",
-        "data_type": "NUMBER"
-      }
-    ]
-  }
+  "table_name": "MyTable",
+  "fields": [
+    {
+      "column_index": 1,
+      "column_name": "id",
+      "data_type": "integer",
+      "char_max_length": null,
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "column_index": 2,
+      "column_name": "u_name",
+      "data_type": "character varying",
+      "char_max_length": 50,
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "column_index": 3,
+      "column_name": "u_age",
+      "data_type": "integer",
+      "char_max_length": null,
+      "numeric_precision": 0,
+      "numeric_scale": 2
+    }
+  ]
+}

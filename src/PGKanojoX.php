@@ -214,7 +214,7 @@ class PGKanojoX extends KanojoX
             PG_FIELD_COL_NAME => TAB_DEF_NAME,
             PG_FIELD_DATA_TP => TAB_DEF_TYPE,
             PG_FIELD_CHAR_LENGTH => TAB_DEF_CHAR_LENGTH,
-            PG_FIELD_NUM_PRECISION => TAB_DEF_NxUM_PRECISION,
+            PG_FIELD_NUM_PRECISION => TAB_DEF_NUM_PRECISION,
             PG_FIELD_NUM_SCALE => TAB_DEF_NUM_SCALE
         );
         return $map;

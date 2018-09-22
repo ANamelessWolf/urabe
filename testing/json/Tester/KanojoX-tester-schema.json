@@ -1,0 +1,34 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#/KanojoX-tester-schema.json",
+    "type": "object",
+    "title": "KanojoX Test data",
+    "description": "Defines the data used to test the KanojoX Class",
+    "properties": {
+        "connection": {
+          "$id": "#/properties/connection",
+          "type": "object",
+          "title": "The connection data",
+          "description":  "Define the necessary connection elements to build a connection string",
+          "$ref": "./schema/connection-template.json"
+        }
+    }
+}
+
+{
+    "connection": {
+        "host": "127.0.0.1",
+        "user_name": "user",
+        "password": "*********",
+        "port": 3306,
+        "db_name": "my_database"
+    },
+    "driver": "MYSQL",
+    "sql_no_params": "SELECT * FROM table_name LIMIT 5",
+    "sql_params": "SELECT * FROM table_name LIMIT $1",
+    "update_sql_params": "UPDATE table_name SET column = $1 WHERE gid = $2",
+    "update_sql_no_params": "UPDATE table_name SET column = 'new_value'",
+    "table_name": "table_name",
+    "schema": "public",
+    "owner": "public"
+}

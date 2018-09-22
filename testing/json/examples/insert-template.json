@@ -1,21 +1,19 @@
 {
-    "insert_values": {
-        "columns": [
-            "name",
-            "user_name",
-            "password"
-        ],
-        "values": [
-            {
-                "name": "Mike",
-                "user_name": "nameless",
-                "password": "pass123"
-            },
-            {
-                "name": "SecondMike",
-                "user_name": "nameless2",
-                "password": "pass123"
-            }
-        ]
-    }
+    "columns": [
+        "name",
+        "user_name",
+        "password"
+    ],
+    "values": [
+        {
+            "name": "Mike",
+            "user_name": "nameless",
+            "password": "pass123"
+        },
+        {
+            "name": "SecondMike",
+            "user_name": "nameless2",
+            "password": "pass123"
+        }
+    ]
 }

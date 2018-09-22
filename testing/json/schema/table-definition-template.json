@@ -1,0 +1,110 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "#/table-definition-template.json",
+  "type": "object",
+  "title": "Table definition",
+  "description": "The name of the table and the definitions of its columns",
+  "properties": {
+    "table_name": {
+      "$id": "#/properties/table_name",
+      "type": "string",
+      "title": "The table name",
+      "description": "The name of the table where the definition is extracted",
+      "examples": [
+        "MyTable",
+        "user_table"
+      ]
+    },
+    "fields": {
+      "$id": "#/properties/fields",
+      "type": "array",
+      "title": "The table fields",
+      "description": "The collection of fields, that describe column name, char length or number scale",
+      "items": {
+        "$id": "#/properties/fields/items",
+        "type": "object",
+        "title": "Column element",
+        "description": "The definition of a column",
+        "properties": {
+          "column_index": {
+            "$id": "#/properties/fields/items/properties/column_index",
+            "type": "integer",
+            "title": "Column Index",
+            "description": "The index of the column in order of table column definition",
+            "examples": [
+              1,
+              2
+            ]
+          },
+          "column_name": {
+            "$id": "#/properties/fields/items/properties/column_name",
+            "type": "string",
+            "title": "Column name",
+            "description": "The name of the column",
+            "examples": [
+              "id",
+              "user_name"
+            ]
+          },
+          "data_type": {
+            "$id": "#/properties/fields/items/properties/data_type",
+            "type": "string",
+            "title": "Column data type",
+            "description": "The column data, varies depending on the current driver",
+            "examples": [
+              "integer",
+              "character varying",
+              "varchar"
+            ]
+          },
+          "char_max_length": {
+            "$id": "#/properties/fields/items/properties/char_max_length",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "title": "Column max character length",
+            "description": "If the type of data stores string, might have a character max length definition",
+            "examples": [
+              5,
+              null,
+              100
+            ]
+          },
+          "numeric_precision": {
+            "$id": "#/properties/fields/items/properties/numeric_precision",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "title": "Column numeric precision",
+            "description": "If the type of data stores a numeric value, the number has a precision and a scale",
+            "examples": [
+              5,
+              null
+            ]
+          },
+          "numeric_scale": {
+            "$id": "#/properties/fields/items/properties/numeric_scale",
+            "type": [
+              "integer",
+              "null"
+            ],
+            "title": "Column numeric scale",
+            "description": "If the type of data stores a numeric value, the number has a precision and a scale",
+            "examples": [
+              2,
+              null
+            ]
+          }
+        }
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "table_name",
+    "fields"
+  ]
+}
