@@ -3,7 +3,7 @@ require_once "Enum.php";
 /**
  * Database connection drivers supported by URABE API
  * The collection of enums that manages URABE API
- * @api Makoto Urabe DB Manager
+ * @api Makoto Urabe DB Manager DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

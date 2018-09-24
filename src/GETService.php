@@ -6,7 +6,7 @@ include_once "HasamiRestfulService.php";
  * This class defines a restful service with a request verbose GET. 
  * This method is often used to select un protected data from the database. 
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

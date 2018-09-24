@@ -11,7 +11,7 @@ include "WebServiceContent.php";
  * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an the database.
  * @version 1.0.0
- * @api Makoto Urabe database connector
+ * @api Makoto Urabe DB Manager database connector
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

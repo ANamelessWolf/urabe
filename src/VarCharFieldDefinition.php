@@ -6,7 +6,7 @@ include_once "FieldDefinition.php";
  * This class encapsulates a table field definition of type character variable. 
  * Each table field is associated to a column name and the column data type.
  * This class will treat the field as string type.
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe DB Manager Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

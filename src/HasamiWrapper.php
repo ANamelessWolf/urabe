@@ -6,7 +6,7 @@ include_once "IHasami.php";
  * A Hasami Wrapper is a web service wrapper Class
  * This class encapsulate and manage web service verbose PUT, POST, DELETE and GET
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

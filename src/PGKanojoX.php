@@ -7,7 +7,7 @@ include_once "PGSQL_Result.php";
  * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an PostgreSQL database.
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

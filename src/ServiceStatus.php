@@ -2,7 +2,7 @@
 require_once "Enum.php";
 /**
  * Defines an availability status when executing a service
- * @api Makoto Urabe DB Manager
+ * @api Makoto Urabe DB Manager DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

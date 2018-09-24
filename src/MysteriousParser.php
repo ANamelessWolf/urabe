@@ -5,7 +5,7 @@
  * 
  * This class parses a row from a table definition
  * @version 1.0.0
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe DB Manager Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

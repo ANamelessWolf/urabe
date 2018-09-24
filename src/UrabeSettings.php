@@ -8,7 +8,7 @@ include "ServiceStatus.php";
  * In this file the application work around can be customized
  * 
  * @version 1.0.0
- * @api Makoto Urabe database connector
+ * @api Makoto Urabe DB Manager database connector
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
