@@ -144,10 +144,20 @@ const ERR_INVALID_SERVICE = 'No service specified';
  */
 const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current service';
 /**
+ * @var string ERR_INVALID_ACTION
+ * The error message sent when trying to call a not implemented action
+ */
+const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s';
+/**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
  */
 const ERR_SERVICE_RESTRICTED = 'This service can not be access via the verbose %s';
+/**
+ * @var string ERR_VERBOSE_NOT_SUPPORTED
+ * The error message sent when the request method is not supported
+ */
+const ERR_VERBOSE_NOT_SUPPORTED = 'This service does not support the verbose %s';
 /**
  * @var string ERR_SERVICE_RESPONSE
  * The error message sent when an exception occurred during a web request
@@ -165,17 +175,17 @@ const ERR_TASK_UNDEFINED = "The given task was not found on the service";
  * @var string CAP_DELETE
  * String caption for Delete.
  */
-const CAP_DELETE = 'Delete';
+const CAP_DELETE = 'delete';
 /**
  * @var string CAP_UPDATE
  * String caption for Update.
  */
-const CAP_UPDATE = 'Update';
+const CAP_UPDATE = 'update';
 /**
  * @var string CAP_INSERT
  * String caption for Insert.
  */
-const CAP_INSERT = 'Insert';
+const CAP_INSERT = 'insert';
 /**
  * @var string CAP_EXTRACT
  * String caption for Extract.
@@ -284,7 +294,11 @@ const NODE_COLS = 'columns';
  * The node name that stores an array of column names paired with its values
  */
 const NODE_VAL = 'values';
-
+/**
+ * @var string NODE_CONDITION
+ * The node name that stores an SQL statement condition
+ */
+const NODE_CONDITION = 'condition';
 
 /****************************************
  ************ URL PARAMS KEYS ************
@@ -381,11 +395,6 @@ const TAB_NAME = 'table_name';
  * The column name used as filter in the selection data
  */
 const TAB_COL_FILTER = 'column_filter';
-/**
- * @var string TAB_INS_COLS
- * The name of the field that stores the name of the columns to insert
- */
-const TAB_INS_COLS = 'ins_columns';
 /******************************************
  ************ FIELD NAMES *****************
  *****************************************/

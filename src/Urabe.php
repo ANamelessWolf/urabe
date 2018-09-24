@@ -27,6 +27,26 @@ class Urabe
      */
     public $is_connected;
     /**
+     * Gets the current parser
+     *
+     * @return MysteriousParser The current parser
+     */
+    public function get_parser()
+    {
+        return $this->connector->parser;
+    }
+    /**
+     * Sets the current parser
+     *
+     * @param MysteriousParser $parser The current parser
+     * @return void
+     */
+    public function set_parser($parser)
+    {
+        $this->connector->parser = $parser;
+    }
+
+    /**
      * __construct
      *
      * Initialize a new instance of the Urabe Database manager.
@@ -178,6 +198,7 @@ class Urabe
         $columns = array();
         $insert_values = array();
         $params = array();
+        $index = 0;
         //Build prepare statement
         foreach ($values as $column => $value) {
             array_push($columns, $column);
@@ -215,7 +236,6 @@ class Urabe
             }
             array_push($insert_rows, sprintf($value_format, implode(', ', $insert_values)));
         }
-
         $columns = implode(', ', $columns);
         $insert_rows = implode(', ', $insert_rows);
         $sql = sprintf($query_format, $columns, $insert_rows);
@@ -238,14 +258,13 @@ class Urabe
         $set_format = "%s = %s";
         $update_values = array();
         $params = array();
+        $index = 0;
         //Build prepare statement
-        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
-            foreach ($values[$i] as $column => $value) {
-                array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
-                array_push($params, $value);
-            }
+        foreach ($values as $column => $value) {
+            array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
+            array_push($params, $value);
         }
-        $update_values = implode(', ', $insert_values);
+        $update_values = implode(', ', $update_values);
         $sql = sprintf($query_format, $update_values, $condition);
         $response = $this->query($sql, $params);
         return $response;
@@ -268,12 +287,11 @@ class Urabe
         $set_format = "%s = %s";
         $update_values = array();
         $params = array();
+        $index = 0;
         //Build prepare statement
-        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
-            foreach ($values[$i] as $column => $value) {
-                array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
-                array_push($params, $value);
-            }
+        foreach ($values as $column => $value) {
+            array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
+            array_push($params, $value);
         }
         array_push($params, $column_value);
         $update_values = implode(', ', $insert_values);

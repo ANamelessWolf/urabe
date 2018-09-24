@@ -1,6 +1,7 @@
 <?php
 include "Warai.php";
 include "WaraiMessages_en.php";
+include "ServiceStatus.php";
 /**
  * Urabe application settings
  *
@@ -48,9 +49,25 @@ return (object)array(
      */
     "hide_exception_error" => false,
     /**
-    * @var bool If sets to true, url parameters are extracted in pairs. Where the first parameter is the key and the
-    * second the value.
-    */
+     * @var bool If sets to true, url parameters are extracted in pairs. Where the first parameter is the key and the
+     * second the value.
+     */
     "url_params_in_pairs" => true,
+    /**
+     * @var ServiceStatus The default status for GET Service
+     */
+    "default_GET_status" => ServiceStatus::AVAILABLE,
+    /**
+     * @var ServiceStatus The default status for POST Service
+     */
+    "default_POST_status" => ServiceStatus::BLOCKED,
+    /**
+     * @var ServiceStatus The default status for PUT Service
+     */
+    "default_PUT_status" => ServiceStatus::BLOCKED,
+    /**
+     * @var ServiceStatus The default status for DELETE Service
+     */
+    "default_GET_status" => ServiceStatus::BLOCKED
 );
 ?>
