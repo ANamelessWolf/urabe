@@ -1,0 +1,8 @@
+{
+    "condition": "uId = 20",
+    "values": {
+        "name": "Mike",
+        "user_name": "nameless",
+        "password": "pass123"
+    }
+}
