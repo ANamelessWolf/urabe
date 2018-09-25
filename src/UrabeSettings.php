@@ -2,6 +2,7 @@
 include "Warai.php";
 include "WaraiMessages_en.php";
 include "ServiceStatus.php";
+include "JsonPrettyStyle.php";
 /**
  * Urabe application settings
  *
@@ -68,6 +69,10 @@ return (object)array(
     /**
      * @var ServiceStatus The default status for DELETE Service
      */
-    "default_GET_status" => ServiceStatus::BLOCKED
+    "default_DELETE_status" => ServiceStatus::BLOCKED,
+    /**
+     * @var JsonPrettyStyle The default JSON PP Style
+     */
+    "default_pp_style" => JsonPrettyStyle::DarkStyle(),
 );
 ?>
