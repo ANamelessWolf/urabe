@@ -91,7 +91,10 @@ function test_query($urabe, $body)
 function test_insert($urabe, $body)
 {
     $insert_params = $body->insert_params;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->insert($table_name, $insert_params);
 }
 /**
@@ -105,7 +108,10 @@ function test_insert($urabe, $body)
 function test_insert_bulk($urabe, $body)
 {
     $bulk = $body->insert_bulk;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->insert_bulk($table_name, $bulk->columns, $bulk->values);
 }
 /**

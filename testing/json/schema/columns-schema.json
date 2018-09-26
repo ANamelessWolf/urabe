@@ -1,0 +1,20 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#/columns-schema.json",
+    "type": "array",
+    "title": "The column names",
+    "description": "The name of the columns",
+    "items": {
+        "$id": "#/properties/columns/items",
+        "type": "string",
+        "title": "Column name",
+        "examples": [
+            "id",
+            "user_name",
+            "registration_date"
+        ],
+        "pattern": "^[a-zA-Z_$0-9]"
+    },
+    "minItems": 1,
+    "uniqueItems": true
+}

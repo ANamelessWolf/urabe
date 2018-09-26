@@ -187,7 +187,7 @@ class Urabe
      * Performs an insertion query into a table
      *
      * @param string $table_name The table name.
-     * @param object $values The values to insert as key value pair array. 
+     * @param object $values The values to insert as key value pair
      * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
      * @return UrabeResponse Returns the service response formatted as an executed response
@@ -215,6 +215,7 @@ class Urabe
      * Performs a bulk insertion query into a table
      *
      * @param string $table_name The table name.
+     * @param array $columns The columns as an array of strings
      * @param array $values The values to insert as key value pair array. 
      * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
