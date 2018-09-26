@@ -31,12 +31,12 @@ const ERR_BAD_RESPONSE = 'The web service returns a bad response';
  * @var string ERR_BAD_QUERY
  * The error message sent when a bad query is executed.
  */
-const ERR_BAD_QUERY = 'Bad query: %s';
+const ERR_BAD_QUERY = 'Bad query: %s.';
 /**
  * @var string ERR_READING_JSON
  * The error message sent when a JSON file can not be parsed.
  */
-const ERR_READING_JSON_FILE = 'Error reading the JSON file from "%s"';
+const ERR_READING_JSON_FILE = 'Error reading the JSON file from "%s".';
 /**
  * @var string ERR_BAD_URL
  * The error message sent when the url can be parsed
@@ -46,12 +46,12 @@ const ERR_BAD_URL = 'The url has an invalid format.';
  * @var string ERR_BODY_IS_NULL
  * The error message sent when the the body is null.
  */
-const ERR_BODY_IS_NULL = 'An error ocurred parsing the message body. The body message is null or invalid';
+const ERR_BODY_IS_NULL = 'An error ocurred parsing the message body. The body message is null or invalid.';
 /**
  * @var string ERR_BAD_CONNECTION
  * The error message sent when the connection is not valid.
  */
-const ERR_BAD_CONNECTION = 'Invalid database connection';
+const ERR_BAD_CONNECTION = 'Invalid database connection.';
 
 /**
  * @var string ERR_NOT_CONNECTED
@@ -77,30 +77,30 @@ const ERR_INCOMPLETE_BODY_CONDITION = 'The body does not contain enough data to 
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
  */
-const ERR_INVALID_SERVICE = 'No service specified';
+const ERR_INVALID_SERVICE = 'No service specified.';
 /**
  * @var string ERR_INVALID_SERVICE_TASK
  * The error message sent when trying to get a service response with no task
  */
-const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current service';
+const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current service.';
 /**
  * @var string ERR_INVALID_ACTION
  * The error message sent when trying to call a not implemented action
  */
-const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s';
+const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s.';
 /**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
  */
-const ERR_SERVICE_RESTRICTED = 'This service can not be access via the verbose %s';
+const ERR_SERVICE_RESTRICTED = 'This service can not be access via the verbose %s.';
 /**
  * @var string ERR_VERBOSE_NOT_SUPPORTED
  * The error message sent when the request method is not supported
  */
-const ERR_VERBOSE_NOT_SUPPORTED = 'This service does not support the verbose %s';
+const ERR_VERBOSE_NOT_SUPPORTED = 'This service does not support the verbose %s.';
 /**
  * @var string ERR_SERVICE_RESPONSE
  * The error message sent when an exception occurred during a web request
  */
-const ERR_SERVICE_RESPONSE = 'Error executing the service. ';
+const ERR_SERVICE_RESPONSE = 'Error executing the service.';
 ?>
