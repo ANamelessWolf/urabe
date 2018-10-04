@@ -1,7 +1,7 @@
 <?php
-include_once "../../src/ORACLEKanojoX.php";
-include_once "../../src/PGKanojoX.php";
-include_once "../../src/MYSQLKanojoX.php";
+include_once "../src/ORACLEKanojoX.php";
+include_once "../src/PGKanojoX.php";
+include_once "../src/MYSQLKanojoX.php";
 include_once "TestUtils.php";
 
 /**

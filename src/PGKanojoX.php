@@ -51,7 +51,7 @@ class PGKanojoX extends KanojoX
     public function close()
     {
         $this->free_result();
-        if (!$this->connection)
+        if (!isset($this->connection))
             throw new Exception(ERR_NOT_CONNECTED);
         return pg_close($this->connection);
     }
