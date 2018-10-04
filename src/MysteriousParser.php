@@ -12,10 +12,6 @@
 class MysteriousParser
 {
     /**
-     * @var DBDriver The database driver
-     */
-    public $driver;
-    /**
      * @var array The table fields definition as an array of FieldDefinition.
      */
     public $table_definition;

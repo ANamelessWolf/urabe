@@ -139,7 +139,6 @@ class PGKanojoX extends KanojoX
      * */
     public function fetch_assoc($sql, $variables = null)
     {
-
         $rows = array();
         if (!$this->connection)
             throw new Exception(ERR_NOT_CONNECTED);
