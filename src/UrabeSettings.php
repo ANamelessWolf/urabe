@@ -34,7 +34,7 @@ return (object)array(
     /**
      * @var bool If sets to true and Urabe handles exceptions the error context is shown in the response
      */
-    "show_error_context" => true,
+    "show_error_context" => false,
     /**
      * @var bool If sets to true and Urabe handles exceptions the stack trace will be added to the response
      */
