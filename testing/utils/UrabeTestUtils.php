@@ -127,7 +127,10 @@ function test_update($urabe, $body)
     $values = $body->update_params;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->update($table_name, $values, "$column_name = $column_value");
 }
 /**
@@ -143,7 +146,10 @@ function test_update_by_field($urabe, $body)
     $values = $body->update_params;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->update_by_field($table_name, $values, $column_name, $column_value);
 }
 /**
@@ -156,7 +162,10 @@ function test_update_by_field($urabe, $body)
  */
 function test_delete($urabe, $body)
 {
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
     return $urabe->delete($table_name, "$column_name = $column_value");
@@ -171,7 +180,10 @@ function test_delete($urabe, $body)
  */
 function test_delete_by_field($urabe, $body)
 {
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
     return $urabe->delete_by_field($table_name, $column_name, $column_value);

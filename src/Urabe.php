@@ -295,7 +295,7 @@ class Urabe
             array_push($params, $value);
         }
         array_push($params, $column_value);
-        $update_values = implode(', ', $insert_values);
+        $update_values = implode(', ', $update_values);
         $sql = sprintf($query_format, $update_values, $this->connector->get_param_place_holder(++$index));
         $response = $this->query($sql, $params);
         return $response;
@@ -312,7 +312,7 @@ class Urabe
     public function delete($table_name, $condition)
     {
         $sql = "DELETE FROM $table_name WHERE $condition";
-        return $this->query($query);
+        return $this->query($sql);
     }
     /**
      * Performs a deletion query by defining a condition
@@ -328,11 +328,9 @@ class Urabe
     public function delete_by_field($table_name, $column_name, $column_value)
     {
         $sql = "DELETE FROM $table_name WHERE $column_name = %s";
-        $sql = sprintf($query_format, $this->connector->get_param_place_holder(1));
-        $query = 'DELETE FROM ' . $table_name . ' WHERE ' . $condition;
-        $variables = array();
-        array_push($column_value);
-        return $this->query($query, $variables);
+        $sql = sprintf($sql, $this->connector->get_param_place_holder(1));
+        $variables = array($column_value);
+        return $this->query($sql, $variables);
     }
     /**
      * Formats the bindable parameters place holders in to
