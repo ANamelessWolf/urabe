@@ -6,7 +6,7 @@ include_once "Urabe.php";
  * execute a defined action
  * 
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -47,23 +47,18 @@ class HasamiRestfulService
         $this->urabe = $urabe;
     }
     /**
-     * This function validates that the body contains all the given fields.
-     * The fields may refer to the column names and must match name and case
-     * @param array $fields The fields that must be contained in the body, as an array of strings
-     * @throws Exception An Exception is thrown if the body is null or the body does not contains all fields
+     * This function validates that the body contains all the given properties.
+     * The properties may refer to the column names and must match name and case
+     * @param array $properties The properties that must be contained in the body, as an array of strings
+     * @throws Exception An Exception is thrown if the body is null or the body does not contains all properties
      * @return void
      */
-    public function validate_body($fields)
+    public function validate_body($properties)
     {
-        if (is_null($body))
+        if (is_null($this->data->body))
             throw new Exception(ERR_BODY_IS_NULL);
-        $values = array();
-        foreach ($fields as &$field_name) {
-            if (property_exists($body, $field_name))
-                array_push($values, $body->$field_name);
-        }
-        if (count($fields) != count($values))
-            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, CAP_EXTRACT, implode(', ', $fields)));
+        if (property_exists($this->data->body, $property_name))
+            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, $property_name));
     }
     /**
      * This method validates the columns contained in the given node.

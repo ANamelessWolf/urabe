@@ -4,7 +4,7 @@
  * A connection database error
  * Can be caused by a bad connection or bad request
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

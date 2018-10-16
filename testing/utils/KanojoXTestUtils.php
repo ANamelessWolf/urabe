@@ -1,7 +1,7 @@
 <?php
-include_once "../../src/ORACLEKanojoX.php";
-include_once "../../src/PGKanojoX.php";
-include_once "../../src/MYSQLKanojoX.php";
+include_once "../src/ORACLEKanojoX.php";
+include_once "../src/PGKanojoX.php";
+include_once "../src/MYSQLKanojoX.php";
 include_once "TestUtils.php";
 
 /**
@@ -9,7 +9,7 @@ include_once "TestUtils.php";
  * KanojoX class
  *  
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

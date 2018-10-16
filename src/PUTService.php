@@ -6,7 +6,7 @@ include_once "HasamiRestfulService.php";
  * This class defines a restful service with a request verbose PUT. 
  * This method is often used to insert data to the database. 
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -24,7 +24,7 @@ class PUTService extends HasamiRestfulService
     {
         $data = $wrapper->get_request_data();
         $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $data->extra->{TAB_INS_COLS} = $wrapper->get_insert_columns();
+        $data->extra->{CAP_INSERT} = $wrapper->get_insert_columns();
         $urabe = $wrapper->get_urabe();
         parent::__construct($data, $urabe);
         $this->wrapper = $wrapper;
@@ -58,8 +58,8 @@ class PUTService extends HasamiRestfulService
         return $this->urabe->insert_bulk($table_name, $columns, $values);
     }
     /**
-     * Defines the default PUT action, by default selects all data from the wrapper table name that match the
-     * column filter. Insert values are sent in the body as defined in the insert JSON documentation
+     * Defines the default PUT action, by default execute an insertion query with the given data passed
+     * in the body properties insert_values
      * @param WebServiceContent $data The web service content
      * @param Urabe $urabe The database manager
      * @throws Exception An Exception is thrown if the response can be processed correctly
@@ -69,11 +69,11 @@ class PUTService extends HasamiRestfulService
     {
         try {
             $table_name = $data->extra->{TAB_NAME};
-            $ins_columns = $data->extra->{TAB_INS_COLS};
+            $insert = $data->extra->{CAP_INSERT};
             //Validate column data
-            $this->validate_columns('insert_values', $ins_columns);
+            $this->validate_columns('insert_values', $insert);
             //Validate values
-            if (property_exists($this->data->body->insert_values, NODE_VAL))
+            if (!property_exists($this->data->body->insert_values, NODE_VAL))
                 throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_VAL));
             //Build insert query
             if (is_array($this->data->body->insert_values->values))

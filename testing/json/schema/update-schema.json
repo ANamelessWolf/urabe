@@ -1,0 +1,52 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#/update-schema.json",
+    "type": "object",
+    "title": "UPDATE sql properties",
+    "description": "The values to update and the update condition",
+    "properties": {
+        "condition": {
+            "$id": "#/properties/condition",
+            "type": "string",
+            "title": "The condition to met to update",
+            "description": "The name of the condition used in the UPDATE statement",
+            "examples": [
+                "uId = 20",
+                "field = value OR field2 = value"
+            ]
+        }
+    },
+    "values": {
+        "$id": "#/properties/values",
+        "type": "array",
+        "title": "The values to update",
+        "description": "The values to update defined by column key paired value.",
+        "patternProperties": {
+            "^[a-zA-Z_$0-9]+": {
+                "type": [
+                    "integer",
+                    "number",
+                    "string",
+                    "boolean",
+                    "null"
+                ]
+            }
+        },
+        "examples": [
+            {
+                "id": 1,
+                "user_name": "Mike",
+                "registration_date": "12-2018"
+            },
+            {
+                "id": 2,
+                "user_name": "Mike Second",
+                "registration_date": "11-2018"
+            }
+        ]
+    },
+    "required": [
+        "condition",
+        "values"
+    ]
+}

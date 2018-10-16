@@ -6,7 +6,7 @@ include_once "HasamiRestfulService.php";
  * This class defines a restful service with a request verbose GET. 
  * This method is often used to select un protected data from the database. 
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -24,7 +24,7 @@ class GETService extends HasamiRestfulService
     {
         $data = $wrapper->get_request_data();
         $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $data->extra->{TAB_COL_FILTER} = $wrapper->get_default_filter_column_name();
+        $data->extra->{TAB_COL_FILTER} = $wrapper->get_selection_filter();
         $urabe = $wrapper->get_urabe();
         parent::__construct($data, $urabe);
         $this->wrapper = $wrapper;
@@ -62,10 +62,10 @@ class GETService extends HasamiRestfulService
     {
         try {
             $table_name = $data->extra->{TAB_NAME};
-            $col_name = $data->extra->{TAB_COL_FILTER};
-            if ($data->in_GET_variables($col_name)) {
-                $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $col_name = @1");
-                return $urabe->select($sql, array($col_name));
+            $filter = $data->extra->{TAB_COL_FILTER};
+            if (!is_null($filter)) {
+                $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $filter");
+                return $urabe->select($sql);
             } else
                 return $urabe->select_all($table_name);
         } catch (Exception $e) {

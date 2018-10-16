@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#/table-records-schema.json",
+    "type": "array",
+    "title": "A collection of table records",
+    "description": "Define more than one table record",
+    "items": {
+        "$id": "#/properties/items/table-record",
+        "type": "object",
+        "title": "A table record",
+        "description": "The definition of a table record, pairing column name with its value",
+        "$ref": "#/table-record-schema.json"
+    },
+    "minItems": 1
+}

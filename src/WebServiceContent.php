@@ -4,7 +4,7 @@
  * This class obtains the web service content from GET variables, URL parameters, POST body
  * and the request method
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

@@ -1,12 +1,12 @@
 <?php
 include_once "TestUtils.php";
-include_once "../../src/Urabe.php";
+include_once "../src/Urabe.php";
 /**
  * This file defines the tests available for testing the 
  * Urabe class
  *  
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -91,7 +91,10 @@ function test_query($urabe, $body)
 function test_insert($urabe, $body)
 {
     $insert_params = $body->insert_params;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->insert($table_name, $insert_params);
 }
 /**
@@ -105,7 +108,10 @@ function test_insert($urabe, $body)
 function test_insert_bulk($urabe, $body)
 {
     $bulk = $body->insert_bulk;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->insert_bulk($table_name, $bulk->columns, $bulk->values);
 }
 /**
@@ -121,7 +127,10 @@ function test_update($urabe, $body)
     $values = $body->update_params;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->update($table_name, $values, "$column_name = $column_value");
 }
 /**
@@ -137,7 +146,10 @@ function test_update_by_field($urabe, $body)
     $values = $body->update_params;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     return $urabe->update_by_field($table_name, $values, $column_name, $column_value);
 }
 /**
@@ -150,7 +162,10 @@ function test_update_by_field($urabe, $body)
  */
 function test_delete($urabe, $body)
 {
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
     return $urabe->delete($table_name, "$column_name = $column_value");
@@ -165,7 +180,10 @@ function test_delete($urabe, $body)
  */
 function test_delete_by_field($urabe, $body)
 {
-    $table_name = $body->table_name;
+    if ($body->driver == "PG")
+        $table_name = $body->schema . "." . $body->table_name;
+    else
+        $table_name = $body->table_name;
     $column_name = $body->column_name;
     $column_value = $body->column_value;
     return $urabe->delete_by_field($table_name, $column_name, $column_value);

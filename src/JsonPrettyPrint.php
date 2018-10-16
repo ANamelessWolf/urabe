@@ -1,47 +1,35 @@
 <?php 
+
+require_once "JsonPrettyStyle.php";
+
 /**
  * Json Pretty Print Class
  * 
  * This class creates a HTML format from a JSON object
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios 
  */
 class JsonPrettyPrint
 {
     /**
-     * @var string Defines the color used for symbols like "{" or "," in the JSON string.
+     * Defines the given JSON Style
+     *
+     * @var JsonPrettyStyle The JSON Style
      */
-    public $symbol_color;
-    /**
-     * @var string Defines the color used for properties names in the JSON string.
-     */
-    public $property_name_color;
-    /**
-     * @var string Defines the color used for text values in the JSON string..
-     */
-    public $text_value_color;
-    /**
-     * @var string Defines the color used for number values in the JSON string..
-     */
-    public $number_value_color;
-    /**
-     * @var string Defines the color used for boolean values in the JSON string.
-     */
-    public $boolean_value_color;
+    public $style;
+
     /**
      * __construct
      *
      * Initialize a new instance of the JSON pretty print class.
+     * @param JsonPrettyStyle $style The PP JSON style
      */
-    function __construct()
+    function __construct($style = null)
     {
-        $this->symbol_color = "#ffffff";
-        $this->boolean_value_color = "#66d5ef";
-        $this->property_name_color = "#a6e22e";
-        $this->text_value_color = "#e92647";
-        $this->number_value_color = "#9481dc";
+        if (is_null($style))
+            $style = KanojoX::$settings->default_pp_style;
     }
     /**
      * Gets the pretty print format from a JSON object
@@ -51,15 +39,15 @@ class JsonPrettyPrint
      * @param boolean $parent_is_array True if the parent node is an array
      * @return The json in pretty print format
      */
-    public function get_format($json, $tab_times = 0, $parent_is_array = FALSE)
+    public function get_format($json, $tab_times = 0, $parent_is_array = false)
     {
         $html = "";
         $tab_symbol = $this->create_tabulation($tab_times);
         $coma = $this->print_symbol(", ");
-        //Inicio JSON
+        //JSON Start
         $html .= $tab_symbol . $this->print_symbol("{");
         $html .= $this->new_line();
-        //Contenido del JSON
+        //JSON Content
         foreach ($json as $key => $value) {
             $html .= $tab_symbol . $this->print_property($key) . $this->print_symbol(" : ");
             if (is_array($value)) {
@@ -70,7 +58,7 @@ class JsonPrettyPrint
                 $tab_times++;
                 foreach ($value as &$arr_value) {
                     if (is_object($arr_value) || is_array($arr_value))
-                        $html .= $this->get_format($arr_value, $tab_times, TRUE);
+                        $html .= $this->get_format($arr_value, $tab_times, true);
                     else {
                         if (is_object($arr_value))
                             $html .= $this->get_format($arr_value, $tab_times++);
@@ -87,11 +75,9 @@ class JsonPrettyPrint
                     $remove_line = $coma . $this->new_line();
                     $html = substr($html, 0, (strlen($html) - (strlen($remove_line) + 1))) . $this->new_line();
                     $html .= $this->new_line() . $this->print_symbol(" ]");
-                }
-                else
+                } else
                     $html .= $this->print_symbol(" ]");
-            }
-            else if (is_object($value))
+            } else if (is_object($value))
                 $html .= $this->get_format($value, $tab_times++);
             else if (is_numeric($value))
                 $html .= $this->print_number_value($value);
@@ -101,62 +87,62 @@ class JsonPrettyPrint
                 $html .= $this->print_text_value($value);
             $html .= $coma . $this->new_line();
         }
-        //Se remueve la última línea con la coma
+        //Removes the last comma in the line
         $remove_line = $coma . $this->new_line();
         $html = substr($html, 0, (strlen($html) - (strlen($remove_line) + 1))) . $this->new_line();
-        //Fin JSON
+        //END JSON
         $html .= $this->new_line() . $tab_symbol . $this->print_symbol("}");
         return $html;
     }
     /**
-     * Prints a symbol with the pretty JSONJ format.
+     * Prints a symbol with the pretty JSON format.
      *
      * @param string $symbol The symbol to print.
      * @return string The symbol in the pretty JSON format.
      */
     private function print_symbol($symbol)
     {
-        return sprintf('<span style="color:%s; font-weight:bold">%s</span>', $this->symbol_color, $symbol);
+        return sprintf('<span style="color:%s; font-weight:bold">%s</span>', $style->symbol_color, $symbol);
     }
     /**
-     * Prints a text value with the pretty JSONJ format.
+     * Prints a text value with the pretty JSON format.
      *
      * @param string $text The text value.
      * @return string The text value in the pretty JSON format.
      */
     private function print_text_value($text)
     {
-        return sprintf('<span style="color:%s; font-weight:lighter">"%s"</span>', $this->text_value_color, $text);
+        return sprintf('<span style="color:%s; font-weight:lighter">"%s"</span>', $style->text_value_color, $text);
     }
     /**
-     * Prints a number value with the pretty JSONJ format.
+     * Prints a number value with the pretty JSON format.
      *
      * @param string $number The number value.
      * @return string The number value in the pretty JSON format.
      */
     private function print_number_value($number)
     {
-        return sprintf('<span style="color:%s; font-weight:lighter">%s</span>', $this->number_value_color, $number);
+        return sprintf('<span style="color:%s; font-weight:lighter">%s</span>', $style->number_value_color, $number);
     }
     /**
-     * Prints a boolean value with the pretty JSONJ format.
+     * Prints a boolean value with the pretty JSON format.
      *
      * @param string $bool The boolean value.
      * @return string The boolean value in the pretty JSON format.
      */
     private function print_bool_value($bool)
     {
-        return sprintf('<span style="color:%s; font-weight:lighter">%s</span>', $this->boolean_value_color, $bool ? "true" : "false");
+        return sprintf('<span style="color:%s; font-weight:lighter">%s</span>', $style->boolean_value_color, $bool ? "true" : "false");
     }
     /**
-     * Prints a property name with the pretty JSONJ format.
+     * Prints a property name with the pretty JSON format.
      *
      * @param string $property The property name.
      * @return string The property name in the pretty JSON format.
      */
     private function print_property($property)
     {
-        return sprintf('<span style="color:%s; font-weight:lighter">"%s"</span>', $this->property_name_color, $property);
+        return sprintf('<span style="color:%s; font-weight:lighter">"%s"</span>', $style->property_name_color, $property);
     }
     /**
      * Creates of tabulation.

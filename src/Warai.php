@@ -3,7 +3,7 @@
 /**
  * Defines constants and messages relative to the Urabe API.
  * @version 1.0.0
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe DB Manager Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -20,144 +20,7 @@ const CLASS_ERR = 'ConnectionError';
  * The class names used for sql exceptions
  */
 const CLASS_SQL_EXC = 'UrabeSQLException';
-/***************************************
- **************** Errors ***************
- ***************************************/
-/**
- * @var string ERR_NOT_IMPLEMENTED
- * The error message sent when method is not implemented.
- */
-const ERR_NOT_IMPLEMENTED = 'The method "%s", is not implemented in the class "%s".';
-/**
- * @var string ERR_BAD_INDEX
- * The error message sent when the index is out of bounds.
- */
-const ERR_BAD_INDEX = 'Bad index, no such index %s in array.';
-/**
- * @var string ERR_BAD_RESPONSE
- * The error message sent when the service returns a bad response
- */
-const ERR_BAD_RESPONSE = 'The web service returns a bad response';
-/**
- * @var string ERR_BAD_QUERY
- * The error message sent when a bad query is executed.
- */
-const ERR_BAD_QUERY = 'Bad query: %s';
-/**
- * @var string ERR_EMPTY_QUERY
- * The error message sent when a query is null or empty
- */
-const ERR_EMPTY_QUERY = 'The query is empty or null';
-/**
- * @var string ERR_BAD_TABLE
- * The error message sent when the given table does not match's its service.
- */
-const ERR_BAD_TABLE = 'The table %s does not match the selected service.';
-/**
- * @var string ERR_READING_JSON
- * The error message sent when a JSON file can not be parsed.
- */
-const ERR_READING_JSON_FILE = 'Error reading the JSON file from "%s"';
-/**
- * @var string ERR_BAD_URL
- * The error message sent when the url parameters are not sent in pairs
- */
-const ERR_URL_PARAM_FORMAT = 'The url has an invalid format, URL parameters must be sent in pairs.';
-/**
- * @var string ERR_BODY_IS_NULL
- * The error message sent when the the body is null.
- */
-const ERR_BODY_IS_NULL = 'An error ocurred parsing the message body. The body message is null or invalid';
-/**
- * @var string ERR_BODY_NOT_ARRAY
- * The error message sent when the the body is needed to be an array.
- */
-const ERR_BODY_NOT_ARRAY = 'The body must be an array.';
-/**
- * @var string ERR_BAD_CONNECTION
- * The error message sent when the connection is not valid.
- */
-const ERR_BAD_CONNECTION = 'Invalid database connection';
-/**
- * @var string ERR_CONNECTION
- * The error message sent when the connection to the database is closed.
- */
-const ERR_CONNECTION_CLOSED = 'The connection to the database is closed.';
-/**
- * @var string ERR_NOT_CONNECTED
- * The error message sent when the KanojoX connector is not connected.
- */
-const ERR_NOT_CONNECTED = 'No connection to the database, did you use connect()?';
-/**
- * @var string ERR_INCOMPLETE_DATA
- * The error message sent when the the node is missing data.
- */
-const ERR_INCOMPLETE_DATA = 'The node %s does not contain enough data. Needed values [%s].';
-/**
- * @var string ERR_INCOMPLETE_BODY
- * The error message sent when the the body doesn't has a property
- */
-const ERR_INCOMPLETE_BODY = 'The property %s was not found in the body.';
-/**
- * @var string ERR_INCOMPLETE_BODY_CONDITION
- * The error message sent when the the condition fields are missing on the body.
- */
-const ERR_INCOMPLETE_BODY_CONDITION = 'The body does not contain enough data to fit the condition. Needed fields [%s].';
-/**
- * @var string ERR_MISS_INSERT_FIELDS
- * The error message sent when there are no insert fields.
- */
-const ERR_MISS_INSERT_FIELDS = 'No insertion fields have been defined, "table_insert_fields" is NULL.';
-/**
- * @var string ERR_MISS_UPDATE_FIELDS
- * The error message sent when there are no update fields.
- */
-const ERR_MISS_UPDATE_FIELDS = 'No update fields have been defined, "table_update_fields" is NULL.';
-/**
- * @var string ERR_MISS_PARAM
- * The error message sent when a parameter is missing.
- */
-const ERR_MISS_PARAM = "The parameter '%s' was not found on the response.";
-/**
- * @var string ERR_MISS_TABLE
- * The error message sent when the table does not exists.
- */
-const ERR_MISS_TABLE = "The table '%s' doesn't exists on the database.";
-/**
- * @var string ERR_METHOD_NOT_DEFINED
- * The error message sent when a callback is used with no definition.
- */
-const ERR_METHOD_NOT_DEFINED = 'An error occurred trying to call %s.';
-/**
- * @var string ERR_NULL_BODY
- * The error message sent when the body is null.
- */
-const ERR_NULL_BODY = 'An error occurred reading the message body, the body does not contain a valid JSON format.';
-/**
- * @var string ERR_INVALID_SERVICE
- * The error message sent when no service name is specified.
- */
-const ERR_INVALID_SERVICE = 'No service specified';
-/**
- * @var string ERR_INVALID_SERVICE_TASK
- * The error message sent when trying to get a service response with no task
- */
-const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current service';
-/**
- * @var string ERR_INVALID_SERVICE
- * The error message sent when no service name is specified.
- */
-const ERR_SERVICE_RESTRICTED = 'This service can not be access via the verbose %s';
-/**
- * @var string ERR_SERVICE_RESPONSE
- * The error message sent when an exception occurred during a web request
- */
-const ERR_SERVICE_RESPONSE = 'Error executing the service. ';
-/**
- * @var string ERR_TASK_UNDEFINED
- * The error message sent when the task is missing or not Defined.
- */
-const ERR_TASK_UNDEFINED = "The given task was not found on the service";
+
 /***************************************
  ************** CAPTIONS ***************
  ***************************************/
@@ -165,17 +28,17 @@ const ERR_TASK_UNDEFINED = "The given task was not found on the service";
  * @var string CAP_DELETE
  * String caption for Delete.
  */
-const CAP_DELETE = 'Delete';
+const CAP_DELETE = 'delete';
 /**
  * @var string CAP_UPDATE
  * String caption for Update.
  */
-const CAP_UPDATE = 'Update';
+const CAP_UPDATE = 'update';
 /**
  * @var string CAP_INSERT
  * String caption for Insert.
  */
-const CAP_INSERT = 'Insert';
+const CAP_INSERT = 'insert';
 /**
  * @var string CAP_EXTRACT
  * String caption for Extract.
@@ -284,7 +147,11 @@ const NODE_COLS = 'columns';
  * The node name that stores an array of column names paired with its values
  */
 const NODE_VAL = 'values';
-
+/**
+ * @var string NODE_CONDITION
+ * The node name that stores an SQL statement condition
+ */
+const NODE_CONDITION = 'condition';
 
 /****************************************
  ************ URL PARAMS KEYS ************
@@ -381,11 +248,6 @@ const TAB_NAME = 'table_name';
  * The column name used as filter in the selection data
  */
 const TAB_COL_FILTER = 'column_filter';
-/**
- * @var string TAB_INS_COLS
- * The name of the field that stores the name of the columns to insert
- */
-const TAB_INS_COLS = 'ins_columns';
 /******************************************
  ************ FIELD NAMES *****************
  *****************************************/

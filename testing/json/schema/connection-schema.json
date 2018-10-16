@@ -1,0 +1,88 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "#/connection-template.json",
+    "type": "object",
+    "title": "Connection object",
+    "description": "Define the necessary connection elements to build a connection string",
+    "properties": {
+        "host": {
+            "$id": "#/properties/host",
+            "type": "string",
+            "title": "The connection host",
+            "description": "The host name or the server ip",
+            "examples": [
+                "localhost",
+                "127.0.0.1"
+            ]
+        },
+        "user_name": {
+            "$id": "#/properties/user_name",
+            "type": "string",
+            "title": "Database user name",
+            "description": "The database user name credentials",
+            "examples": [
+                "admin",
+                "root"
+            ]
+        },
+        "password": {
+            "$id": "#/properties/password",
+            "type": [
+                "string",
+                "null"
+            ],
+            "title": "Database user password",
+            "description": "The database user password",
+            "examples": [
+                "password",
+                null
+            ]
+        },
+        "port": {
+            "$id": "#/properties/port",
+            "type": "integer",
+            "title": "Database connection port",
+            "description": "The database connection port",
+            "examples": [
+                5432,
+                3306
+            ]
+        },
+        "db_name": {
+            "$id": "#/properties/db_name",
+            "type": "string",
+            "title": "Database name, SID, Service name or instance",
+            "description": "The database identifier name",
+            "examples": [
+                "db_name"
+            ]
+        },
+        "owner": {
+            "$id": "#/properties/owner",
+            "type": "string",
+            "title": "Database owner",
+            "description": "If connected with an ORACLE driver the database owner can be passed",
+            "examples": [
+                "public",
+                "sales"
+            ]
+        },
+        "schema": {
+            "$id": "#/properties/schema",
+            "type": "string",
+            "title": "Database schema",
+            "description": "If connected with an PG driver the database schema can be passed",
+            "examples": [
+                "public",
+                "sales"
+            ]
+        }
+    },
+    "required": [
+        "host",
+        "user_name",
+        "password",
+        "port",
+        "db_name"
+    ]
+}

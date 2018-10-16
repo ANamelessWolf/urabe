@@ -7,7 +7,7 @@ include_once "PGSQL_Result.php";
  * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
  * an PostgreSQL database.
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -51,7 +51,7 @@ class PGKanojoX extends KanojoX
     public function close()
     {
         $this->free_result();
-        if (!$this->connection)
+        if (!isset($this->connection))
             throw new Exception(ERR_NOT_CONNECTED);
         return pg_close($this->connection);
     }
@@ -139,7 +139,6 @@ class PGKanojoX extends KanojoX
      * */
     public function fetch_assoc($sql, $variables = null)
     {
-
         $rows = array();
         if (!$this->connection)
             throw new Exception(ERR_NOT_CONNECTED);
@@ -214,7 +213,7 @@ class PGKanojoX extends KanojoX
             PG_FIELD_COL_NAME => TAB_DEF_NAME,
             PG_FIELD_DATA_TP => TAB_DEF_TYPE,
             PG_FIELD_CHAR_LENGTH => TAB_DEF_CHAR_LENGTH,
-            PG_FIELD_NUM_PRECISION => TAB_DEF_NxUM_PRECISION,
+            PG_FIELD_NUM_PRECISION => TAB_DEF_NUM_PRECISION,
             PG_FIELD_NUM_SCALE => TAB_DEF_NUM_SCALE
         );
         return $map;

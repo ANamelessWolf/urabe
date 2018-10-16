@@ -1,10 +1,10 @@
 <?php
-include_once "KanojoXTestUtils.php";
+include_once "./utils/KanojoXTestUtils.php";
 /**
  * This file test the functionality for the class KanojoX
  *  
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

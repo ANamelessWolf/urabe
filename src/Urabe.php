@@ -10,7 +10,7 @@ include_once "FieldDefinition.php";
  * Urabe is the main protagonist in the Nazo no Kanojo X, this class manage and wraps all transactions to the database.
  * Given the Kanojo profile Urabe should be able to connect with ORACLE, PG and MySQL
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
@@ -26,6 +26,26 @@ class Urabe
      * Check if there is an active connection to the database.
      */
     public $is_connected;
+    /**
+     * Gets the current parser
+     *
+     * @return MysteriousParser The current parser
+     */
+    public function get_parser()
+    {
+        return $this->connector->parser;
+    }
+    /**
+     * Sets the current parser
+     *
+     * @param MysteriousParser $parser The current parser
+     * @return void
+     */
+    public function set_parser($parser)
+    {
+        $this->connector->parser = $parser;
+    }
+
     /**
      * __construct
      *
@@ -167,7 +187,7 @@ class Urabe
      * Performs an insertion query into a table
      *
      * @param string $table_name The table name.
-     * @param object $values The values to insert as key value pair array. 
+     * @param object $values The values to insert as key value pair
      * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
      * @return UrabeResponse Returns the service response formatted as an executed response
@@ -178,6 +198,7 @@ class Urabe
         $columns = array();
         $insert_values = array();
         $params = array();
+        $index = 0;
         //Build prepare statement
         foreach ($values as $column => $value) {
             array_push($columns, $column);
@@ -194,6 +215,7 @@ class Urabe
      * Performs a bulk insertion query into a table
      *
      * @param string $table_name The table name.
+     * @param array $columns The columns as an array of strings
      * @param array $values The values to insert as key value pair array. 
      * Column names as keys and insert values as associated value, place holders can not be identifiers only values.
      * @throws Exception An Exception is raised if the connection is null or executing a bad query
@@ -215,7 +237,6 @@ class Urabe
             }
             array_push($insert_rows, sprintf($value_format, implode(', ', $insert_values)));
         }
-
         $columns = implode(', ', $columns);
         $insert_rows = implode(', ', $insert_rows);
         $sql = sprintf($query_format, $columns, $insert_rows);
@@ -238,14 +259,13 @@ class Urabe
         $set_format = "%s = %s";
         $update_values = array();
         $params = array();
+        $index = 0;
         //Build prepare statement
-        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
-            foreach ($values[$i] as $column => $value) {
-                array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
-                array_push($params, $value);
-            }
+        foreach ($values as $column => $value) {
+            array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
+            array_push($params, $value);
         }
-        $update_values = implode(', ', $insert_values);
+        $update_values = implode(', ', $update_values);
         $sql = sprintf($query_format, $update_values, $condition);
         $response = $this->query($sql, $params);
         return $response;
@@ -268,15 +288,14 @@ class Urabe
         $set_format = "%s = %s";
         $update_values = array();
         $params = array();
+        $index = 0;
         //Build prepare statement
-        for ($i = 0, $index = 0; $i < sizeof($values); $i++) {
-            foreach ($values[$i] as $column => $value) {
-                array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
-                array_push($params, $value);
-            }
+        foreach ($values as $column => $value) {
+            array_push($update_values, sprintf($set_format, $column, $this->connector->get_param_place_holder(++$index)));
+            array_push($params, $value);
         }
         array_push($params, $column_value);
-        $update_values = implode(', ', $insert_values);
+        $update_values = implode(', ', $update_values);
         $sql = sprintf($query_format, $update_values, $this->connector->get_param_place_holder(++$index));
         $response = $this->query($sql, $params);
         return $response;
@@ -293,7 +312,7 @@ class Urabe
     public function delete($table_name, $condition)
     {
         $sql = "DELETE FROM $table_name WHERE $condition";
-        return $this->query($query);
+        return $this->query($sql);
     }
     /**
      * Performs a deletion query by defining a condition
@@ -309,11 +328,9 @@ class Urabe
     public function delete_by_field($table_name, $column_name, $column_value)
     {
         $sql = "DELETE FROM $table_name WHERE $column_name = %s";
-        $sql = sprintf($query_format, $this->connector->get_param_place_holder(1));
-        $query = 'DELETE FROM ' . $table_name . ' WHERE ' . $condition;
-        $variables = array();
-        array_push($column_value);
-        return $this->query($query, $variables);
+        $sql = sprintf($sql, $this->connector->get_param_place_holder(1));
+        $variables = array($column_value);
+        return $this->query($sql, $variables);
     }
     /**
      * Formats the bindable parameters place holders in to

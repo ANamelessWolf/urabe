@@ -6,7 +6,7 @@
  * This class encapsulates a table column definition and format it values to JSON field value
  * Each table field is associated to a column and stores its index and data type.
  * 
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */

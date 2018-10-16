@@ -1,20 +1,15 @@
 <?php
-
 /**
  * Mysterious parser class
  * 
  * This class parses a row from a table definition
  * @version 1.0.0
- * @api Makoto Urabe Oracle
+ * @api Makoto Urabe DB Manager Oracle
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
 class MysteriousParser
 {
-    /**
-     * @var DBDriver The database driver
-     */
-    public $driver;
     /**
      * @var array The table fields definition as an array of FieldDefinition.
      */
@@ -68,40 +63,26 @@ class MysteriousParser
      * Parse the fetch assoc result by the parse_method callback definition
      *
      * @param array $result The result row to parse
-     * @param array $row The associative array to parse with a new format
+     * @param array $row The selected row picked from the fetch assoc process.
      * @return void
      */
     public function parse(&$result, $row)
     {
         call_user_func_array($this->parse_method, array($this, &$result, $row));
-        // $result = new stdClass();
-        // foreach ($this->table_definition as &$field) {
-        //     try {
-        //         $value = oci_result($sentence, $field->field_name);
-        //         if ($field->is_date()) {
-        //             $result->{$field->field_name . "_angular"} = date_format_angular($value);
-        //             $result->{$field->field_name} = $value;
-        //         } else
-        //             $result->{$field->field_name} = $field->get_value($value);
-        //     } catch (Exception $e) {
-        //         $result->{$field->field_name} = $field->get_value(null);
-        //         $result->{NODE_ERROR} = $e->getMessage();
-        //     }
-        // }
-        // return $result;
     }
     /**
      * Parse the data using the field definition, if a column map is set the result keys are mapped
      * to the given value
      *
-     * @param array $result The result row to parse
-     * @param array $row The associative array to parse with a new format
+     * @param array $result The collection of rows where the parsed rows are stored
+     * @param array $row The selected row picked from the fetch assoc process
      * @return void
      */
     public function parse_with_field_definition(&$result, $row)
     {
         $newRow = array();
-        foreach ($row as $column_name => $column_value) {
+        foreach ($row as $column_name => $column_value)
+            if (isset($this->table_definition) && is_array($this->table_definition) && array_key_exists($column_name, $this->table_definition)) {
             $key = $this->get_column_name($column_name);
             $value = $this->table_definition[$column_name]->get_value($column_value);
             $newRow[$key] = $value;
@@ -122,8 +103,7 @@ class MysteriousParser
         else
             return $column_name;
     }
-
-
+    
     /**
      * Creates a Mysterious parser from a JSON string
      *

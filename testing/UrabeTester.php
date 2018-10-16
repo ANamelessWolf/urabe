@@ -1,10 +1,10 @@
 <?php
-include_once "UrabeTestUtils.php";
+include_once "./utils/UrabeTestUtils.php";
 /**
  * This file test the functionality for the class Urabe
  *  
  * @version 1.0.0
- * @api Makoto Urabe
+ * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
