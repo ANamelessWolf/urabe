@@ -1,6 +1,6 @@
 <?php
-include "Warai.php";
-include "WaraiMessages_en.php";
+include "/resources/EnumErrorMessages_en.php";
+include "/resources/WaraiMessages_en.php";
 include "ServiceStatus.php";
 include "JsonPrettyStyle.php";
 /**

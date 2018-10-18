@@ -22,5 +22,5 @@ $test = TEST_VAR_NAME . "_" . $_GET[TEST_VAR_NAME];
 //2: Test
 $result->{$_GET[TEST_VAR_NAME]} = $test($body);
 //Connection is closed automatically calling the kanojo destructor
-echo json_encode($result);
+echo json_encode($result,JSON_PRETTY_PRINT);
 ?>

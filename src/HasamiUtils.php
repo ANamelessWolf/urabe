@@ -9,6 +9,7 @@
  *
  * @param string $file_path The path where the file is going to be saved
  * @param KanojoX $kanojo The Kanojo connection object
+ * @throws Exception An Exception is thrown if theres an error creating the file
  * @return void
  */
 function save_connection($file_path, $kanojo)
@@ -22,16 +23,67 @@ function save_connection($file_path, $kanojo)
             "port" => $kanojo->port,
             "db_name" => $kanojo->db_name
         ),
-        "driver" => $kanojo->db_driver
+        "driver" => DBDriver::getName($kanojo->db_driver)
     );
     if ($kanojo->db_driver == DBDriver::ORACLE)
-        $data["connection"]["owner"] = $kanojo->owner;
+        $data["owner"] = $kanojo->owner;
     else if ($kanojo->db_driver == DBDriver::PG)
-        $data["connection"]["schema"] = $kanojo->schema;
-   return $data;
+        $data["schema"] = $kanojo->schema;
+    if (file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT)) == false)
+        throw new Exception(ERR_SAVING_JSON);
 }
-
-
+/**
+ * Reads a connection file and returns the database connector object as KanojoX Class
+ *
+ * @param string $file_path The path where the file is located
+ * @throws Exception An Exception is thrown if theres a problem reading the file
+ * @return KanojoX The connection object
+ */
+function get_KanojoX_from_file($file_path)
+{
+    $kanojoObj = open_json_file($file_path);
+    $driver = $kanojoObj->driver;
+    if ($driver == "ORACLE") {
+        $kanojo = new ORACLEKanojoX();
+        $kanojo->owner = $kanojoObj->owner;
+    } else if ($driver == "PG") {
+        $kanojo = new PGKanojoX();
+        $kanojo->schema = $kanojoObj->schema;
+    } else if ($driver == "MYSQL")
+        $kanojo = new MYSQLKanojoX();
+    else
+        throw new Exception("Driver " + (isset($driver) ? $driver . "not supported." : " not valid."));
+    $kanojo->init($kanojoObj->connection);
+    return $kanojo;
+}
+/*************************************
+ ************ File utils *************
+ *************************************/
+/**
+ * Creates a JSON object from a JSON file
+ *
+ * @param string $file_path The JSON file path
+ * @throws Exception An Exception is thrown if theres an error reading the file
+ * @return object The JSON Object
+ */
+function open_json_file($file_path)
+{
+    if (file_exists($file_path)) {
+        $file_string = file_get_contents($file_path);
+        //Remove escaping characters
+        $file_string = preg_replace('!/\*.*?\*/!s', '', $file_string);
+        $file_string = preg_replace('/(\/\/).*/', '', $file_string);
+        $file_string = preg_replace('/\n\s*\n/', "\n", $file_string);
+        //Encode as UTF8
+        $file_string = utf8_encode($file_string);
+        $json_object = json_decode($file_string);
+        if (is_null($json_object))
+            throw new Exception(sprintf(ERR_READING_JSON_FILE, $file_path));
+        else
+            return $json_object;
+    } else
+        throw new Exception(sprintf(ERR_READING_JSON_FILE, $file_path));
+}
 /******************************************
  ************ Default queries *************
  *****************************************/
@@ -122,32 +174,7 @@ function pretty_print_format($json, $format = null, $background_dark = true)
         $json_string .= '</body>';
     return $json_string;
 }
-/**
- * Creates a JSON object from a JSON file
- *
- * @param string $file_path The JSON file path
- * @return stdClass The JSON Object
- */
-function open_json_file($file_path)
-{
-    //Verifica que el archivo exista
-    if (file_exists($file_path)) {
-        $file_string = file_get_contents($file_path);
-        //Removemos comentarios del archivo
-        $file_string = preg_replace('!/\*.*?\*/!s', '', $file_string);
-        $file_string = preg_replace('/(\/\/).*/', '', $file_string);
-        $file_string = preg_replace('/\n\s*\n/', "\n", $file_string);
-        //Se códifica en UTF8
-        $file_string = utf8_encode($file_string);
-        //Se regresa el objeto JSON
-        $json_object = json_decode($file_string);
-        if (is_null($json_object))
-            throw new Exception(sprintf(ERR_READING_JSON_FILE, $file_path));
-        else
-            return $json_object;
-    } else
-        return false;
-}
+
 /**
  * From the current request body create a JSON object
  *
