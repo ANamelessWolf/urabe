@@ -5,6 +5,7 @@ include "ConnectionError.php";
 include "UrabeResponse.php";
 include "MysteriousParser.php";
 include "WebServiceContent.php";
+include "DBDriver.php";
 /**
  * Database connection model
  * 
@@ -23,6 +24,10 @@ abstract class KanojoX
      * @var MysteriousParser The selection data parser
      */
     public $parser;
+    /**
+     * @var DBDriver The database driver
+     */
+    public $db_driver;
     /**
      * @var array $error 
      * The application current errors

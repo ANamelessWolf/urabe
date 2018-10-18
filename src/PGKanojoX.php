@@ -19,6 +19,14 @@ class PGKanojoX extends KanojoX
      */
     public $schema;
     /**
+     * Initialize a new instance of the connection object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_driver = DBDriver::PG;
+    }
+    /**
      * Open a PostgreSQL Database connection
      *
      * @return resource The database connection object

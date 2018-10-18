@@ -1,8 +1,37 @@
 <?php
-// include_once("HasamiWrapper.php");
-// include_once("QueryResult.php");
-// include_once("JsonPrettyPrint.php");
-// include_once("JsonPrettyPrintLight.php");
+
+/******************************************
+ ********** Connection utils **************
+ *****************************************/
+/**
+ * Saves the connection data extracted from a
+ * KanojoX Object
+ *
+ * @param string $file_path The path where the file is going to be saved
+ * @param KanojoX $kanojo The Kanojo connection object
+ * @return void
+ */
+function save_connection($file_path, $kanojo)
+{
+    $data = array(
+        "connection" =>
+            array(
+            "host" => $kanojo->host,
+            "user_name" => $kanojo->user_name,
+            "password" => $kanojo->password,
+            "port" => $kanojo->port,
+            "db_name" => $kanojo->db_name
+        ),
+        "driver" => $kanojo->db_driver
+    );
+    if ($kanojo->db_driver == DBDriver::ORACLE)
+        $data["connection"]["owner"] = $kanojo->owner;
+    else if ($kanojo->db_driver == DBDriver::PG)
+        $data["connection"]["schema"] = $kanojo->schema;
+   return $data;
+}
+
+
 /******************************************
  ************ Default queries *************
  *****************************************/

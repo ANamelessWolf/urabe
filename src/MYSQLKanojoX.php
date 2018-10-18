@@ -18,6 +18,14 @@ class MYSQLKanojoX extends KanojoX
      */
     const DEFAULT_CHAR_SET = 'utf8';
     /**
+     * Initialize a new instance of the connection object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_driver = DBDriver::MYSQL;
+    }
+    /**
      * Closes a connection
      *
      * @return bool Returns TRUE on success or FALSE on failure.
