@@ -18,6 +18,11 @@ const INF_SELECT = 'Selection succeed';
  **************** Error ****************
  ***************************************/
 /**
+ * @var string ERR_SAVING_JSON
+ * The error message sent when an error ocurred saving a JSON object
+ */
+const ERR_SAVING_JSON = 'An error ocurred saving the JSON object';
+/**
  * @var string ERR_NOT_IMPLEMENTED
  * The error message sent when method is not implemented.
  */
