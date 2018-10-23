@@ -136,10 +136,13 @@ class HasamiWrapper implements IHasami
      */
     public function get_insert_columns()
     {
-        return array_map(function ($item) {
-            if ($item->column_name != $this->primary_key)
-                return $item->column_name;
-        }, $this->table_definition);
+        $columns = array();
+        //var_dump($this->table_definition);
+        for ($i = 0; $i < sizeof($this->table_definition); $i++) {
+            if ($this->table_definition[$i]["column_name"] != $this->primary_key)
+                array_push($columns, $this->table_definition[$i]["column_name"]);
+        }
+        return $columns;
     }
     /**
      * Gets the service manager by the verbose type
@@ -191,11 +194,11 @@ class HasamiWrapper implements IHasami
         $this->primary_key = $primary_key;
         //Selecting table definition and table definition parser
         if (is_null($table_def))
-            $this->table_fields = $this->urabe->get_table_definition($this->table_name);
+            $this->table_definition = $this->urabe->get_table_definition($this->table_name);
         else
-            $this->table_fields = $table_def;
+            $this->table_definition = $table_def;
         //Start with the table definition parser
-        $this->urabe->set_parser(new MysteriousParser($this->table_fields));
+        $this->urabe->set_parser(new MysteriousParser($this->table_definition));
         //Get the request content
         $this->request_data = new WebServiceContent();
         //Initialize services
@@ -243,9 +246,40 @@ class HasamiWrapper implements IHasami
     public function get_status()
     {
         $keys = array_keys($this->services_status);
-        return (object)array("Status" => array_map(function ($key) {
-            return array($key => ServiceStatus::getName($this->get_service_status($key)));
-        }, $keys));
+        $status = array();
+        foreach ($keys as &$key)
+            $status[$key] = ServiceStatus::getName($this->get_service_status($key));
+
+        return (object)array(
+            "Status" => $status,
+            "Content" => $this->request_data,
+            "Connection" => $this->urabe->get_connection_data(),
+            "Table" => array(
+                "name" => $this->table_name,
+                "primary_key" => $this->primary_key,
+                "columns" => $this->table_definition,
+                "selection_filter" => $this->selection_filter
+            ),
+            "Actions" => $this->get_available_actions()
+        );
+    }
+    /**
+     * This function list all available web service special actions
+     * all actions are identified by starting with the prefix u_action
+     * @return array The list of available actions inside an array
+     */
+    function get_available_actions()
+    {
+        $class_name = get_class($this);
+        $class = new ReflectionClass($class_name);
+        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
+        $actions = array();
+        $uSize = strlen(CAP_URABE_ACTION);
+        foreach ($methods as &$method) {
+            if ($method->class == $class_name && substr($method->name, 0, $uSize) == CAP_URABE_ACTION)
+                array_push($actions, substr($method->name, $uSize));
+        }
+        return $actions;
     }
     /**
      * Gets the service response

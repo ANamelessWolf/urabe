@@ -24,6 +24,11 @@ class HasamiWrapperTester extends HasamiWrapper
         $table_name = "users";
         parent::__construct($connector->schema . "." . $table_name, $connector, "id", get_table_definition($connector, $table_name));
     }
+
+    public function u_action_hello()
+    {
+        echo "Hello";
+    }
 }
 $service = new HasamiWrapperTester();
 echo json_encode($service->get_status());

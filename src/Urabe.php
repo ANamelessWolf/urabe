@@ -22,6 +22,23 @@ class Urabe
      */
     private $connector;
     /**
+     * Gets the current connection data
+     *
+     * @return The current connection data
+     */
+    public function get_connection_data()
+    {
+        return array(
+            "db_driver" => DBDriver::getName($this->connector->db_driver),
+            "host" => $this->connector->host,
+            "port" => $this->connector->port,
+            "db_name" => $this->connector->db_name,
+            "user_name" => $this->connector->user_name,
+            //"password" = $this->connector->password
+        );
+    }
+
+    /**
      * @var string $is_connected 
      * Check if there is an active connection to the database.
      */

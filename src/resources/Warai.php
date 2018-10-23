@@ -49,7 +49,7 @@ const CAP_EXTRACT = 'Extract';
  * @var string CAP_URABE_ACTION
  * GET variable name used to defined a web service costume call back action
  */
-const CAP_URABE_ACTION = 'urabeAction';
+const CAP_URABE_ACTION = 'u_action_';
 /***************************************
  ************** JSON NODES *************
  ***************************************/
