@@ -1,5 +1,5 @@
 <?php 
-include "/resources/Warai.php";
+require_once "/resources/Warai.php";
 /**
  * This class wraps an ENUM definition, this idea was solve using the post of Brian Cline
  * under the stack overflow platform

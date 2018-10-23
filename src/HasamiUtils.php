@@ -56,6 +56,21 @@ function get_KanojoX_from_file($file_path)
     $kanojo->init($kanojoObj->connection);
     return $kanojo;
 }
+/**
+ * Gets the table from a table and the default connector.
+ *
+ * @param KanojoX $connector The database connector
+ * @param string $table_name The name of the table, without schema or owner
+ * @return array The table definition column array
+ */
+function get_table_definition($connector, $table_name)
+{
+    $connector->connect();
+    $connector->parser = new MysteriousParser($connector->get_table_definition_parser());
+    $parser->column_map = $connector->get_table_definition_mapper();
+    $sql = $connector->get_table_definition_query($table_name);
+    return $connector->fetch_assoc($sql, null);
+}
 /*************************************
  ************ File utils *************
  *************************************/

@@ -1,7 +1,6 @@
 <?php
-include "/resources/EnumErrorMessages_en.php";
-include "/resources/WaraiMessages_en.php";
 include "ServiceStatus.php";
+include "DBDriver.php";
 include "JsonPrettyStyle.php";
 /**
  * Urabe application settings

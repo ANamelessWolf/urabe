@@ -151,14 +151,11 @@ class Urabe
      *
      * @param string $table_name The name of the table
      * @throws Exception An exception is thrown when the table doesn't exists.
-     * @return FieldDefinition[] The row definition of the table fields.
+     * @return array The row definition of the table fields.
      */
     public function get_table_definition($table_name)
     {
-        $parser = new MysteriousParser($this->connector->get_table_definition_parser());
-        $parser->column_map = $this->connector->get_table_definition_mapper();
-        $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
-        return $result;
+        return get_table_definition($this->connector, $table_name);
     }
     /**
      * Check if a table exists on the database

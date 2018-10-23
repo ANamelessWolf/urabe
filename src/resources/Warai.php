@@ -1,5 +1,6 @@
 <?php
-
+require_once "WaraiMessages_en.php";
+require_once "EnumErrorMessages_en.php";
 /**
  * Defines constants and messages relative to the Urabe API.
  * @version 1.0.0

@@ -1,5 +1,8 @@
 <?php
-include_once "HasamiRestfulService.php";
+include_once "GETService.php";
+include_once "PUTService.php";
+include_once "DELETEService.php";
+include_once "POSTService.php";
 include_once "IHasami.php";
 
 /**
@@ -154,7 +157,7 @@ class HasamiWrapper implements IHasami
      */
     public function get_service_status($verbose)
     {
-        return $this->services_status[$services_status];
+        return $this->services_status[$verbose];
     }
     /**
      * Sets the service status to the given service name
@@ -164,7 +167,7 @@ class HasamiWrapper implements IHasami
      */
     public function set_service_status($verbose, $status)
     {
-        $this->services_status[$services_status] = $status;
+        $this->services_status[$verbose] = $status;
     }
 
     /*******************
@@ -175,22 +178,23 @@ class HasamiWrapper implements IHasami
      * __construct
      *
      * Initialize a new instance of a HasamiWrapper Class
-     * @param string $table_name The table name, used to wrap SELECT, UPDATE, INSERT AND DELETE actions
-     * @param KanojoX $connection The database connection 
+     * @param string $full_table_name The full table name, used to wrap SELECT, UPDATE, INSERT AND DELETE actions
+     * @param KanojoX $connector The database connector 
      * @param string|NULL $primary_key The name of the primary key.
      * @param FieldDefinition[] $table_definition The table definition, if null
      * the table definition are obtained via a selection query.
      */
-    public function __construct($table_name, $connection_id, $primary_key = null, $table_def = null)
+    public function __construct($full_table_name, $connector, $primary_key = null, $table_def = null)
     {
-        $this->table_name = $table_name;
-        $this->urabe = new Urabe($connection_id);
+        $this->table_name = $full_table_name;
+        $this->urabe = new Urabe($connector);
         $this->primary_key = $primary_key;
         //Selecting table definition and table definition parser
         if (is_null($table_def))
             $this->table_fields = $this->urabe->get_table_definition($this->table_name);
         else
             $this->table_fields = $table_def;
+        //Start with the table definition parser
         $this->urabe->set_parser(new MysteriousParser($this->table_fields));
         //Get the request content
         $this->request_data = new WebServiceContent();
@@ -233,7 +237,16 @@ class HasamiWrapper implements IHasami
             "DELETE" => KanojoX::$settings->default_DELETE_status,
         );
     }
-
+    /**
+     * Gets the service status
+     */
+    public function get_status()
+    {
+        $keys = array_keys($this->services_status);
+        return (object)array("Status" => array_map(function ($key) {
+            return array($key => ServiceStatus::getName($this->get_service_status($key)));
+        }, $keys));
+    }
     /**
      * Gets the service response
      * First check if an action exists on the service, The action service is passed in the GET Variable action
@@ -241,7 +254,7 @@ class HasamiWrapper implements IHasami
      * from the Request method wrapper.
      *
      * @return UrabeResponse|string The web service response, if the PP variable is found in GET Variables, the result is a formatted HTML
-     */
+  
     public function get_response()
     {
         try {
@@ -253,7 +266,7 @@ class HasamiWrapper implements IHasami
                 if (in_array($action, $actions)) {
                     $service = $this->get_service($request_method);
                     $service->service_task = CAP_URABE_ACTION . $action;
-                } else{
+                } else {
                     http_response_code(500);
                     throw new Exception(sprintf(ERR_INVALID_ACTION, $action));
                 }
@@ -271,7 +284,7 @@ class HasamiWrapper implements IHasami
      * @param string $request_method The request method verbose
      * @throws Exception An exception is thrown if an error occurred executing the web request
      * @return UrabeResponse The web service response
-     */
+
     private function get_service_response($request_method)
     {
         try {
@@ -296,6 +309,8 @@ class HasamiWrapper implements IHasami
             throw new Exception($e->getMessage(), $e->getCode());
         }
     }
+     */
+
 
     /**
      * This function list with all available actions for the current web service

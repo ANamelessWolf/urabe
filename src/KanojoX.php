@@ -5,7 +5,7 @@ include "ConnectionError.php";
 include "UrabeResponse.php";
 include "MysteriousParser.php";
 include "WebServiceContent.php";
-include "DBDriver.php";
+require_once "/resources/Warai.php";
 /**
  * Database connection model
  * 
@@ -77,11 +77,16 @@ abstract class KanojoX
     public $affected_rows;
     /**
      * Initialize a new instance of the connection object
+     * @param MysteriousParser $parser Defines how the data is going to be parsed if,
+     * null the data is parsed associatively column value
      */
-    public function __construct()
+    public function __construct($parser = null)
     {
         $this->statementsIds = array();
-        $this->parser = new MysteriousParser();
+        if (is_null($parser))
+            $this->parser = new MysteriousParser();
+        else
+            $this->parser = $parser;
         KanojoX::$errors = array();
         KanojoX::$settings = require "UrabeSettings.php";
         if (KanojoX::$settings->handle_errors)

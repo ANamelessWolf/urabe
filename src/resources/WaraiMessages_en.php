@@ -38,10 +38,10 @@ const ERR_BAD_RESPONSE = 'The web service returns a bad response';
  */
 const ERR_BAD_QUERY = 'Bad query: %s.';
 /**
- * @var string ERR_READING_JSON
+ * @var string ERR_READING_JSON_FILE
  * The error message sent when a JSON file can not be parsed.
  */
-const ERR_READING_JSON_FILE = 'Error reading the JSON file from "%s".';
+const ERR_READING_JSON_FILE = "Error reading the JSON file from '%s'.";
 /**
  * @var string ERR_BAD_URL
  * The error message sent when the url can be parsed
