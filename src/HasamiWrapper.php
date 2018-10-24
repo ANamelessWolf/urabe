@@ -137,7 +137,6 @@ class HasamiWrapper implements IHasami
     public function get_insert_columns()
     {
         $columns = array();
-        //var_dump($this->table_definition);
         for ($i = 0; $i < sizeof($this->table_definition); $i++) {
             if ($this->table_definition[$i]["column_name"] != $this->primary_key)
                 array_push($columns, $this->table_definition[$i]["column_name"]);
@@ -264,50 +263,37 @@ class HasamiWrapper implements IHasami
         );
     }
     /**
-     * This function list all available web service special actions
-     * all actions are identified by starting with the prefix u_action
-     * @return array The list of available actions inside an array
-     */
-    function get_available_actions()
-    {
-        $class_name = get_class($this);
-        $class = new ReflectionClass($class_name);
-        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
-        $actions = array();
-        $uSize = strlen(CAP_URABE_ACTION);
-        foreach ($methods as &$method) {
-            if ($method->class == $class_name && substr($method->name, 0, $uSize) == CAP_URABE_ACTION)
-                array_push($actions, substr($method->name, $uSize));
-        }
-        return $actions;
-    }
-    /**
      * Gets the service response
      * First check if an action exists on the service, The action service is passed in the GET Variable action
      * If the action exists but is not defined an exception is thrown, if no action is passed the task is directly taken
      * from the Request method wrapper.
      *
      * @return UrabeResponse|string The web service response, if the PP variable is found in GET Variables, the result is a formatted HTML
-  
+     **/
     public function get_response()
     {
         try {
-            if (in_array(CAP_URABE_ACTION, $this->request_data->get_variables)) {
-                $actions = $this->get_actions();
-                $action = $this->request_data->get_variables[CAP_URABE_ACTION];
+            $request_method = $this->request_data->method;
+            $service = $this->get_service($request_method);
+            if (in_array(VAR_URABE_ACTION, array_keys($this->request_data->get_variables))) {
+                $actions = $this->get_available_actions();
+                $action = $this->request_data->get_variables[VAR_URABE_ACTION];
                 $isSupported = array_key_exists($request_method, $this->services);
                 //Execute if the action exist otherwise throw an Exception
-                if (in_array($action, $actions)) {
-                    $service = $this->get_service($request_method);
-                    $service->service_task = CAP_URABE_ACTION . $action;
-                } else {
+                if (in_array($action, $actions)) //Select urabe action instead of service default action
+                $service->service_task = CAP_URABE_ACTION . $action;
+                else {
                     http_response_code(500);
                     throw new Exception(sprintf(ERR_INVALID_ACTION, $action));
                 }
             }
-            $result = $service->get_service_response();
+            $result = $this->get_service_response($service);
             //If pretty print is enable prints result with HTML format
-            return in_array(KEY_PRETTY_PRINT, $this->request_data->get_variables) ? pretty_print_format($result) : $result;
+            if (in_array(KEY_PRETTY_PRINT, array_keys($this->request_data->get_variables))) {
+                $enable_filter = filter_var($this->request_data->get_variables[KEY_PRETTY_PRINT], FILTER_VALIDATE_BOOLEAN);
+                return ($enable_filter==true ? pretty_print_format($result, KanojoX::$settings->default_pp_style) : $result);
+            } else
+                return $result;
         } catch (Exception $e) {
             throw new Exception(ERR_SERVICE_RESPONSE . $e->getMessage(), $e->getCode());
         }
@@ -315,19 +301,19 @@ class HasamiWrapper implements IHasami
 
     /**
      * Gets the web service response 
+     * @param HasamiRestfulService $service The current web service
      * @param string $request_method The request method verbose
      * @throws Exception An exception is thrown if an error occurred executing the web request
      * @return UrabeResponse The web service response
-
-    private function get_service_response($request_method)
+     */
+    private function get_service_response($service, $request_method)
     {
         try {
-            if (array_key_exists($request_method, $this->services)) {
+            if (isset($service)) {
                 $status = $this->get_service_status($request_method);
                 if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->check_login_session())) {
                     http_response_code(200);
-                    $service = $this->get_service($request_method);
-                    $result = $service->get_response();
+                    return $service->get_response();
                 } else if ($status == ServiceStatus::LOGGED) {
                     http_response_code(403);
                     throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
@@ -343,26 +329,26 @@ class HasamiWrapper implements IHasami
             throw new Exception($e->getMessage(), $e->getCode());
         }
     }
-     */
+
 
 
     /**
-     * This function list with all available actions for the current web service
-     * Only functions starting with the word "action" are listed
-     *                                  
-     * @return array The list of available actions as an array of strings
+     * This function list all available web service special actions
+     * all actions are identified by starting with the prefix u_action
+     * @return array The list of available actions inside an array
      */
-    private function get_actions()
+    private function get_available_actions()
     {
-        $functions = get_defined_functions();
-        $functions = $functions["user"];
-        $action_funcs = array();
-        $actionSize = strlen(CAP_URABE_ACTION);
-        for ($i = 0; $i < sizeof($functions); $i++) {
-            if (strlen($functions[$i]) > $actionSize && substr($functions[$i], 0, $actionSize) == CAP_URABE_ACTION)
-                array_push($test_func, str_replace(array(SERVICE_FUNC_PREFIX), array(), $functions[$i]));
+        $class_name = get_class($this);
+        $class = new ReflectionClass($class_name);
+        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
+        $actions = array();
+        $uSize = strlen(CAP_URABE_ACTION);
+        foreach ($methods as &$method) {
+            if ($method->class == $class_name && substr($method->name, 0, $uSize) == CAP_URABE_ACTION)
+                array_push($actions, substr($method->name, $uSize));
         }
-        return $action_funcs;
+        return $actions;
     }
 }
 ?>

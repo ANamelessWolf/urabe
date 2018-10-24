@@ -1,5 +1,6 @@
 <?php
 
+
 /******************************************
  ********** Connection utils **************
  *****************************************/
@@ -169,25 +170,18 @@ function get_error_response($e, $query = "", $encode = false)
  * Creates a pretty json print from a JSON object, defining a pretty
  * print format. 
  *
- * @param stdClass $json The JSON object
- * @param JsonPrettyPrint $format The class
- * @param bool $background_dark True if a dark background is applied
- * @return string The json object in the pretty print format.
+ * @param stdClass $json The JSON data to format
+ * @param JsonPrettyStyle $style The JSON pretty format
+ * @param bool $bg_black True if a dark background is applied otherwise the background will be white
+ * @return string The response encoded as a pretty HTML
  */
-function pretty_print_format($json, $format = null, $background_dark = true)
+function pretty_print_format($json, $style, $bg_black = true)
 {
-    if (is_null($format) && $background_dark)
-        $format = new JsonPrettyPrint();
-    else if (is_null($format))
-        $format = new JsonPrettyPrintLight();
-    if ($background_dark)
-        $json_string = '<body bgcolor="#394034">';
-    else
-        $json_string = "";
-    $json_string .= $format->get_format($json);
-    if ($background_dark)
-        $json_string .= '</body>';
-    return $json_string;
+    $format = new JsonPrettyPrint($style);
+    $html = $bg_black ? '<body bgcolor="#394034">' : '<body bgcolor="#B1D9D2">';
+    $html .= $format->get_format($json);
+    $html .= '</body>';
+    return $html;
 }
 
 /**

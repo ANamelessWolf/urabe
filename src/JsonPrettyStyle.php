@@ -26,6 +26,10 @@ class JsonPrettyStyle
      * @var string Defines the color used for number values in the JSON string..
      */
     public $number_value_color;
+        /**
+     * @var string Defines the color used for null value
+     */
+    public $null_value_color;
     /**
      * @var string Defines the color used for boolean values in the JSON string.
      */
@@ -44,6 +48,8 @@ class JsonPrettyStyle
         $style->property_name_color = "#000";
         $style->text_value_color = "#008000";
         $style->number_value_color = "#e23400";
+        $style->null_value_color ="#730202";
+        return $style;
     }
 
     /**
@@ -58,8 +64,10 @@ class JsonPrettyStyle
         $style->symbol_color = "#ffffff";
         $style->boolean_value_color = "#66d5ef";
         $style->property_name_color = "#a6e22e";
-        $style->text_value_color = "#e92647";
+        $style->text_value_color = "#FAB02F";
         $style->number_value_color = "#9481dc";
+        $style->null_value_color ="#e92647";
+        return $style;
     }
 }
 ?>

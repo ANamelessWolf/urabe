@@ -47,9 +47,15 @@ const CAP_INSERT = 'insert';
 const CAP_EXTRACT = 'Extract';
 /**
  * @var string CAP_URABE_ACTION
- * GET variable name used to defined a web service costume call back action
+ * The method prefix name used to define the methods that can be called
+ * via a web service
  */
 const CAP_URABE_ACTION = 'u_action_';
+/**
+ * @var string VAR_URABE_ACTION
+ * GET variable name used to defined a web service costume call back action
+ */
+const VAR_URABE_ACTION = 'uAction';
 /***************************************
  ************** JSON NODES *************
  ***************************************/

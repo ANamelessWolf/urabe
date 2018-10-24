@@ -1,7 +1,7 @@
 <?php
 include "ServiceStatus.php";
 include "DBDriver.php";
-include "JsonPrettyStyle.php";
+include "JsonPrettyPrint.php";
 /**
  * Urabe application settings
  *
