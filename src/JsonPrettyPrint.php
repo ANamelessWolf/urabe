@@ -1,7 +1,5 @@
 <?php 
-
 require_once "JsonPrettyStyle.php";
-
 /**
  * Json Pretty Print Class
  * 
@@ -13,16 +11,52 @@ require_once "JsonPrettyStyle.php";
  */
 class JsonPrettyPrint
 {
+    /**
+     * @var string PLUS_BUTTON
+     * HTML classes to insert a plus glyph icon
+     */
     const PLUS_BUTTON = 'glyphicon glyphicon-plus-sign';
+    /**
+     * @var string GLYPH_BUTTON
+     * glyph icon HTML snippet
+     */
     const GLYPH_BUTTON = '<a href="#group_%s" class="%s" data-toggle="collapse" style="padding-left:%spx;"></a>';
+    /**
+     * @var string COLLAPSE_AREA_OPEN
+     * Initial area group HTML snippet
+     */
     const COLLAPSE_AREA_OPEN = '<div id="group_%s" class="collapse in">';
+    /**
+     * @var string COLLAPSE_AREA_CLOSE
+     * Close area group HTML snippet
+     */
     const COLLAPSE_AREA_CLOSE = '</div>';
+    /**
+     * @var string HTML_FORMAT_FONT_LIGHTER
+     * HTML snippet for writing a lighter text
+     */
     const HTML_FORMAT_FONT_LIGHTER = '<span style="color:%s; padding-left:%spx; font-weight:lighter">';
+    /**
+     * @var string HTML_FORMAT_FONT_BOLD
+     * HTML snippet for writing a bold text
+     */
     const HTML_FORMAT_FONT_BOLD = '<span style="color:%s; padding-left:%spx; font-weight:bold">';
+    /**
+     * @var string HTML_FORMAT_CLOSE
+     * HTML snippet for closing a written text
+     */
     const HTML_FORMAT_CLOSE = '</span>';
+    /**
+     * @var string LEFT_PADDING_PX
+     * Defines the TAB padding size
+     */
     const LEFT_PADDING_PX = "20";
-
-    public $groupIndex = 0;
+    /**
+     * Undocumented variable
+     *
+     * @var integer
+     */
+    private $groupIndex = 0;
     /**
      * Defines the given JSON Style
      *
@@ -34,16 +68,32 @@ class JsonPrettyPrint
      * __construct
      *
      * Initialize a new instance of the JSON pretty print class.
-     * @param JsonPrettyStyle $style The PP JSON style
+     * @param JsonPrettyStyle $style The JSON pretty format style
      */
-    function __construct($style = null)
+    public function __construct($style = null)
     {
         if (is_null($style))
             $this->style = KanojoX::$settings->default_pp_style;
         else
             $this->style = $style;
     }
-
+    /**
+     * Gets the pretty print format from a JSON object
+     *
+     * @param object $json The JSON object
+     * @return string The JSON formatted in the pretty print format
+     */
+    public function get_format($json)
+    {
+        $html = $this->format_json($json, 0);
+        return $html;
+    }
+    /**
+     * Formats a JSON object at a given depth level
+     * @param object $json The JSON object
+     * @param int $level The JSON level depth
+     * @return string The JSON formatted in the pretty print format
+     */
     public function format_json($json, $level)
     {
         if (is_object($json))
@@ -54,7 +104,13 @@ class JsonPrettyPrint
             $html .= $this->format_value($json, 0);
         return $html;
     }
-
+    /**
+     * Formats a JSON object at a given depth level and desired tab offset
+     * @param object $json The JSON object
+     * @param int $level The JSON level depth
+     * @param offset $offset The JSON tab offset
+     * @return string The JSON formatted in the pretty print format
+     */
     public function format_object($json, $level, $offset = 0)
     {
         $html .= $this->new_line($html);
@@ -65,22 +121,20 @@ class JsonPrettyPrint
             $html .= $this->print_property($properties[$i], $level + 1);
             $html .= $this->print_symbol(" : ", 0);
             $html .= $this->format_json($json->{$properties[$i]}, $level + 1);
-            if ($i < (count($properties) - 1)) {
-                $last_tag_was_div = strlen($html) > 6 && substr($html, strlen($html) - 6) == "</div>";
-                if ($last_tag_was_div) {
-                    $html = substr($html, 0, strlen($html) - strlen(self::COLLAPSE_AREA_CLOSE));
-                    $html .= $this->print_symbol(",", 0);
-                    $html .= $this->close_group();
-                } else
-                    $html .= $this->print_symbol(", ", 0);
-            }
+            $html = $this->append_comma($index, count($properties), $html);
         }
         $html .= $this->new_line($html);
         $html .= $this->print_symbol("}", $level);
         $html .= $this->close_group();
         return $html;
     }
-
+    /**
+     * Formats a JSON array at a given depth level and desired tab offset
+     * @param array $array The JSON array
+     * @param int $level The JSON level depth
+     * @param offset $offset The JSON tab offset
+     * @return string The JSON formatted in the pretty print format
+     */
     public function format_array($array, $level, $offset = 0)
     {
         if (count($array) == 0)
@@ -90,8 +144,6 @@ class JsonPrettyPrint
             $is_array_of_objects = is_string($keys[0]);
             $symbol = ($is_array_of_objects ? "{" : "[");
             $html = $this->open_group(" $symbol", $offset);
-            //$html = $this->print_symbol(" $symbol", $offset);
-
             for ($i = 0; $i < count($array); $i++) {
                 if (is_string($keys[$i])) {
                     $html .= $this->new_line($html);
@@ -103,15 +155,7 @@ class JsonPrettyPrint
                     $html .= $this->new_line($html);
                     $html .= $this->format_value($array[$keys[$i]], $level + 1);
                 }
-                if ($i < (count($array) - 1)) {
-                    $last_tag_was_div = strlen($html) > 6 && substr($html, strlen($html) - 6) == "</div>";
-                    if ($last_tag_was_div) {
-                        $html = substr($html, 0, strlen($html) - strlen(self::COLLAPSE_AREA_CLOSE));
-                        $html .= $this->print_symbol(",", 0);
-                        $html .= $this->close_group();
-                    } else
-                        $html .= $this->print_symbol(", ", 0);
-                }
+                $html = $this->append_comma($index, count($properties), $html);
             }
             $html .= $this->new_line($html);
             $symbol = ($is_array_of_objects ? "}" : "]");
@@ -120,8 +164,12 @@ class JsonPrettyPrint
         }
         return $html;
     }
-
-
+    /**
+     * Formats a JSON value at a given depth level
+     * @param mixed $value The JSON value
+     * @param int $level The JSON level depth
+     * @return string The JSON formatted in the pretty print format
+     */
     public function format_value($value, $level)
     {
         if (is_string($value)) {
@@ -138,38 +186,16 @@ class JsonPrettyPrint
             $html .= $this->format_array($value, $level, $level);
         return $html;
     }
-
-
-    /**
-     * Gets the pretty print format from a JSON object
-     *
-     * @param stdClass $json The json object
-     * @param int $tab The number of times to append a tabulation
-     * @param boolean $parent_is_array True if the parent node is an array
-     * @return The json in pretty print format
-     */
-    public function get_format($json)
-    {
-        $html = $this->format_json($json, 0);
-        // $size = strlen($this->print_symbol("},")) + strlen($this->close_group()) ;
-        // $html = substr($html, 0, strlen($html) - $size);
-        // $html .= $this->print_symbol("}");
-        // $html .= $this->close_group();
-        return $html;
-    }
     /*************************************
-     * Values are formatted with as span *
+     * Values are formatted with span tag*
      *************************************/
     /**
-     * Prints a symbol with the pretty JSON format.
+     * Opens a JSON group that can be collapsed via clicking the a glyph icon
      *
-     * @param string $symbol The symbol to print.
-     * @return string The symbol in the pretty JSON format.
+     * @param string $symbol The symbol that opens the group can be a "{" or a "["
+     * @param int $level The JSON level depth
+     * @return string The html snippet
      */
-    private function print_symbol($symbol, $level)
-    {
-        return sprintf(self::HTML_FORMAT_FONT_BOLD . '%s' . self::HTML_FORMAT_CLOSE, $this->style->symbol_color, $level * self::LEFT_PADDING_PX, $symbol);
-    }
     private function open_group($symbol, $level)
     {
         $html .= sprintf(self::GLYPH_BUTTON, ++$this->groupIndex, self::PLUS_BUTTON, $level * self::LEFT_PADDING_PX);
@@ -177,15 +203,32 @@ class JsonPrettyPrint
         $html .= sprintf(self::COLLAPSE_AREA_OPEN, $this->groupIndex);
         return $html;
     }
+    /**
+     * Returns the HTML close group tag
+     *
+     * @return string The html snippet
+     */
     private function close_group()
     {
         return self::COLLAPSE_AREA_CLOSE;
     }
     /**
+     * Prints a symbol with the pretty JSON format.
+     *
+     * @param string $symbol The symbol to print
+     * @param int $level The JSON level depth
+     * @return string The html snippet
+     */
+    private function print_symbol($symbol, $level)
+    {
+        return sprintf(self::HTML_FORMAT_FONT_BOLD . '%s' . self::HTML_FORMAT_CLOSE, $this->style->symbol_color, $level * self::LEFT_PADDING_PX, $symbol);
+    }
+    /**
      * Prints a property name with the pretty JSON format.
      *
-     * @param string $property The property name.
-     * @return string The property name in the pretty JSON format.
+     * @param string $property The property name
+     * @param int $level The JSON level depth
+     * @return string The html snippet
      */
     private function print_property($property, $level)
     {
@@ -194,8 +237,9 @@ class JsonPrettyPrint
     /**
      * Prints a text value with the pretty JSON format.
      *
-     * @param string $text The text value.
-     * @return string The text value in the pretty JSON format.
+     * @param string $text The text value
+     * @param int $level The JSON level depth
+     * @return string The html snippet
      */
     private function print_text_value($text, $level)
     {
@@ -204,7 +248,8 @@ class JsonPrettyPrint
     /**
      * Prints a null value with the pretty JSON format.
      *
-     * @return string The text value in the pretty JSON format.
+     * @param int $level The JSON level depth
+     * @return string The html snippet
      */
     private function print_null_value($level)
     {
@@ -214,7 +259,8 @@ class JsonPrettyPrint
      * Prints a number value with the pretty JSON format.
      *
      * @param string $number The number value.
-     * @return string The number value in the pretty JSON format.
+     * @param int $level The JSON level depth
+     * @return string The html snippet
      */
     private function print_number_value($number, $level)
     {
@@ -224,7 +270,8 @@ class JsonPrettyPrint
      * Prints a boolean value with the pretty JSON format.
      *
      * @param string $bool The boolean value.
-     * @return string The boolean value in the pretty JSON format.
+     * @param int $level The JSON level depth
+     * @return string The html snippet
      */
     private function print_bool_value($bool, $level)
     {
@@ -232,9 +279,10 @@ class JsonPrettyPrint
     }
 
     /**
-     * Inserts a new line html tag
+     * Inserts a new line in HTML tag if the previous item is a collapse are TAG
      *
-     * @return string The new line html tag
+     * @param string $html The html code
+     * @return string The html snippet
      */
     private function new_line($html)
     {
@@ -248,6 +296,28 @@ class JsonPrettyPrint
             return "<br>";
         else
             return "";
+    }
+    /**
+     * Appends a comma at the end of a given element
+     *
+     * @param int $index The element index
+     * @param int $elements_count The total number of elements
+     * @param string $html The html code
+     * @return string The html code with an appended comma
+     */
+    private function append_comma($index, $elements_count, $html)
+    {
+        if ($index < ($elements_count - 1)) {
+            $closeDivSize = strlen(self::COLLAPSE_AREA_CLOSE);
+            $last_tag_was_div = strlen($html) > $closeDivSize && substr($html, strlen($html) - $closeDivSize) == self::COLLAPSE_AREA_CLOSE;
+            if ($last_tag_was_div) {
+                $html = substr($html, 0, strlen($html) - strlen(self::COLLAPSE_AREA_CLOSE));
+                $html .= $this->print_symbol(",", 0);
+                $html .= $this->close_group();
+            } else
+                $html .= $this->print_symbol(", ", 0);
+        }
+        return $html;
     }
 }
 ?>
