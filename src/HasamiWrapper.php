@@ -291,7 +291,7 @@ class HasamiWrapper implements IHasami
             //If pretty print is enable prints result with HTML format
             if (in_array(KEY_PRETTY_PRINT, array_keys($this->request_data->get_variables))) {
                 $enable_filter = filter_var($this->request_data->get_variables[KEY_PRETTY_PRINT], FILTER_VALIDATE_BOOLEAN);
-                return ($enable_filter==true ? pretty_print_format($result, KanojoX::$settings->default_pp_style) : $result);
+                return ($enable_filter == true ? pretty_print_format($result, KanojoX::$settings->default_pp_style, KanojoX::$settings->default_pp_bg) : $result);
             } else
                 return $result;
         } catch (Exception $e) {

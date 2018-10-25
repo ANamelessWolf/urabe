@@ -73,5 +73,10 @@ return (object)array(
      * @var JsonPrettyStyle The default JSON PP Style
      */
     "default_pp_style" => JsonPrettyStyle::DarkStyle(),
+    /**
+     * @var boolean True if the background is dark, otherwise it will be white
+     */
+    "default_pp_bg" => true,
+
 );
 ?>
