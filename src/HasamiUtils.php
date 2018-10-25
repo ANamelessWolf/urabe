@@ -177,10 +177,20 @@ function get_error_response($e, $query = "", $encode = false)
  */
 function pretty_print_format($json, $style, $bg_black = true)
 {
+    $bg_color = $bg_black ? '#394034' : '#B1D9D2';
+    $html .= '<html><head>' .
+        '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">' .
+        '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>' .
+        '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>' .
+        '<style>' .
+        'body { background-color: ' . $bg_color . '} ' .
+        //'div { padding:0; margin:0; display:inline-block; float:left; }' .
+        '</style>' . 
+        '</head>'.
+        '<body>';
     $format = new JsonPrettyPrint($style);
-    $html = $bg_black ? '<body bgcolor="#394034">' : '<body bgcolor="#B1D9D2">';
-    $html .= $format->get_format($json);
-    $html .= '</body>';
+    $html .= $format->get_format($json);    
+    $html .= '</body></html>';
     return $html;
 }
 
