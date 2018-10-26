@@ -70,7 +70,8 @@ function get_table_definition($connector, $table_name)
     $connector->parser = new MysteriousParser($connector->get_table_definition_parser());
     $parser->column_map = $connector->get_table_definition_mapper();
     $sql = $connector->get_table_definition_query($table_name);
-    return $connector->fetch_assoc($sql, null);
+    $result = $connector->fetch_assoc($sql, null);
+    return $result;
 }
 /*************************************
  ************ File utils *************
@@ -185,11 +186,11 @@ function pretty_print_format($json, $style, $bg_black = true)
         '<style>' .
         'body { background-color: ' . $bg_color . '} ' .
         //'div { padding:0; margin:0; display:inline-block; float:left; }' .
-        '</style>' . 
-        '</head>'.
+    '</style>' .
+        '</head>' .
         '<body>';
     $format = new JsonPrettyPrint($style);
-    $html .= $format->get_format($json);    
+    $html .= $format->get_format($json);
     $html .= '</body></html>';
     return $html;
 }

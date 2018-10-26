@@ -22,7 +22,8 @@ class HasamiWrapperTester extends HasamiWrapper
     {
         $connector = get_KanojoX_from_file("../tmp/conn_file.json");
         $table_name = "users";
-        parent::__construct($connector->schema . "." . $table_name, $connector, "id", get_table_definition($connector, $table_name));
+        $table_def = get_table_definition($connector, $table_name);
+        parent::__construct($connector->schema . "." . $table_name, $connector, "id", $table_def);
     }
     /**
      * Tests the service data current status

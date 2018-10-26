@@ -94,9 +94,9 @@ class HasamiRestfulService
         if (is_null($this->service_task))
             throw new Exception(ERR_INVALID_SERVICE_TASK);
         else if (is_string($this->service_task))
-            $result = $this->wrapper->{$this->service_task}($data, $urabe);
+            $result = $this->wrapper->{$this->service_task}($this->data, $this->urabe);
         else if (!is_null($this->service_task))
-            $result = call_user_func_array($this->service_task, array($data, $urabe));
+            $result = call_user_func_array($this->service_task, array($this->data, $this->urabe));
         else
             throw new Exception(ERR_BAD_RESPONSE);
         return $result;
