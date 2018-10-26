@@ -198,6 +198,9 @@ class HasamiWrapper implements IHasami
             $this->table_definition = $table_def;
         //Start with the table definition parser
         $this->urabe->set_parser(new MysteriousParser($this->table_definition));
+        echo "Hasami_Wrapper::" . json_encode(array_map(function ($item) {
+            return $item["column_name"];
+        }, KanojoX::$parser->table_definition))."<br>";
         //Get the request content
         $this->request_data = new WebServiceContent();
         //Initialize services

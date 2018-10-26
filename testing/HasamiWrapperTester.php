@@ -23,6 +23,7 @@ class HasamiWrapperTester extends HasamiWrapper
         $connector = get_KanojoX_from_file("../tmp/conn_file.json");
         $table_name = "users";
         $table_def = get_table_definition($connector, $table_name);
+        
         parent::__construct($connector->schema . "." . $table_name, $connector, "id", $table_def);
     }
     /**
@@ -35,7 +36,10 @@ class HasamiWrapperTester extends HasamiWrapper
         return $this->get_status();
     }
 }
-$service = new HasamiWrapperTester();
-$result = $service->get_response();
+//$service = new HasamiWrapperTester();
+//$result = $service->get_response();
+$connector = get_KanojoX_from_file("../tmp/conn_file.json");
+        $table_name = "users";
+        $result = get_table_definition($connector, $table_name);
 echo (is_string($result) ? $result : json_encode($result, JSON_PRETTY_PRINT));
 ?>

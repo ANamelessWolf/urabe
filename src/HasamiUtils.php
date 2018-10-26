@@ -66,11 +66,15 @@ function get_KanojoX_from_file($file_path)
  */
 function get_table_definition($connector, $table_name)
 {
-    $connector->connect();
-    $connector->parser = new MysteriousParser($connector->get_table_definition_parser());
-    $parser->column_map = $connector->get_table_definition_mapper();
-    $sql = $connector->get_table_definition_query($table_name);
-    $result = $connector->fetch_assoc($sql, null);
+    $conn = clone $connector;
+    $conn->connect();
+    KanojoX::$parser = new MysteriousParser($connector->get_table_definition_parser());
+    // echo "TableDefinition::" . json_encode(array_map(function ($item) {
+    //     return $item;
+    // }, KanojoX::$parser->table_definition))."<br>";
+    KanojoX::$parser->column_map = $conn->get_table_definition_mapper();
+    $sql = $conn->get_table_definition_query($table_name);
+    $result = $conn->fetch_assoc($sql, null);
     return $result;
 }
 /*************************************
@@ -101,48 +105,48 @@ function open_json_file($file_path)
     } else
         throw new Exception(sprintf(ERR_READING_JSON_FILE, $file_path));
 }
-/******************************************
- ************ Default queries *************
- *****************************************/
-/**
- * Select all fields from the table that matches the condition 
- * where the primary key is equals to value. 
- *
- * @param HasamiWrapper $service The web service wrapper
- * @param mixed $value The value to match in the condition
- * @param boolean $encode True if the output is encoded as a JSON string
- * @return QueryResult|string The query result or the JSON string
- */
-function select_by_primary_key($service, $value, $encode = false)
-{
-    try {
-        $query = "SELECT * FROM %s WHERE %s = $value";
-        $query = sprintf($query, $service->table_name, $service->primary_key);
-        $response = $service->connector->select($query, $service->parser, $encode);
-    } catch (Exception $e) {
-        $response = get_error_response($e, $encode);
-    }
-    return $response;
-}
-/**
- * Select all fields from the table.
- *
- * @param HasamiWrapper $service The web service wrapper
- * @param boolean $encode True if the output is encoded as a JSON string
- * @return QueryResult|string The query result or the JSON string
- */
-function select_all($service, $encode = false)
-{
-    try {
-        $query = "SELECT * FROM %s";
-        $query = sprintf($query, $service->table_name);
-        $response = $service->connector->select($query, $service->parser, $encode);
-    } catch (Exception $e) {
-        $response = get_error_response($e, $encode);
-    }
-    return $response;
+// /******************************************
+//  ************ Default queries *************
+//  *****************************************/
+// /**
+//  * Select all fields from the table that matches the condition 
+//  * where the primary key is equals to value. 
+//  *
+//  * @param HasamiWrapper $service The web service wrapper
+//  * @param mixed $value The value to match in the condition
+//  * @param boolean $encode True if the output is encoded as a JSON string
+//  * @return QueryResult|string The query result or the JSON string
+//  */
+// function select_by_primary_key($service, $value, $encode = false)
+// {
+//     try {
+//         $query = "SELECT * FROM %s WHERE %s = $value";
+//         $query = sprintf($query, $service->table_name, $service->primary_key);
+//         $response = $service->connector->select($query, $service->parser, $encode);
+//     } catch (Exception $e) {
+//         $response = get_error_response($e, $encode);
+//     }
+//     return $response;
+// }
+// /**
+//  * Select all fields from the table.
+//  *
+//  * @param HasamiWrapper $service The web service wrapper
+//  * @param boolean $encode True if the output is encoded as a JSON string
+//  * @return QueryResult|string The query result or the JSON string
+//  */
+// function select_all($service, $encode = false)
+// {
+//     try {
+//         $query = "SELECT * FROM %s";
+//         $query = sprintf($query, $service->table_name);
+//         $response = $service->connector->select($query, $service->parser, $encode);
+//     } catch (Exception $e) {
+//         $response = get_error_response($e, $encode);
+//     }
+//     return $response;
 
-}
+// }
 /******************************************
  ********* HTTP Response Result ***********
  *****************************************/

@@ -23,7 +23,7 @@ abstract class KanojoX
      *
      * @var MysteriousParser The selection data parser
      */
-    public $parser;
+    public static $parser;
     /**
      * @var DBDriver The database driver
      */
@@ -84,9 +84,10 @@ abstract class KanojoX
     {
         $this->statementsIds = array();
         if (is_null($parser))
-            $this->parser = new MysteriousParser();
+            KanojoX::$parser = new MysteriousParser();
         else
-            $this->parser = $parser;
+            KanojoX::$parser = $parser;
+
         KanojoX::$errors = array();
         KanojoX::$settings = require "UrabeSettings.php";
         if (KanojoX::$settings->handle_errors)
@@ -124,7 +125,6 @@ abstract class KanojoX
         } else
             throw new Exception(ERR_BODY_IS_NULL);
     }
-
     /**
      * Gets the last executed error
      *

@@ -33,10 +33,12 @@ class FieldDefinition
      */
     public function __construct($index, $column, $data_type)
     {
-        $this->column_index = $column;
+        $this->column_index = $index;
         $this->field_name = $column;
+        $this->column_name = $column;
         $this->data_type = $data_type;
     }
+
 
     /**
      * Gets the value from a string in the row definition data type

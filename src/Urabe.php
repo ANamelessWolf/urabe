@@ -50,7 +50,7 @@ class Urabe
      */
     public function get_parser()
     {
-        return $this->connector->parser;
+        return KanojoX::$parser;
     }
     /**
      * Sets the current parser
@@ -58,9 +58,9 @@ class Urabe
      * @param MysteriousParser $parser The current parser
      * @return void
      */
-    public function set_parser($parser)
+    public function set_parser($mys_parser)
     {
-        $this->connector->parser = $parser;
+        KanojoX::$parser = $mys_parser;
     }
 
     /**
@@ -100,8 +100,9 @@ class Urabe
         if ($this->is_connected) {
             $response = new UrabeResponse();
             //1: Select row parsing method
+           
             if (isset($row_parser) && is_callable($row_parser->parse_method))
-                $this->connector->parser = $row_parser;
+                KanojoX::$parser = $row_parser;                
             //2: Executes the query and fetches the rows as an associative array
             $result = $this->connector->fetch_assoc($sql, $variables);
             //3: Formats response

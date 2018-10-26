@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Mysterious parser class
  * 
@@ -40,11 +41,11 @@ class MysteriousParser
     {
         if (isset($table_definition)) {
             $this->table_definition = $table_definition;
-            $this->parse_method = function ($parser, &$result, $row) {
-                $this->parse_with_field_definition($result, $row);
+            $this->parse_method = function ($mys_parser, &$result, $row) {
+                $this->parse_with_field_definition($mys_parser, $result, $row);
             };
         } else
-            $this->parse_method = function ($parser, &$result, $row) {
+            $this->parse_method = function ($mys_parser, &$result, $row) {
             array_push($result, $row);
         };
     }
@@ -71,23 +72,39 @@ class MysteriousParser
         call_user_func_array($this->parse_method, array($this, &$result, $row));
     }
     /**
+     * Gets the field definition used to parse a row
+     *
+     * @param string $newRow The row definition
+     * @return FieldDefinition The field definition
+     */
+    public function get_parsing_data($newRow)
+    {
+        $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $newRow[TAB_DEF_TYPE]);
+        return $field_definition;
+    }
+    /**
      * Parse the data using the field definition, if a column map is set the result keys are mapped
      * to the given value
      *
+     * @param MysteriousParser $mys_parser The mysterious parser that are extracting the data
      * @param array $result The collection of rows where the parsed rows are stored
      * @param array $row The selected row picked from the fetch assoc process
      * @return void
      */
-    public function parse_with_field_definition(&$result, $row)
+    private function parse_with_field_definition($mys_parser, &$result, $row)
     {
         $newRow = array();
-        foreach ($row as $column_name => $column_value)
-            if (isset($this->table_definition) && is_array($this->table_definition) && array_key_exists($column_name, $this->table_definition)) {
-            $key = $this->get_column_name($column_name);
-            $value = $this->table_definition[$column_name]->get_value($column_value);
-            $newRow[$key] = $value;
+        $column_names = array_map(function ($item) {
+            return $item->column_name;
+        }, $mys_parser->table_definition);
+        foreach ($row as $column_name => $column_value) {
+            if (in_array($column_name, $column_names)) {
+                $key = $mys_parser->get_column_name($column_name);
+                $value = $mys_parser->table_definition[$column_name]->get_value($column_value);
+                $newRow[$key] = $value;
+            }
         }
-        array_push($result, $newRow);
+        $result[$newRow[TAB_DEF_NAME]] =;
     }
     /**
      * Gets the column name from the column_map array if is defined, otherwise
@@ -102,21 +119,6 @@ class MysteriousParser
             return $this->column_map[$column_name];
         else
             return $column_name;
-    }
-    
-    /**
-     * Creates a Mysterious parser from a JSON string
-     *
-     * @param string $json_string The JSON string
-     * @return MysteriousParser  Table definition parser
-     */
-    public static function create_from_JSON($json_string)
-    {
-        $fields = array();
-        $data = json_decode($json_string);
-        foreach ($data->{NODE_FIELDS} as &$field)
-            array_push($fields, new FieldDefinition($field->field_name, $field->data_type));
-        return new MysteriousParser($fields);
     }
 
 }
