@@ -215,7 +215,7 @@ const PARSE_AS_DATE = 'Date';
 /**
  * Parse the value as boolean
  */
-const PARSE_AS_DATE = 'Boolean';
+const PARSE_AS_BOOLEAN = 'Boolean';
 /************************************
  ****** Table definition nodes ******
  ************************************/
