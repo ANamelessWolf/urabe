@@ -212,6 +212,10 @@ const PARSE_AS_NUMBER = 'Number';
  * Parse the value as date
  */
 const PARSE_AS_DATE = 'Date';
+/**
+ * Parse the value as boolean
+ */
+const PARSE_AS_DATE = 'Boolean';
 /************************************
  ****** Table definition nodes ******
  ************************************/

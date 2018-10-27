@@ -80,6 +80,7 @@ class MysteriousParser
     public function get_parsing_data($newRow)
     {
         $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $newRow[TAB_DEF_TYPE]);
+        
         return $field_definition;
     }
     /**
@@ -104,7 +105,7 @@ class MysteriousParser
                 $newRow[$key] = $value;
             }
         }
-        $result[$newRow[TAB_DEF_NAME]] =;
+        $result[$newRow[TAB_DEF_NAME]] =$this->get_parsing_data($newRow);
     }
     /**
      * Gets the column name from the column_map array if is defined, otherwise

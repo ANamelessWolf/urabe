@@ -77,6 +77,27 @@ return (object)array(
      * @var boolean True if the background is dark, otherwise it will be white
      */
     "default_pp_bg" => true,
-
+    "field_type_category" => array(
+        "Integer" => array(
+            //PG Types
+            "integer", "smallint"
+        ),
+        "Long" => array(
+            //PG Types
+            "bigint"
+        ),
+        "Number" => array(
+            //PG Types
+            "double precision", "numeric", "real"
+        ),
+        "Date" => array(
+            //PG Types
+            "date",
+            "timestamp"
+        ),
+        "Boolean" => array(
+            "boolean"
+        )
+    )
 );
 ?>

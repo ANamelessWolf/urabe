@@ -12,6 +12,8 @@
  */
 class FieldDefinition
 {
+
+
     /**
      * @var int The column index
      */
