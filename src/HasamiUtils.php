@@ -69,9 +69,10 @@ function get_table_definition($connector, $table_name)
     $conn = clone $connector;
     $conn->connect();
     KanojoX::$parser = new MysteriousParser($connector->get_table_definition_parser());
-    // echo "TableDefinition::" . json_encode(array_map(function ($item) {
-    //     return $item;
-    // }, KanojoX::$parser->table_definition))."<br>";
+    
+    //  echo "TableDefinition::" . json_encode(array_map(function ($item) {
+    //      return $item;
+    //  }, KanojoX::$parser->table_definition))."<br>";
     KanojoX::$parser->column_map = $conn->get_table_definition_mapper();
     $sql = $conn->get_table_definition_query($table_name);
     $result = $conn->fetch_assoc($sql, null);

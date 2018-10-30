@@ -77,7 +77,14 @@ return (object)array(
      * @var boolean True if the background is dark, otherwise it will be white
      */
     "default_pp_bg" => true,
-    "field_type_category" => array(
+    "field_type_category" => (object)array(
+        "ParsingTypes" => array(
+            "String", "Integer", "Long", "Number", "Date", "Boolean"
+        ),
+        "String" => array(
+            //PG Types
+            "character", "text"
+        ),
         "Integer" => array(
             //PG Types
             "integer", "smallint"

@@ -1,5 +1,6 @@
 <?php
-
+include_once "StringFieldDefinition.php";
+include_once "NumericFieldDefinition.php";
 /**
  * Mysterious parser class
  * 
@@ -79,9 +80,38 @@ class MysteriousParser
      */
     public function get_parsing_data($newRow)
     {
-        $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $newRow[TAB_DEF_TYPE]);
-        
+        $tp = $newRow[TAB_DEF_TYPE];
+        $dataTypes = KanojoX::$settings->field_type_category;
+        $max_length = is_null($newRow[TAB_DEF_CHAR_LENGTH]) ? 0 : intval($newRow[TAB_DEF_CHAR_LENGTH]);
+        $scale = is_null($newRow[TAB_DEF_NUM_SCALE]) ? 0 : intval($newRow[TAB_DEF_NUM_SCALE]);
+        $precision = is_null($newRow[TAB_DEF_NUM_PRECISION]) ? 0 : intval($newRow[TAB_DEF_NUM_PRECISION]);
+        if ($tp == PARSE_AS_STRING || $this->is_of_type($tp, $dataTypes->String))
+            $field_definition = new StringFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_STRING, $max_length);
+        else if ($tp == PARSE_AS_INT || $this->is_of_type($tp, $dataTypes->Integer))
+            $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_INT, $precision, $scale);
+        else if ($tp == PARSE_AS_NUMBER || $this->is_of_type($tp, $dataTypes->Number))
+            $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_NUMBER, $precision, $scale);
+        else if ($tp == PARSE_AS_LONG || $this->is_of_type($tp, $dataTypes->Long))
+            $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_LONG, $precision, $scale);
+        else
+            $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $tp);
+        //var_dump($newRow);
         return $field_definition;
+    }
+    /**
+     * Check if a given type belongs to a given type category
+     *
+     * @param string $dataType The data type to validate
+     * @param string $dataTypes The collection of data types
+     * @return Boolean True if the data types is of any of the given types
+     */
+    public function is_of_type($dataType, $dataTypes)
+    {
+        $tp = strtolower($dataType);
+        foreach ($dataTypes as &$data_type)
+            if (strpos($tp, $data_type) !== false)
+            return true;
+        return false;
     }
     /**
      * Parse the data using the field definition, if a column map is set the result keys are mapped
@@ -105,7 +135,7 @@ class MysteriousParser
                 $newRow[$key] = $value;
             }
         }
-        $result[$newRow[TAB_DEF_NAME]] =$this->get_parsing_data($newRow);
+        $result[$newRow[TAB_DEF_NAME]] = $this->get_parsing_data($newRow);
     }
     /**
      * Gets the column name from the column_map array if is defined, otherwise

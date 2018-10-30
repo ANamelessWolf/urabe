@@ -1,7 +1,7 @@
 <?php
-
+include_once "FieldDefinition.php";
 /**
- * Field Definition Class
+ * String Field Definition Class
  * 
  * This class encapsulates a table column definition and format it values to JSON field value
  * Each table field is associated to a column and stores its index and data type.
@@ -10,32 +10,25 @@
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class FieldDefinition
+class StringFieldDefinition extends FieldDefinition
 {
     /**
-     * @var int The column index
+     * @var int The maximum number of allowed characters
      */
-    public $column_index;
-    /**
-     * @var string The column name
-     */
-    public $column_name;
-    /**
-     * @var string The column data type
-     */
-    public $data_type;
+    public $char_max_length;
     /**
      * Initialize a new instance of a Field Definition class
      *
      * @param string $index The column index
      * @param string $column The column name
      * @param string $data_type The data type name
+     * @param int $char_max_length The maximum number of allowed characters, 
+     * value zero allows unlimited characters
      */
-    public function __construct($index, $column, $data_type)
+    public function __construct($index, $column, $data_type, $char_max_length)
     {
-        $this->column_index = $index;
-        $this->column_name = $column;
-        $this->data_type = $data_type;
+        $this->char_max_length = $char_max_length;
+        parent::__construct($index, $column, $data_type);
     }
     /**
      * Gets the value from a string in the row definition data type
@@ -47,16 +40,9 @@ class FieldDefinition
     {
         if (is_null($value))
             return null;
-        else if ($this->data_type == PARSE_AS_STRING)
+        else {
             return strval($value);
-        else if ($this->data_type == PARSE_AS_INT || $this->data_type == PARSE_AS_LONG)
-            return intval($value);
-        else if ($this->data_type == PARSE_AS_NUMBER)
-            return doubleval($value);
-        else if ($this->data_type == PARSE_AS_DATE)
-            return $value;
-        else if ($this->data_type == PARSE_AS_BOOLEAN)
-            return boolval($value);
+        }
     }
 }
 ?>
