@@ -15,16 +15,14 @@ include_once "./utils/HasamiWrapperTestUtils.php";
  */
 class HasamiWrapperTester extends HasamiWrapper
 {
+    const TABLE_NAME = "users";
     /**
      * Initialize a new instance of the test service
      */
     public function __construct()
     {
         $connector = get_KanojoX_from_file("../tmp/conn_file.json");
-        $table_name = "users";
-        $table_def = get_table_definition($connector, $table_name);
-
-        parent::__construct($connector->schema . "." . $table_name, $connector, "id", $table_def);
+        parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
     }
     /**
      * Tests the service data current status
@@ -36,16 +34,7 @@ class HasamiWrapperTester extends HasamiWrapper
         return $this->get_status();
     }
 }
-//$service = new HasamiWrapperTester();
-//$result = $service->get_response();
-$connector = get_KanojoX_from_file("../tmp/conn_file.json");
-$table_name = "users";
-
-if (table_definition_exists("testing.users")) {
-    $result = load_table_definition("testing.users");
-} else {
-    $result = get_table_definition($connector, $table_name);
-    save_table_definition("testing.users", $connector->db_driver, $result);
-}
+$service = new HasamiWrapperTester();
+$result = $service->get_response();
 echo (is_string($result) ? $result : json_encode($result, JSON_PRETTY_PRINT));
 ?>

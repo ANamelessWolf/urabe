@@ -33,8 +33,8 @@ class BooleanFieldDefinition extends FieldDefinition
     {
         if (is_null($value))
             return null;
-        else if (str_val(strtolower($value) == 'true') || str_val(strtolower($value) == 'false'))
-            return str_val(strtolower($value)) == 'true';
+        else if (strval (strtolower($value) == 'true') || strval(strtolower($value) == 'false'))
+            return strval(strtolower($value)) == 'true';
         else
             return intval($value) == 1;
     }

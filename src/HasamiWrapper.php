@@ -186,21 +186,21 @@ class HasamiWrapper implements IHasami
      * @param FieldDefinition[] $table_definition The table definition, if null
      * the table definition are obtained via a selection query.
      */
-    public function __construct($full_table_name, $connector, $primary_key = null, $table_def = null)
+    public function __construct($full_table_name, $connector, $primary_key = null, $table_definition = null)
     {
         $this->table_name = $full_table_name;
         $this->urabe = new Urabe($connector);
         $this->primary_key = $primary_key;
         //Selecting table definition and table definition parser
-        if (is_null($table_def))
-            $this->table_definition = $this->urabe->get_table_definition($this->table_name);
-        else
-            $this->table_definition = $table_def;
+        if (is_null($table_definition) && table_definition_exists($this->table_name)) {
+            $this->table_fields = load_table_definition($this->table_name);
+        } else if (is_null($table_definition)) {
+            $this->table_fields = $this->urabe->get_table_definition($this->table_name);
+            save_table_definition($full_table_name, $connector->db_driver, $this->table_fields);
+        } else
+            $this->table_fields = $table_def;
         //Start with the table definition parser
-        $this->urabe->set_parser(new MysteriousParser($this->table_definition));
-        echo "Hasami_Wrapper::" . json_encode(array_map(function ($item) {
-            return $item["column_name"];
-        }, KanojoX::$parser->table_definition))."<br>";
+        $this->urabe->set_parser(new MysteriousParser($this->table_fields));
         //Get the request content
         $this->request_data = new WebServiceContent();
         //Initialize services
@@ -214,11 +214,11 @@ class HasamiWrapper implements IHasami
      */
     protected function init_services()
     {
-        if (property_exists($this->request_data->body, $primary_key))
-            $condition = "$primary_key = " . $this->request_data->body->{$primary_key};
+        if (isset($this->request_data->body) && property_exists($this->request_data->body, 'primary_key'))
+            $condition = "$this->primary_key = " . $this->request_data->body->{$this->primary_key};
         else
             $condition = null;
-        if (property_exists($this->request_data->body, 'filter'))
+        if (isset($this->request_data->body) && property_exists($this->request_data->body, 'filter'))
             $this->selection_filter = $this->request_data->body->filter;
         return array(
             "GET" => new GETService($this),
@@ -290,7 +290,8 @@ class HasamiWrapper implements IHasami
                     throw new Exception(sprintf(ERR_INVALID_ACTION, $action));
                 }
             }
-            $result = $this->get_service_response($service);
+            $result = $this->get_service_response($service, $request_method);
+            
             //If pretty print is enable prints result with HTML format
             if (in_array(KEY_PRETTY_PRINT, array_keys($this->request_data->get_variables))) {
                 $enable_filter = filter_var($this->request_data->get_variables[KEY_PRETTY_PRINT], FILTER_VALIDATE_BOOLEAN);
@@ -316,6 +317,7 @@ class HasamiWrapper implements IHasami
                 $status = $this->get_service_status($request_method);
                 if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->check_login_session())) {
                     http_response_code(200);
+
                     return $service->get_response();
                 } else if ($status == ServiceStatus::LOGGED) {
                     http_response_code(403);

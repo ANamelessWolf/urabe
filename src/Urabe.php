@@ -100,7 +100,7 @@ class Urabe
         if ($this->is_connected) {
             $response = new UrabeResponse();
             //1: Select row parsing method
-           
+
             if (isset($row_parser) && is_callable($row_parser->parse_method))
                 KanojoX::$parser = $row_parser;                
             //2: Executes the query and fetches the rows as an associative array
@@ -173,7 +173,12 @@ class Urabe
      */
     public function get_table_definition($table_name)
     {
-        return get_table_definition($this->connector, $table_name);
+        if ((strpos($table_name, '.') !== false)) {
+            $tn = explode('.', $table_name);
+            $tn = $tn[1];
+        } else
+            $tn = $table_name;
+        return get_table_definition($this->connector, $tn);
     }
     /**
      * Check if a table exists on the database

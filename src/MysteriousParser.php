@@ -101,7 +101,7 @@ class MysteriousParser
             $field_definition = new BooleanFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_BOOLEAN);
         else
             $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $tp);
-        $field_definition->db_type = $newRow[TAB_DEF_TYPE]; 
+        $field_definition->db_type = $newRow[TAB_DEF_TYPE];
         return $field_definition;
     }
     /**
@@ -128,7 +128,7 @@ class MysteriousParser
      * @param array $row The selected row picked from the fetch assoc process
      * @return void
      */
-    private function parse_with_field_definition($mys_parser, &$result, $row)
+    public function parse_table_field_definition($mys_parser, &$result, $row)
     {
         $newRow = array();
         $column_names = array_map(function ($item) {
@@ -142,6 +142,30 @@ class MysteriousParser
             }
         }
         $result[$newRow[TAB_DEF_NAME]] = $this->get_parsing_data($newRow);
+    }
+    /**
+     * Parse the data using the field definition, if a column map is set the result keys are mapped
+     * to the given value
+     *
+     * @param MysteriousParser $mys_parser The mysterious parser that are extracting the data
+     * @param array $result The collection of rows where the parsed rows are stored
+     * @param array $row The selected row picked from the fetch assoc process
+     * @return void
+     */
+    private function parse_with_field_definition($mys_parser, &$result, $row)
+    {
+        $newRow = array();
+        $column_names = array_map(function ($item) {
+            return $item->column_name;
+        }, $mys_parser->table_definition);
+        foreach ($row as $column_name => $column_value) {
+            if (in_array($column_name, $column_names)) {
+                $key = $mys_parser->get_column_name($column_name);
+                $value = $mys_parser->table_definition[$column_name]->get_value($column_value);
+                $newRow[$key] = $value;
+            }
+        }
+        array_push($result, $newRow);
     }
     /**
      * Gets the column name from the column_map array if is defined, otherwise
