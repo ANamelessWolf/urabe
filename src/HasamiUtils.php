@@ -1,6 +1,5 @@
 <?php
 
-
 /******************************************
  ********** Connection utils **************
  *****************************************/
@@ -69,14 +68,57 @@ function get_table_definition($connector, $table_name)
     $conn = clone $connector;
     $conn->connect();
     KanojoX::$parser = new MysteriousParser($connector->get_table_definition_parser());
-    
-    //  echo "TableDefinition::" . json_encode(array_map(function ($item) {
-    //      return $item;
-    //  }, KanojoX::$parser->table_definition))."<br>";
     KanojoX::$parser->column_map = $conn->get_table_definition_mapper();
     $sql = $conn->get_table_definition_query($table_name);
     $result = $conn->fetch_assoc($sql, null);
     return $result;
+}
+/**
+ * Gets the table from a table and the default connector.
+ *
+ * @param KanojoX $connector The database connector
+ * @param string $table_name The name of the table
+ * @return array The table definition column array
+ */
+function load_table_definition($table_name)
+{
+    $file_path = KanojoX::$settings->table_definitions_path . "$table_name.json";
+    if (file_exists($file_path)) {
+        $json = open_json_file($file_path);
+        
+        $fields = array();
+        foreach ($json->columns as $column_name => $field_data)
+            $fields[$column_name] = FieldDefinition::create($field_data);
+        return $fields;
+    } else
+        throw new Exception(ERR_SAVING_JSON);
+}
+/**
+ * Saves the table definition in a JSON file
+ *
+ * @param string $table_name The table name
+ * @param DBDriver $driver The database driver
+ * @param string $content The table definition content
+ * @throws Exception An Exception is thrown if theres an error saving the file
+ * @return void
+ */
+function save_table_definition($table_name, $driver, $content)
+{
+    $file_path = KanojoX::$settings->table_definitions_path . "$table_name.json";
+    $data = array("table_name" => $table_name, "driver" => DBDriver::getName($driver), "columns" => $content);
+    if (file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT)) == false)
+        throw new Exception(ERR_SAVING_JSON);
+}
+/**
+ * Check if a file of a table definition exists
+ *
+ * @param string $table_name The table name
+ * @return boolean True if the table definition file exists
+ */
+function table_definition_exists($table_name)
+{
+    $file_path = KanojoX::$settings->table_definitions_path . "$table_name.json";
+    return file_exists($file_path);
 }
 /*************************************
  ************ File utils *************
@@ -106,6 +148,7 @@ function open_json_file($file_path)
     } else
         throw new Exception(sprintf(ERR_READING_JSON_FILE, $file_path));
 }
+
 // /******************************************
 //  ************ Default queries *************
 //  *****************************************/

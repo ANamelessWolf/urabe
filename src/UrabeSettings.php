@@ -77,6 +77,18 @@ return (object)array(
      * @var boolean True if the background is dark, otherwise it will be white
      */
     "default_pp_bg" => true,
+    /**
+     * @var string The date format used to present dates, to modify 
+     * the date format visit the url: https://secure.php.net/manual/en/function.date.php
+     */
+    "date_format" => "m-d-y",
+    /**
+     * @var string The path to the folder where the table definitions are stored
+     */
+    "table_definitions_path" => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'table_definitions' . DIRECTORY_SEPARATOR,
+    /**
+     * @var object Defines the parsing types sort by category
+     */
     "field_type_category" => (object)array(
         "ParsingTypes" => array(
             "String", "Integer", "Long", "Number", "Date", "Boolean"

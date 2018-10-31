@@ -40,6 +40,12 @@ class HasamiWrapperTester extends HasamiWrapper
 //$result = $service->get_response();
 $connector = get_KanojoX_from_file("../tmp/conn_file.json");
 $table_name = "users";
-$result = get_table_definition($connector, $table_name);
+
+if (table_definition_exists("testing.users")) {
+    $result = load_table_definition("testing.users");
+} else {
+    $result = get_table_definition($connector, $table_name);
+    save_table_definition("testing.users", $connector->db_driver, $result);
+}
 echo (is_string($result) ? $result : json_encode($result, JSON_PRETTY_PRINT));
 ?>

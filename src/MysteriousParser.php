@@ -1,6 +1,8 @@
 <?php
 include_once "StringFieldDefinition.php";
 include_once "NumericFieldDefinition.php";
+include_once "DateFieldDefinition.php";
+include_once "BooleanFieldDefinition.php";
 /**
  * Mysterious parser class
  * 
@@ -91,11 +93,15 @@ class MysteriousParser
             $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_INT, $precision, $scale);
         else if ($tp == PARSE_AS_NUMBER || $this->is_of_type($tp, $dataTypes->Number))
             $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_NUMBER, $precision, $scale);
+        else if ($tp == PARSE_AS_DATE || $this->is_of_type($tp, $dataTypes->Date))
+            $field_definition = new DateFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_DATE, KanojoX::$settings->date_format);
         else if ($tp == PARSE_AS_LONG || $this->is_of_type($tp, $dataTypes->Long))
             $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_LONG, $precision, $scale);
+        else if ($tp == PARSE_AS_BOOLEAN || $this->is_of_type($tp, $dataTypes->Boolean))
+            $field_definition = new BooleanFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_BOOLEAN);
         else
             $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $tp);
-        //var_dump($newRow);
+        $field_definition->db_type = $newRow[TAB_DEF_TYPE]; 
         return $field_definition;
     }
     /**
