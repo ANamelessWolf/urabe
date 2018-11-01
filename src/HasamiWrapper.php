@@ -39,7 +39,7 @@ class HasamiWrapper implements IHasami
      */
     protected $table_name;
     /**
-     * @var string The Selection filter collection used by GET service
+     * @var string The Selection filter used by GET service
      */
     protected $selection_filter;
     /**
