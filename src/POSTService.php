@@ -29,7 +29,7 @@ class POSTService extends HasamiRestfulService
     {
         $data = $wrapper->get_request_data();
         $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $data->extra->{CAP_UPDATE} = $update_condition;
+        $data->extra->{CAP_UPDATE} = is_null($update_condition) ? "" : $update_condition;
         $urabe = $wrapper->get_urabe();
         parent::__construct($data, $urabe);
         $this->wrapper = $wrapper;

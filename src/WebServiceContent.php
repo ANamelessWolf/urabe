@@ -67,7 +67,7 @@ class WebServiceContent
      */
     public function in_GET_variables($var_name)
     {
-        return in_array($var_name, $this->get_variables);
+        return in_array($var_name, array_keys($this->get_variables));
     }
 
     /**
@@ -91,6 +91,36 @@ class WebServiceContent
             }
             return $url_params;
         }
+    }
+    /**
+     * If the request method is GET the filter is extracted from the GET Variables
+     * otherwise is searched in the body
+     *
+     * @return mixed filter value
+     */
+    public function get_filter()
+    {
+        if ($this->method == 'GET' && $this->in_GET_variables('filter'))
+            return $this->get_variables['filter'];
+        else if (isset($this->body) && property_exists($this->body, 'filter'))
+            return $this->body->filter;
+        else
+            return null;
+    }
+    /**
+     * Builds a condition using the primary key that match a column name
+     *
+     * @param string $column_name The primary key column name
+     * @return string The condition
+     */
+    public function build_primary_key_condition($column_name)
+    {
+        $primary_key = null;
+        if ($this->method == 'GET' && $this->in_GET_variables($column_name))
+            $primary_key = $this->get_variables[$column_name];
+        else if (isset($this->body) && property_exists($this->body, $column_name))
+            $primary_key = $this->body->{$column_name};
+        return isset($primary_key) ? "$column_name = " . $primary_key : null;
     }
 }
 ?>

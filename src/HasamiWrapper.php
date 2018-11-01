@@ -214,12 +214,8 @@ class HasamiWrapper implements IHasami
      */
     protected function init_services()
     {
-        if (isset($this->request_data->body) && property_exists($this->request_data->body, 'primary_key'))
-            $condition = "$this->primary_key = " . $this->request_data->body->{$this->primary_key};
-        else
-            $condition = null;
-        if (isset($this->request_data->body) && property_exists($this->request_data->body, 'filter'))
-            $this->selection_filter = $this->request_data->body->filter;
+        $condition = $this->request_data->build_primary_key_condition($this->primary_key);
+        $this->selection_filter = $this->request_data->get_filter();
         return array(
             "GET" => new GETService($this),
             "PUT" => new PUTService($this),
@@ -262,7 +258,8 @@ class HasamiWrapper implements IHasami
                 "columns" => $this->table_definition,
                 "selection_filter" => $this->selection_filter
             ),
-            "Actions" => $this->get_available_actions()
+            "Actions" => $this->get_available_actions(),
+            "Filter" => $this->selection_filter,
         );
     }
     /**
