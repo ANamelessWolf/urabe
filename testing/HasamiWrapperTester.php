@@ -23,11 +23,11 @@ class HasamiWrapperTester extends HasamiWrapper
     {
         $connector = get_KanojoX_from_file("../tmp/conn_file.json");
         parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
-        //If 
-        if ($this->request_data->in_GET_variables("selection_mode") &&
-            $this->request_data->get_variables["selection_mode"] == "advance")
+
+        if ($this->request_data->GET_variable_equals("selection_mode", "advance"))
             $this->set_service_task("GET", "advance_select");
     }
+
     /**
      * This functions test the advance selection, this function overrides the default selection
      * and its defined using the Wrapper set_service_task passing as parameter the request method "GET"
@@ -40,14 +40,18 @@ class HasamiWrapperTester extends HasamiWrapper
      */
     public function advance_select($data, $urabe)
     {
-        if ($data->validate_obligatory_GET_variables(array("username", "password")))
-            return "hello world";
-        var_dump($data);
-
+        if ($data->validate_obligatory_GET_variables("username", "password")) {
+            $table_name = $this->table_name;
+            //Use universal format @paramIndex for place holders
+            $condition = "u_name = @1 AND u_pass = @2";
+            $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $condition");
+            $result = $urabe->select($sql, $data->pick_GET_variable("username", "password"));
+            return $result;
+        }
     }
 
     /**
-     * Tests the service data current status
+     * Tests the service data current status this function should be called
      *
      * @return void
      */

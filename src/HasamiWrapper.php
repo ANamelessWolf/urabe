@@ -301,16 +301,38 @@ class HasamiWrapper implements IHasami
                 }
             }
             $result = $this->get_service_response($service, $request_method);
-            
-            //If pretty print is enable prints result with HTML format
-            if (in_array(KEY_PRETTY_PRINT, array_keys($this->request_data->get_variables))) {
-                $enable_filter = filter_var($this->request_data->get_variables[KEY_PRETTY_PRINT], FILTER_VALIDATE_BOOLEAN);
-                return ($enable_filter == true ? pretty_print_format($result, KanojoX::$settings->default_pp_style, KanojoX::$settings->default_pp_bg) : $result);
-            } else
-                return $result;
+
+            return $this->print_result($result);
         } catch (Exception $e) {
             throw new Exception(ERR_SERVICE_RESPONSE . $e->getMessage(), $e->getCode());
         }
+    }
+
+    protected function print_result($result)
+    {
+        //If pretty print is enable prints result with HTML format
+        if (in_array(KEY_PRETTY_PRINT, $this->request_data->url_params)) {
+            if (in_array(KEY_PRETTY_PRINT, $this->request_data->get_variables_names())) {
+                $style_name = $this->request_data->get_variables[KEY_PRETTY_PRINT];
+                switch (strtolower($style_name)) {
+                    case "light":
+                        $style = KanojoX::$settings->light_pp_style;
+                        $bg = false;
+                        break;
+                    case "dark":
+                        $style = KanojoX::$settings->dark_pp_style;
+                        $bg = true;
+                        break;
+                    default:
+                        $style = KanojoX::$settings->default_pp_style;
+                        $bg = KanojoX::$settings->default_pp_bg;
+                        break;
+                }
+                $result = pretty_print_format($result, $style, $bg);
+            } else
+                $result = pretty_print_format($result, KanojoX::$settings->default_pp_style, KanojoX::$settings->default_pp_bg);
+        }
+        return $result;
     }
 
     /**

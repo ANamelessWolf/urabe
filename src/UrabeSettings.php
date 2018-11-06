@@ -49,11 +49,6 @@ return (object)array(
      */
     "hide_exception_error" => false,
     /**
-     * @var bool If sets to true, url parameters are extracted in pairs. Where the first parameter is the key and the
-     * second the value.
-     */
-    "url_params_in_pairs" => true,
-    /**
      * @var ServiceStatus The default status for GET Service
      */
     "default_GET_status" => ServiceStatus::AVAILABLE,
@@ -69,6 +64,18 @@ return (object)array(
      * @var ServiceStatus The default status for DELETE Service
      */
     "default_DELETE_status" => ServiceStatus::BLOCKED,
+    /**
+     * @var JsonPrettyStyle The JSON PP Dark Style
+     */
+    "dark_pp_style" => JsonPrettyStyle::DarkStyle(),
+    /**
+     * @var JsonPrettyStyle The JSON PP Light Style
+     */
+    "light_pp_style" => JsonPrettyStyle::LightStyle(),
+    /**
+     * @var JsonPrettyStyle The default JSON PP Style
+     */
+    "default_pp_style" => JsonPrettyStyle::DarkStyle(),
     /**
      * @var JsonPrettyStyle The default JSON PP Style
      */

@@ -47,7 +47,7 @@ class WebServiceContent
             $this->get_variables[$key] = $value;
         //URL parameters
         if (isset($_SERVER['PATH_INFO']))
-            $this->url_params = $this->parse_url_params(explode('/', trim($_SERVER['PATH_INFO'], '/')));
+            $this->url_params = explode('/', trim($_SERVER['PATH_INFO'], '/'));
         else
             $this->url_params = array();
         //POST content, must be a JSON string
@@ -60,7 +60,7 @@ class WebServiceContent
     }
     /**
      * This function check if the given variable name is defined in the current
-     * web service GET variable
+     * web service GET variables
      * 
      * @param string $var_name The variable name
      * @return true Returns true when the variable is defined
@@ -69,28 +69,36 @@ class WebServiceContent
     {
         return in_array($var_name, array_keys($this->get_variables));
     }
-
     /**
-     * Returns the url parameters depending on the Urabe settings variable
-     * url_params_in_pairs. When url parameters in pairs is enable and odd number of parameters will result in the last
-     * parameter having a null value
-     *
-     * @param array $params The read parameters taken from the url as a String array
-     * @return array The url parameters
+     * This function check if the given variable name is defined in the current
+     * web service GET variables and if the variable value is equals to the given value
+     * 
+     * @param string $var_name The variable name
+     * @param mixed $value The value to compare
+     * @return true Returns true when the variable is defined
      */
-    private function parse_url_params($params)
+    public function GET_variable_equals($var_name, $value)
     {
-        $items_count = count($params);
-        if (KanojoX::$settings->url_params_in_pairs) {
-            if ($items_count == 1)
-                return array($params[0] => null);
-            else {
-                $url_params = array();
-                for ($i = 0; $i < $items_count; $i += 2)
-                    $url_params[$params[$i]] = $i < $i + 1 ? $params[$i + 1] : null;
-            }
-            return $url_params;
+        return $this->in_GET_variables($var_name) && $this->get_variables[$var_name] == $value;
+    }
+    /**
+     * This function picks the GET variables values by name and returns them in an array
+     * if the value to pick is not in the GET variables it throws and exception
+     * 
+     * @param string $var_names The variables name to pick its values
+     * @return array The picked values in the given variable names order
+     */
+    public function pick_GET_variable(...$var_names)
+    {
+        $values = array();
+        $keys = array_keys($this->get_variables);
+        foreach ($var_names as $var_name) {
+            if (in_array($var_name, $keys))
+                array_push($values, $this->get_variables[$var_name]);
+            else
+                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, CAP_GET_VARS, "'" . implode("', '", $var_names) . "'"));
         }
+        return $values;
     }
     /**
      * If the request method is GET the filter is extracted from the GET Variables
@@ -106,6 +114,15 @@ class WebServiceContent
             return $this->body->filter;
         else
             return null;
+    }
+    /**
+     * Gets the GET variables names as a string array
+     *
+     * @return array The array of GET variables names
+     */
+    public function get_variables_names()
+    {
+        return array_keys($this->get_variables);
     }
     /**
      * Builds a condition using the primary key that match a column name
@@ -126,11 +143,11 @@ class WebServiceContent
      * Validates if the passed variables names are contained in the web service content.
      * As the fields are considered obligatory, they must appear in the GET variables 
      * otherwise an exception will be thrown.
-     * @param string $variables The primary key column name
+     * @param array $variables The primary key column name
      * @throws Exception Throws an Exception if any of the variables are not presented in the GET variables
      * @return boolean True if all variables names are defined in GET variables
      */
-    public function validate_obligatory_GET_variables($variables)
+    public function validate_obligatory_GET_variables(...$variables)
     {
         $obl_variables_count = 0;
         for ($i = 0; $i < count($variables); $i++)

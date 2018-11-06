@@ -24,7 +24,7 @@ class Urabe
     /**
      * Gets the current connection data
      *
-     * @return The current connection data
+     * @return Object current connection data
      */
     public function get_connection_data()
     {
