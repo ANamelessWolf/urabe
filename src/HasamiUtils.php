@@ -256,6 +256,16 @@ function get_body_as_json()
     $body = json_decode($body);
     return $body;
 }
-
+/**
+ * Removes from this base array all of its elements that are contained by the given array keys. 
+ * @param array $base_array The array to modify
+ * @param array $array_keys The array keys to be removed.
+ * @return void
+ */
+function array_remove(&$base_array, $array_keys)
+{
+    foreach ($array_keys as &$key)
+        unset($base_array[$key]);
+}
 
 ?>

@@ -56,6 +56,11 @@ const CAP_URABE_ACTION = 'u_action_';
  * GET variable name used to defined a web service costume call back action
  */
 const VAR_URABE_ACTION = 'uAction';
+/**
+ * @var string CAP_GET_VARS
+ * String caption for Get variables
+ */
+const CAP_GET_VARS = 'GET variables';
 /***************************************
  ************** JSON NODES *************
  ***************************************/

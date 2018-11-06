@@ -63,7 +63,6 @@ class GETService extends HasamiRestfulService
         try {
             $table_name = $data->extra->{TAB_NAME};
             $filter = $data->extra->{TAB_COL_FILTER};
-      
             if (!is_null($filter)) {
                 $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $filter");
                 return $urabe->select($sql);

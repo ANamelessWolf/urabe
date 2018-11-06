@@ -67,7 +67,7 @@ const ERR_NOT_CONNECTED = 'No connection to the database, did you use connect()?
  * @var string ERR_INCOMPLETE_DATA
  * The error message sent when the the node is missing data.
  */
-const ERR_INCOMPLETE_DATA = 'The node %s does not contain enough data. Needed values [%s].';
+const ERR_INCOMPLETE_DATA = 'The %s does not contain enough data. Needed values [%s].';
 /**
  * @var string ERR_INCOMPLETE_BODY
  * The error message sent when the the body doesn't has a property

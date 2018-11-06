@@ -215,7 +215,7 @@ class HasamiWrapper implements IHasami
     protected function init_services()
     {
         $condition = $this->request_data->build_primary_key_condition($this->primary_key);
-        $this->selection_filter = $this->request_data->get_filter();
+        $this->selection_filter = is_null($this->request_data->get_filter()) ? null : $this->primary_key . "=" . $this->request_data->get_filter();
         return array(
             "GET" => new GETService($this),
             "PUT" => new PUTService($this),
@@ -261,6 +261,19 @@ class HasamiWrapper implements IHasami
             "Actions" => $this->get_available_actions(),
             "Filter" => $this->selection_filter,
         );
+    }
+    /**
+     * Sets the service desired task for the given request method
+     *
+     * @param string $request_method The request method verbose.
+     * GET, POST, PUT, DELETE, etc.
+     * @param mixed $task The task name or the callback to execute
+     * @return void
+     */
+    public function set_service_task($request_method, $task)
+    {
+        $service = $this->get_service($request_method);
+        $service->service_task = $task;
     }
     /**
      * Gets the service response
@@ -314,7 +327,6 @@ class HasamiWrapper implements IHasami
                 $status = $this->get_service_status($request_method);
                 if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->check_login_session())) {
                     http_response_code(200);
-
                     return $service->get_response();
                 } else if ($status == ServiceStatus::LOGGED) {
                     http_response_code(403);

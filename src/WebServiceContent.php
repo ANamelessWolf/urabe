@@ -122,5 +122,24 @@ class WebServiceContent
             $primary_key = $this->body->{$column_name};
         return isset($primary_key) ? "$column_name = " . $primary_key : null;
     }
+    /**
+     * Validates if the passed variables names are contained in the web service content.
+     * As the fields are considered obligatory, they must appear in the GET variables 
+     * otherwise an exception will be thrown.
+     * @param string $variables The primary key column name
+     * @throws Exception Throws an Exception if any of the variables are not presented in the GET variables
+     * @return boolean True if all variables names are defined in GET variables
+     */
+    public function validate_obligatory_GET_variables($variables)
+    {
+        $obl_variables_count = 0;
+        for ($i = 0; $i < count($variables); $i++)
+            if ($this->in_GET_variables($variables[$i]))
+            $obl_variables_count++;
+        if (count($variables) == $obl_variables_count)
+            return true;
+        else
+            throw new Exception(sprintf(ERR_INCOMPLETE_DATA, CAP_GET_VARS, "'" . implode("', '", $variables) . "'"));
+    }
 }
 ?>

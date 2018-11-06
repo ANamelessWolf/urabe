@@ -23,7 +23,29 @@ class HasamiWrapperTester extends HasamiWrapper
     {
         $connector = get_KanojoX_from_file("../tmp/conn_file.json");
         parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
+        //If 
+        if ($this->request_data->in_GET_variables("selection_mode") &&
+            $this->request_data->get_variables["selection_mode"] == "advance")
+            $this->set_service_task("GET", "advance_select");
     }
+    /**
+     * This functions test the advance selection, this function overrides the default selection
+     * and its defined using the Wrapper set_service_task passing as parameter the request method "GET"
+     * and this function name. Also for this example this function expects that the GET variables contains
+     * "username" and "password"
+     *
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @return UrabeResponse The selection response
+     */
+    public function advance_select($data, $urabe)
+    {
+        if ($data->validate_obligatory_GET_variables(array("username", "password")))
+            return "hello world";
+        var_dump($data);
+
+    }
+
     /**
      * Tests the service data current status
      *
