@@ -301,14 +301,20 @@ class HasamiWrapper implements IHasami
                 }
             }
             $result = $this->get_service_response($service, $request_method);
-
-            return $this->print_result($result);
+            //Only formats if PP is in the URL
+            return $this->format_result($result);
         } catch (Exception $e) {
             throw new Exception(ERR_SERVICE_RESPONSE . $e->getMessage(), $e->getCode());
         }
     }
-
-    protected function print_result($result)
+    /**
+     * This functions formats the web service result if the PP format is presented
+     * in the URL. The web service response is returned in a HTML string
+     *
+     * @param UrabeResponse $result The web service result response
+     * @return string|UrabeResponse The web service response
+     */
+    protected function format_result($result)
     {
         //If pretty print is enable prints result with HTML format
         if (in_array(KEY_PRETTY_PRINT, $this->request_data->url_params)) {
@@ -334,6 +340,18 @@ class HasamiWrapper implements IHasami
         }
         return $result;
     }
+    /**
+     * This functions validates the access of a service called via verbose
+     * Can be used to validate a login or a group access validation, this function should be overwritten in 
+     * the child class.
+     *
+     * By default returns true
+     * @return boolean True if the validation access succeed
+     */
+    protected function validation_succeed()
+    {
+        return true;
+    }
 
     /**
      * Gets the web service response 
@@ -347,7 +365,7 @@ class HasamiWrapper implements IHasami
         try {
             if (isset($service)) {
                 $status = $this->get_service_status($request_method);
-                if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->check_login_session())) {
+                if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->validation_succeed())) {
                     http_response_code(200);
                     return $service->get_response();
                 } else if ($status == ServiceStatus::LOGGED) {

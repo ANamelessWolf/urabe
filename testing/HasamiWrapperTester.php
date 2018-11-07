@@ -23,9 +23,12 @@ class HasamiWrapperTester extends HasamiWrapper
     {
         $connector = get_KanojoX_from_file("../tmp/conn_file.json");
         parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
-
-        if ($this->request_data->GET_variable_equals("selection_mode", "advance"))
+        //This changes default status for the given services
+        $this->set_service_status("PUT", ServiceStatus::AVAILABLE);
+        //This only applies if GET verbose detected
+        if ($this->request_data->method == "GET" && $this->request_data->GET_variable_equals("selection_mode", "advance"))
             $this->set_service_task("GET", "advance_select");
+        
     }
 
     /**
