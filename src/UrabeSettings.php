@@ -1,8 +1,7 @@
 <?php
-include "Warai.php";
-include "WaraiMessages_en.php";
 include "ServiceStatus.php";
-include "JsonPrettyStyle.php";
+include "DBDriver.php";
+include "JsonPrettyPrint.php";
 /**
  * Urabe application settings
  *
@@ -34,11 +33,11 @@ return (object)array(
     /**
      * @var bool If sets to true and Urabe handles exceptions the error context is shown in the response
      */
-    "show_error_context" => false,
+    "show_error_context" => true,
     /**
      * @var bool If sets to true and Urabe handles exceptions the stack trace will be added to the response
      */
-    "enable_stack_trace" => false,
+    "enable_stack_trace" => true,
     /**
      * @var bool If sets to true add SQL statement in Urabe response. This should be enable just for testing purpose,
      * not recommendable for staging or production.
@@ -49,11 +48,6 @@ return (object)array(
      * not recommendable for staging or production.
      */
     "hide_exception_error" => false,
-    /**
-     * @var bool If sets to true, url parameters are extracted in pairs. Where the first parameter is the key and the
-     * second the value.
-     */
-    "url_params_in_pairs" => true,
     /**
      * @var ServiceStatus The default status for GET Service
      */
@@ -71,8 +65,65 @@ return (object)array(
      */
     "default_DELETE_status" => ServiceStatus::BLOCKED,
     /**
+     * @var JsonPrettyStyle The JSON PP Dark Style
+     */
+    "dark_pp_style" => JsonPrettyStyle::DarkStyle(),
+    /**
+     * @var JsonPrettyStyle The JSON PP Light Style
+     */
+    "light_pp_style" => JsonPrettyStyle::LightStyle(),
+    /**
      * @var JsonPrettyStyle The default JSON PP Style
      */
     "default_pp_style" => JsonPrettyStyle::DarkStyle(),
+    /**
+     * @var JsonPrettyStyle The default JSON PP Style
+     */
+    "default_pp_style" => JsonPrettyStyle::DarkStyle(),
+    /**
+     * @var boolean True if the background is dark, otherwise it will be white
+     */
+    "default_pp_bg" => true,
+    /**
+     * @var string The date format used to present dates, to modify 
+     * the date format visit the url: https://secure.php.net/manual/en/function.date.php
+     */
+    "date_format" => "m-d-y",
+    /**
+     * @var string The path to the folder where the table definitions are stored
+     */
+    "table_definitions_path" => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'table_definitions' . DIRECTORY_SEPARATOR,
+    /**
+     * @var object Defines the parsing types sort by category
+     */
+    "field_type_category" => (object)array(
+        "ParsingTypes" => array(
+            "String", "Integer", "Long", "Number", "Date", "Boolean"
+        ),
+        "String" => array(
+            //PG Types
+            "character", "text"
+        ),
+        "Integer" => array(
+            //PG Types
+            "integer", "smallint"
+        ),
+        "Long" => array(
+            //PG Types
+            "bigint"
+        ),
+        "Number" => array(
+            //PG Types
+            "double precision", "numeric", "real"
+        ),
+        "Date" => array(
+            //PG Types
+            "date",
+            "timestamp"
+        ),
+        "Boolean" => array(
+            "boolean"
+        )
+    )
 );
 ?>

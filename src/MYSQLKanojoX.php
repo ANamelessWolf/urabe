@@ -18,6 +18,14 @@ class MYSQLKanojoX extends KanojoX
      */
     const DEFAULT_CHAR_SET = 'utf8';
     /**
+     * Initialize a new instance of the connection object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_driver = DBDriver::MYSQL;
+    }
+    /**
      * Closes a connection
      *
      * @return bool Returns TRUE on success or FALSE on failure.
@@ -130,7 +138,7 @@ class MYSQLKanojoX extends KanojoX
             if ($ok) {
                 $result = $statement->get_result();
                 while ($row = $result->fetch_assoc())
-                    $this->parser->parse($rows, $row);
+                    KanojoX::$parser->parse($rows, $row);
             } else
                 throw new UrabeSQLException($this->error($sql));
         }

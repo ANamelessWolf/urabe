@@ -46,7 +46,7 @@ class GETService extends HasamiRestfulService
      */
     public function select($sql, $variables = null, $row_parser = null)
     {
-        return $this->urabe->select($sql, $variables);
+        return $this->urabe->select($sql, $variables, $row_parser);
     }
 
     /**

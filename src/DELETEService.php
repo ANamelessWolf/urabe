@@ -29,7 +29,7 @@ class DELETEService extends HasamiRestfulService
     {
         $data = $wrapper->get_request_data();
         $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $this->extra->{CAP_DELETE} = $delete_condition;
+        $data->extra->{CAP_DELETE} = is_null($delete_condition) ? "" : $delete_condition;
         $urabe = $wrapper->get_urabe();
         parent::__construct($data, $urabe);
         $this->wrapper = $wrapper;

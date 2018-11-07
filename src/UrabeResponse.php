@@ -76,7 +76,7 @@ class UrabeResponse
      * Gets the response message for a successful request
      *
      * @param string $msg The response message
-     * @param string $result The response result
+     * @param array $result The response result
      * @param string $sql The SQL statement
      * @return object The response message
      */

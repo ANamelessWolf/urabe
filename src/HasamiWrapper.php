@@ -1,5 +1,8 @@
 <?php
-include_once "HasamiRestfulService.php";
+include_once "GETService.php";
+include_once "PUTService.php";
+include_once "DELETEService.php";
+include_once "POSTService.php";
 include_once "IHasami.php";
 
 /**
@@ -36,7 +39,7 @@ class HasamiWrapper implements IHasami
      */
     protected $table_name;
     /**
-     * @var string The Selection filter collection used by GET service
+     * @var string The Selection filter used by GET service
      */
     protected $selection_filter;
     /**
@@ -133,10 +136,12 @@ class HasamiWrapper implements IHasami
      */
     public function get_insert_columns()
     {
-        return array_map(function ($item) {
-            if ($item->column_name != $this->primary_key)
-                return $item->column_name;
-        }, $this->table_definition);
+        $columns = array();
+        for ($i = 0; $i < sizeof($this->table_definition); $i++) {
+            if ($this->table_definition[$i]["column_name"] != $this->primary_key)
+                array_push($columns, $this->table_definition[$i]["column_name"]);
+        }
+        return $columns;
     }
     /**
      * Gets the service manager by the verbose type
@@ -154,7 +159,7 @@ class HasamiWrapper implements IHasami
      */
     public function get_service_status($verbose)
     {
-        return $this->services_status[$services_status];
+        return $this->services_status[$verbose];
     }
     /**
      * Sets the service status to the given service name
@@ -164,7 +169,7 @@ class HasamiWrapper implements IHasami
      */
     public function set_service_status($verbose, $status)
     {
-        $this->services_status[$services_status] = $status;
+        $this->services_status[$verbose] = $status;
     }
 
     /*******************
@@ -175,22 +180,26 @@ class HasamiWrapper implements IHasami
      * __construct
      *
      * Initialize a new instance of a HasamiWrapper Class
-     * @param string $table_name The table name, used to wrap SELECT, UPDATE, INSERT AND DELETE actions
-     * @param KanojoX $connection The database connection 
+     * @param string $full_table_name The full table name, used to wrap SELECT, UPDATE, INSERT AND DELETE actions
+     * @param KanojoX $connector The database connector 
      * @param string|NULL $primary_key The name of the primary key.
      * @param FieldDefinition[] $table_definition The table definition, if null
      * the table definition are obtained via a selection query.
      */
-    public function __construct($table_name, $connection_id, $primary_key = null, $table_def = null)
+    public function __construct($full_table_name, $connector, $primary_key = null, $table_definition = null)
     {
-        $this->table_name = $table_name;
-        $this->urabe = new Urabe($connection_id);
+        $this->table_name = $full_table_name;
+        $this->urabe = new Urabe($connector);
         $this->primary_key = $primary_key;
         //Selecting table definition and table definition parser
-        if (is_null($table_def))
+        if (is_null($table_definition) && table_definition_exists($this->table_name)) {
+            $this->table_fields = load_table_definition($this->table_name);
+        } else if (is_null($table_definition)) {
             $this->table_fields = $this->urabe->get_table_definition($this->table_name);
-        else
+            save_table_definition($full_table_name, $connector->db_driver, $this->table_fields);
+        } else
             $this->table_fields = $table_def;
+        //Start with the table definition parser
         $this->urabe->set_parser(new MysteriousParser($this->table_fields));
         //Get the request content
         $this->request_data = new WebServiceContent();
@@ -205,12 +214,8 @@ class HasamiWrapper implements IHasami
      */
     protected function init_services()
     {
-        if (property_exists($this->request_data->body, $primary_key))
-            $condition = "$primary_key = " . $this->request_data->body->{$primary_key};
-        else
-            $condition = null;
-        if (property_exists($this->request_data->body, 'filter'))
-            $this->selection_filter = $this->request_data->body->filter;
+        $condition = $this->request_data->build_primary_key_condition($this->primary_key);
+        $this->selection_filter = is_null($this->request_data->get_filter()) ? null : $this->primary_key . "=" . $this->request_data->get_filter();
         return array(
             "GET" => new GETService($this),
             "PUT" => new PUTService($this),
@@ -233,7 +238,43 @@ class HasamiWrapper implements IHasami
             "DELETE" => KanojoX::$settings->default_DELETE_status,
         );
     }
+    /**
+     * Gets the service status
+     */
+    public function get_status()
+    {
+        $keys = array_keys($this->services_status);
+        $status = array();
+        foreach ($keys as &$key)
+            $status[$key] = ServiceStatus::getName($this->get_service_status($key));
 
+        return (object)array(
+            "Status" => $status,
+            "Content" => $this->request_data,
+            "Connection" => $this->urabe->get_connection_data(),
+            "Table" => array(
+                "name" => $this->table_name,
+                "primary_key" => $this->primary_key,
+                "columns" => $this->table_definition,
+                "selection_filter" => $this->selection_filter
+            ),
+            "Actions" => $this->get_available_actions(),
+            "Filter" => $this->selection_filter,
+        );
+    }
+    /**
+     * Sets the service desired task for the given request method
+     *
+     * @param string $request_method The request method verbose.
+     * GET, POST, PUT, DELETE, etc.
+     * @param mixed $task The task name or the callback to execute
+     * @return void
+     */
+    public function set_service_task($request_method, $task)
+    {
+        $service = $this->get_service($request_method);
+        $service->service_task = $task;
+    }
     /**
      * Gets the service response
      * First check if an action exists on the service, The action service is passed in the GET Variable action
@@ -241,46 +282,92 @@ class HasamiWrapper implements IHasami
      * from the Request method wrapper.
      *
      * @return UrabeResponse|string The web service response, if the PP variable is found in GET Variables, the result is a formatted HTML
-     */
+     **/
     public function get_response()
     {
         try {
-            if (in_array(CAP_URABE_ACTION, $this->request_data->get_variables)) {
-                $actions = $this->get_actions();
-                $action = $this->request_data->get_variables[CAP_URABE_ACTION];
+            $request_method = $this->request_data->method;
+            $service = $this->get_service($request_method);
+            if (in_array(VAR_URABE_ACTION, array_keys($this->request_data->get_variables))) {
+                $actions = $this->get_available_actions();
+                $action = $this->request_data->get_variables[VAR_URABE_ACTION];
                 $isSupported = array_key_exists($request_method, $this->services);
                 //Execute if the action exist otherwise throw an Exception
-                if (in_array($action, $actions)) {
-                    $service = $this->get_service($request_method);
-                    $service->service_task = CAP_URABE_ACTION . $action;
-                } else{
+                if (in_array($action, $actions)) //Select urabe action instead of service default action
+                $service->service_task = CAP_URABE_ACTION . $action;
+                else {
                     http_response_code(500);
                     throw new Exception(sprintf(ERR_INVALID_ACTION, $action));
                 }
             }
-            $result = $service->get_service_response();
-            //If pretty print is enable prints result with HTML format
-            return in_array(KEY_PRETTY_PRINT, $this->request_data->get_variables) ? pretty_print_format($result) : $result;
+            $result = $this->get_service_response($service, $request_method);
+            //Only formats if PP is in the URL
+            return $this->format_result($result);
         } catch (Exception $e) {
             throw new Exception(ERR_SERVICE_RESPONSE . $e->getMessage(), $e->getCode());
         }
     }
+    /**
+     * This functions formats the web service result if the PP format is presented
+     * in the URL. The web service response is returned in a HTML string
+     *
+     * @param UrabeResponse $result The web service result response
+     * @return string|UrabeResponse The web service response
+     */
+    protected function format_result($result)
+    {
+        //If pretty print is enable prints result with HTML format
+        if (in_array(KEY_PRETTY_PRINT, $this->request_data->url_params)) {
+            if (in_array(KEY_PRETTY_PRINT, $this->request_data->get_variables_names())) {
+                $style_name = $this->request_data->get_variables[KEY_PRETTY_PRINT];
+                switch (strtolower($style_name)) {
+                    case "light":
+                        $style = KanojoX::$settings->light_pp_style;
+                        $bg = false;
+                        break;
+                    case "dark":
+                        $style = KanojoX::$settings->dark_pp_style;
+                        $bg = true;
+                        break;
+                    default:
+                        $style = KanojoX::$settings->default_pp_style;
+                        $bg = KanojoX::$settings->default_pp_bg;
+                        break;
+                }
+                $result = pretty_print_format($result, $style, $bg);
+            } else
+                $result = pretty_print_format($result, KanojoX::$settings->default_pp_style, KanojoX::$settings->default_pp_bg);
+        }
+        return $result;
+    }
+    /**
+     * This functions validates the access of a service called via verbose
+     * Can be used to validate a login or a group access validation, this function should be overwritten in 
+     * the child class.
+     *
+     * By default returns true
+     * @return boolean True if the validation access succeed
+     */
+    protected function validation_succeed()
+    {
+        return true;
+    }
 
     /**
      * Gets the web service response 
+     * @param HasamiRestfulService $service The current web service
      * @param string $request_method The request method verbose
      * @throws Exception An exception is thrown if an error occurred executing the web request
      * @return UrabeResponse The web service response
      */
-    private function get_service_response($request_method)
+    private function get_service_response($service, $request_method)
     {
         try {
-            if (array_key_exists($request_method, $this->services)) {
+            if (isset($service)) {
                 $status = $this->get_service_status($request_method);
-                if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->check_login_session())) {
+                if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->validation_succeed())) {
                     http_response_code(200);
-                    $service = $this->get_service($request_method);
-                    $result = $service->get_response();
+                    return $service->get_response();
                 } else if ($status == ServiceStatus::LOGGED) {
                     http_response_code(403);
                     throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
@@ -297,23 +384,25 @@ class HasamiWrapper implements IHasami
         }
     }
 
+
+
     /**
-     * This function list with all available actions for the current web service
-     * Only functions starting with the word "action" are listed
-     *                                  
-     * @return array The list of available actions as an array of strings
+     * This function list all available web service special actions
+     * all actions are identified by starting with the prefix u_action
+     * @return array The list of available actions inside an array
      */
-    private function get_actions()
+    private function get_available_actions()
     {
-        $functions = get_defined_functions();
-        $functions = $functions["user"];
-        $action_funcs = array();
-        $actionSize = strlen(CAP_URABE_ACTION);
-        for ($i = 0; $i < sizeof($functions); $i++) {
-            if (strlen($functions[$i]) > $actionSize && substr($functions[$i], 0, $actionSize) == CAP_URABE_ACTION)
-                array_push($test_func, str_replace(array(SERVICE_FUNC_PREFIX), array(), $functions[$i]));
+        $class_name = get_class($this);
+        $class = new ReflectionClass($class_name);
+        $methods = $class->getMethods(ReflectionMethod::IS_PUBLIC);
+        $actions = array();
+        $uSize = strlen(CAP_URABE_ACTION);
+        foreach ($methods as &$method) {
+            if ($method->class == $class_name && substr($method->name, 0, $uSize) == CAP_URABE_ACTION)
+                array_push($actions, substr($method->name, $uSize));
         }
-        return $action_funcs;
+        return $actions;
     }
 }
 ?>

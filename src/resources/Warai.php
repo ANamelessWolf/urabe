@@ -1,5 +1,6 @@
 <?php
-
+require_once "WaraiMessages_en.php";
+require_once "EnumErrorMessages_en.php";
 /**
  * Defines constants and messages relative to the Urabe API.
  * @version 1.0.0
@@ -46,9 +47,20 @@ const CAP_INSERT = 'insert';
 const CAP_EXTRACT = 'Extract';
 /**
  * @var string CAP_URABE_ACTION
+ * The method prefix name used to define the methods that can be called
+ * via a web service
+ */
+const CAP_URABE_ACTION = 'u_action_';
+/**
+ * @var string VAR_URABE_ACTION
  * GET variable name used to defined a web service costume call back action
  */
-const CAP_URABE_ACTION = 'urabeAction';
+const VAR_URABE_ACTION = 'uAction';
+/**
+ * @var string CAP_GET_VARS
+ * String caption for Get variables
+ */
+const CAP_GET_VARS = 'GET variables';
 /***************************************
  ************** JSON NODES *************
  ***************************************/
@@ -185,26 +197,40 @@ const PRETTY_PRINT_LIGHT = 'Light';
  ****** Parsing Types ******
  ***************************/
 /**
- * @var string ORACLE_FIELD_COL_ORDER
+ * @var string PARSE_AS_STRING
  * The field name that stores the column name
  */
 const PARSE_AS_STRING = 'String';
 /**
+ * @var string PARSE_AS_INT
  * Parse the value as an integer
  */
 const PARSE_AS_INT = 'Integer';
 /**
- * Parse the value as long
+  * @var string PARSE_AS_LONG
+  * Parse the value as long
  */
 const PARSE_AS_LONG = 'Long';
 /**
- * Parse the value as number
+  * @var string PARSE_AS_NUMBER
+  * Parse the value as number
  */
 const PARSE_AS_NUMBER = 'Number';
 /**
- * Parse the value as date
+  * @var string PARSE_AS_DATE
+  * Parse the value as date
  */
 const PARSE_AS_DATE = 'Date';
+/**
+  * @var string PARSE_AS_BOOLEAN
+  * Parse the value as boolean
+ */
+const PARSE_AS_BOOLEAN = 'Boolean';
+/**
+  * @var string PARSING_TYPES
+  * The name of the parsing types row
+ */
+const PARSING_TYPES = 'ParsingTypes';
 /************************************
  ****** Table definition nodes ******
  ************************************/

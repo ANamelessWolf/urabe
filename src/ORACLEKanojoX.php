@@ -37,6 +37,14 @@ class ORACLEKanojoX extends KanojoX
      */
     public $owner;
     /**
+     * Initialize a new instance of the connection object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_driver = DBDriver::ORACLE;
+    }
+    /**
      * Open an ORACLE Database connection
      *
      * @return resource The database connection object
@@ -55,7 +63,7 @@ class ORACLEKanojoX extends KanojoX
         $this->connection = oci_connect($username, $passwd, $connString, self::DEFAULT_CHAR_SET);
         if ($this->connection)
             return $this->connection;
-        else 
+        else
             throw new Exception(ERR_BAD_CONNECTION);
     }
     /**
@@ -171,7 +179,7 @@ class ORACLEKanojoX extends KanojoX
             $ok = oci_execute($statement);
             if ($ok) {
                 while ($row = oci_fetch_assoc($statement))
-                    $this->parser->parse($rows, $row);
+                KanojoX::$parser->parse($rows, $row);
             } else {
                 $err = $this->error($sql, $this->get_error($statement));
                 throw new UrabeSQLException($err);

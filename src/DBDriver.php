@@ -10,6 +10,11 @@ require_once "Enum.php";
 abstract class DBDriver extends Enum
 {
     /**
+     * @var string NS
+     * Not supported driver
+     */
+    const NS = -1;
+    /**
      * @var string ORACLE
      * ORACLE driver connection with OCI Functions
      */

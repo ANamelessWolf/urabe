@@ -22,6 +22,23 @@ class Urabe
      */
     private $connector;
     /**
+     * Gets the current connection data
+     *
+     * @return Object current connection data
+     */
+    public function get_connection_data()
+    {
+        return array(
+            "db_driver" => DBDriver::getName($this->connector->db_driver),
+            "host" => $this->connector->host,
+            "port" => $this->connector->port,
+            "db_name" => $this->connector->db_name,
+            "user_name" => $this->connector->user_name,
+            //"password" = $this->connector->password
+        );
+    }
+
+    /**
      * @var string $is_connected 
      * Check if there is an active connection to the database.
      */
@@ -33,7 +50,7 @@ class Urabe
      */
     public function get_parser()
     {
-        return $this->connector->parser;
+        return KanojoX::$parser;
     }
     /**
      * Sets the current parser
@@ -41,9 +58,9 @@ class Urabe
      * @param MysteriousParser $parser The current parser
      * @return void
      */
-    public function set_parser($parser)
+    public function set_parser($mys_parser)
     {
-        $this->connector->parser = $parser;
+        KanojoX::$parser = $mys_parser;
     }
 
     /**
@@ -83,8 +100,9 @@ class Urabe
         if ($this->is_connected) {
             $response = new UrabeResponse();
             //1: Select row parsing method
+
             if (isset($row_parser) && is_callable($row_parser->parse_method))
-                $this->connector->parser = $row_parser;
+                KanojoX::$parser = $row_parser;                
             //2: Executes the query and fetches the rows as an associative array
             $result = $this->connector->fetch_assoc($sql, $variables);
             //3: Formats response
@@ -151,14 +169,16 @@ class Urabe
      *
      * @param string $table_name The name of the table
      * @throws Exception An exception is thrown when the table doesn't exists.
-     * @return FieldDefinition[] The row definition of the table fields.
+     * @return array The row definition of the table fields.
      */
     public function get_table_definition($table_name)
     {
-        $parser = new MysteriousParser($this->connector->get_table_definition_parser());
-        $parser->column_map = $this->connector->get_table_definition_mapper();
-        $result = $this->select($this->connector->get_table_definition_query($table_name), null, $parser);
-        return $result;
+        if ((strpos($table_name, '.') !== false)) {
+            $tn = explode('.', $table_name);
+            $tn = $tn[1];
+        } else
+            $tn = $table_name;
+        return get_table_definition($this->connector, $tn);
     }
     /**
      * Check if a table exists on the database

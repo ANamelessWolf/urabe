@@ -1,4 +1,8 @@
 <?php
+include_once "StringFieldDefinition.php";
+include_once "NumericFieldDefinition.php";
+include_once "DateFieldDefinition.php";
+include_once "BooleanFieldDefinition.php";
 /**
  * Mysterious parser class
  * 
@@ -40,11 +44,11 @@ class MysteriousParser
     {
         if (isset($table_definition)) {
             $this->table_definition = $table_definition;
-            $this->parse_method = function ($parser, &$result, $row) {
-                $this->parse_with_field_definition($result, $row);
+            $this->parse_method = function ($mys_parser, &$result, $row) {
+                $this->parse_with_field_definition($mys_parser, $result, $row);
             };
         } else
-            $this->parse_method = function ($parser, &$result, $row) {
+            $this->parse_method = function ($mys_parser, &$result, $row) {
             array_push($result, $row);
         };
     }
@@ -71,21 +75,95 @@ class MysteriousParser
         call_user_func_array($this->parse_method, array($this, &$result, $row));
     }
     /**
+     * Gets the field definition used to parse a row
+     *
+     * @param string $newRow The row definition
+     * @return FieldDefinition The field definition
+     */
+    public function get_parsing_data($newRow)
+    {
+        $tp = $newRow[TAB_DEF_TYPE];
+        $dataTypes = KanojoX::$settings->field_type_category;
+        $max_length = is_null($newRow[TAB_DEF_CHAR_LENGTH]) ? 0 : intval($newRow[TAB_DEF_CHAR_LENGTH]);
+        $scale = is_null($newRow[TAB_DEF_NUM_SCALE]) ? 0 : intval($newRow[TAB_DEF_NUM_SCALE]);
+        $precision = is_null($newRow[TAB_DEF_NUM_PRECISION]) ? 0 : intval($newRow[TAB_DEF_NUM_PRECISION]);
+        if ($tp == PARSE_AS_STRING || $this->is_of_type($tp, $dataTypes->String))
+            $field_definition = new StringFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_STRING, $max_length);
+        else if ($tp == PARSE_AS_INT || $this->is_of_type($tp, $dataTypes->Integer))
+            $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_INT, $precision, $scale);
+        else if ($tp == PARSE_AS_NUMBER || $this->is_of_type($tp, $dataTypes->Number))
+            $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_NUMBER, $precision, $scale);
+        else if ($tp == PARSE_AS_DATE || $this->is_of_type($tp, $dataTypes->Date))
+            $field_definition = new DateFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_DATE, KanojoX::$settings->date_format);
+        else if ($tp == PARSE_AS_LONG || $this->is_of_type($tp, $dataTypes->Long))
+            $field_definition = new NumericFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_LONG, $precision, $scale);
+        else if ($tp == PARSE_AS_BOOLEAN || $this->is_of_type($tp, $dataTypes->Boolean))
+            $field_definition = new BooleanFieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], PARSE_AS_BOOLEAN);
+        else
+            $field_definition = new FieldDefinition($newRow[TAB_DEF_INDEX], $newRow[TAB_DEF_NAME], $tp);
+        $field_definition->db_type = $newRow[TAB_DEF_TYPE];
+        return $field_definition;
+    }
+    /**
+     * Check if a given type belongs to a given type category
+     *
+     * @param string $dataType The data type to validate
+     * @param string $dataTypes The collection of data types
+     * @return Boolean True if the data types is of any of the given types
+     */
+    public function is_of_type($dataType, $dataTypes)
+    {
+        $tp = strtolower($dataType);
+        foreach ($dataTypes as &$data_type)
+            if (strpos($tp, $data_type) !== false)
+            return true;
+        return false;
+    }
+    /**
      * Parse the data using the field definition, if a column map is set the result keys are mapped
      * to the given value
      *
+     * @param MysteriousParser $mys_parser The mysterious parser that are extracting the data
      * @param array $result The collection of rows where the parsed rows are stored
      * @param array $row The selected row picked from the fetch assoc process
      * @return void
      */
-    public function parse_with_field_definition(&$result, $row)
+    public function parse_table_field_definition($mys_parser, &$result, $row)
     {
         $newRow = array();
-        foreach ($row as $column_name => $column_value)
-            if (isset($this->table_definition) && is_array($this->table_definition) && array_key_exists($column_name, $this->table_definition)) {
-            $key = $this->get_column_name($column_name);
-            $value = $this->table_definition[$column_name]->get_value($column_value);
-            $newRow[$key] = $value;
+        $column_names = array_map(function ($item) {
+            return $item->column_name;
+        }, $mys_parser->table_definition);
+        foreach ($row as $column_name => $column_value) {
+            if (in_array($column_name, $column_names)) {
+                $key = $mys_parser->get_column_name($column_name);
+                $value = $mys_parser->table_definition[$column_name]->get_value($column_value);
+                $newRow[$key] = $value;
+            }
+        }
+        $result[$newRow[TAB_DEF_NAME]] = $this->get_parsing_data($newRow);
+    }
+    /**
+     * Parse the data using the field definition, if a column map is set the result keys are mapped
+     * to the given value
+     *
+     * @param MysteriousParser $mys_parser The mysterious parser that are extracting the data
+     * @param array $result The collection of rows where the parsed rows are stored
+     * @param array $row The selected row picked from the fetch assoc process
+     * @return void
+     */
+    private function parse_with_field_definition($mys_parser, &$result, $row)
+    {
+        $newRow = array();
+        $column_names = array_map(function ($item) {
+            return $item->column_name;
+        }, $mys_parser->table_definition);
+        foreach ($row as $column_name => $column_value) {
+            if (in_array($column_name, $column_names)) {
+                $key = $mys_parser->get_column_name($column_name);
+                $value = $mys_parser->table_definition[$column_name]->get_value($column_value);
+                $newRow[$key] = $value;
+            }
         }
         array_push($result, $newRow);
     }
@@ -102,21 +180,6 @@ class MysteriousParser
             return $this->column_map[$column_name];
         else
             return $column_name;
-    }
-    
-    /**
-     * Creates a Mysterious parser from a JSON string
-     *
-     * @param string $json_string The JSON string
-     * @return MysteriousParser  Table definition parser
-     */
-    public static function create_from_JSON($json_string)
-    {
-        $fields = array();
-        $data = json_decode($json_string);
-        foreach ($data->{NODE_FIELDS} as &$field)
-            array_push($fields, new FieldDefinition($field->field_name, $field->data_type));
-        return new MysteriousParser($fields);
     }
 
 }

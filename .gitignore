@@ -1,2 +1,5 @@
 .vscode/*
 .vscode/settings.json
+tmp/*
+.vscode/settings.json
+.vscode/launch.json

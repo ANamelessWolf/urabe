@@ -19,6 +19,14 @@ class PGKanojoX extends KanojoX
      */
     public $schema;
     /**
+     * Initialize a new instance of the connection object
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->db_driver = DBDriver::PG;
+    }
+    /**
      * Open a PostgreSQL Database connection
      *
      * @return resource The database connection object
@@ -87,6 +95,7 @@ class PGKanojoX extends KanojoX
     {
         if (is_null($error)) {
             $this->error = new ConnectionError();
+
             $this->error->message = pg_last_error($this->connection);
             $this->error->code = pg_result_status($this->connection);
             $this->error->sql = $sql;
@@ -140,7 +149,7 @@ class PGKanojoX extends KanojoX
     public function fetch_assoc($sql, $variables = null)
     {
         $rows = array();
-        if (!$this->connection)
+        if (!(pg_connection_status($this->connection) === PGSQL_CONNECTION_OK))
             throw new Exception(ERR_NOT_CONNECTED);
         if (isset($variables) && is_array($variables)) {
             $result = pg_prepare($this->connection, self::DEFT_STMT_NAME, $sql);
@@ -154,13 +163,14 @@ class PGKanojoX extends KanojoX
                 $err = $this->error($sql, $this->get_error($result == false ? null : $result, $sql));
                 throw new UrabeSQLException($err);
             }
-        } else
+        } else {
             $ok = pg_query($this->connection, $sql);
+        }
         
         //fetch result
         if ($ok) {
             while ($row = pg_fetch_assoc($ok))
-                $this->parser->parse($rows, $row);
+                KanojoX::$parser->parse($rows, $row);
         } else {
             $err = $this->error($sql, $this->get_error($ok == false ? null : $result, $sql));
             throw new UrabeSQLException($err);
@@ -228,9 +238,10 @@ class PGKanojoX extends KanojoX
      */
     private function get_error($resource, $sql)
     {
+        $err_msg = pg_last_error($this->connection);
         $this->error = new ConnectionError();
         $this->error->code = is_null($resource) ? PGSQL_Result::PGSQL_BAD_RESPONSE : pg_result_status($resource);
-        $this->error->message = pg_last_error($this->connection);
+        $this->error->message = $err_msg ? $err_msg : "";
         $this->error->sql = $sql;
         return $this->error;
     }

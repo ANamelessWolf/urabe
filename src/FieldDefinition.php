@@ -21,23 +21,26 @@ class FieldDefinition
      */
     public $column_name;
     /**
-     * @var string The column data type
+     * @var string The column parsing type
      */
     public $data_type;
     /**
+     * @var string The column db_type
+     */
+    public $db_type;
+    /**
      * Initialize a new instance of a Field Definition class
      *
-     * @param string $index The field name
-     * @param string $field The field name
-     * @param string $data_type The field data type
+     * @param string $index The column index
+     * @param string $column The column name
+     * @param string $data_type The column parsing type
      */
     public function __construct($index, $column, $data_type)
     {
-        $this->column_index = $column;
-        $this->field_name = $column;
+        $this->column_index = $index;
+        $this->column_name = $column;
         $this->data_type = $data_type;
     }
-
     /**
      * Gets the value from a string in the row definition data type
      *
@@ -50,12 +53,34 @@ class FieldDefinition
             return null;
         else if ($this->data_type == PARSE_AS_STRING)
             return strval($value);
-        else if ($this->data_type == PARSE_AS_INT)
+        else if ($this->data_type == PARSE_AS_INT || $this->data_type == PARSE_AS_LONG)
             return intval($value);
         else if ($this->data_type == PARSE_AS_NUMBER)
             return doubleval($value);
         else if ($this->data_type == PARSE_AS_DATE)
             return $value;
+        else if ($this->data_type == PARSE_AS_BOOLEAN)
+            return boolval($value);
+    }
+    public static function create($data)
+    {
+        $tp = $data->data_type;
+        if ($tp == PARSE_AS_STRING)
+            $field_definition = new StringFieldDefinition($data->column_index, $data->column_name, PARSE_AS_STRING, $data->char_max_length);
+        else if ($tp == PARSE_AS_INT)
+            $field_definition = new NumericFieldDefinition($data->column_index, $data->column_name, PARSE_AS_INT, $data->numeric_precision, $data->numeric_scale);
+        else if ($tp == PARSE_AS_NUMBER)
+            $field_definition = new NumericFieldDefinition($data->column_index, $data->column_name, PARSE_AS_NUMBER, $data->numeric_precision, $data->numeric_scale);
+        else if ($tp == PARSE_AS_DATE)
+            $field_definition = new DateFieldDefinition($data->column_index, $data->column_name, PARSE_AS_DATE, $data->date_format);
+        else if ($tp == PARSE_AS_LONG)
+            $field_definition = new NumericFieldDefinition($data->column_index, $data->column_name, PARSE_AS_LONG, $data->numeric_precision, $data->numeric_scale);
+        else if ($tp == PARSE_AS_BOOLEAN)
+            $field_definition = new BooleanFieldDefinition($data->column_index, $data->column_name, PARSE_AS_BOOLEAN);
+        else
+            $field_definition = new FieldDefinition($data->column_index, $data->column_name, $data->db_type);
+        $field_definition->db_type = $data->db_type;
+        return $field_definition;
     }
 }
 ?>
