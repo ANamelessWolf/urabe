@@ -72,9 +72,9 @@ class HasamiRestfulService
     {
         if (is_null($this->data->body))
             throw new Exception(ERR_BODY_IS_NULL);
-        if (property_exists($this->data->body, $property_name))
+        if (!property_exists($this->data->body, $property_name))
             throw new Exception(sprintf(ERR_INCOMPLETE_BODY, $property_name));
-        if (property_exists($this->data->body->{$property_name}, NODE_COLS))
+        if (!property_exists($this->data->body->{$property_name}, NODE_COLS))
             throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_COLS));
         $columns = $this->data->body->{$property_name}->{NODE_COLS};
         //Columns must contain all obligatory columns

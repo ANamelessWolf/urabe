@@ -25,10 +25,26 @@ class HasamiWrapperTester extends HasamiWrapper
         parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
         //This changes default status for the given services
         $this->set_service_status("PUT", ServiceStatus::AVAILABLE);
+
         //This only applies if GET verbose detected
         if ($this->request_data->method == "GET" && $this->request_data->GET_variable_equals("selection_mode", "advance"))
             $this->set_service_task("GET", "advance_select");
-        
+
+    }
+
+    /**
+     * Gets the table INSERT column names
+     * By default the insertion columns are all the columns from the table definition
+     * except by the primary key column
+     *
+     * @return array Returns the column names in an array of strings
+     */
+    public function get_insert_columns()
+    {
+        $column_names =  parent::get_insert_columns();
+        //Ignore last login column
+        unset($column_names["last_login"]);
+        return $column_names;
     }
 
     /**

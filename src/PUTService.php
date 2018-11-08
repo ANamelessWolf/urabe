@@ -74,12 +74,14 @@ class PUTService extends HasamiRestfulService
             $this->validate_columns('insert_values', $insert);
             //Validate values
             if (!property_exists($this->data->body->insert_values, NODE_VAL))
-                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_VAL));
+                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, 'insert_values', NODE_VAL));    
+            //Formats values with table definition
+            $values = $this->wrapper->format_values($this->data->body->insert_values->values);
             //Build insert query
-            if (is_array($this->data->body->insert_values->values))
-                $response = $this->urabe->insert_bulk($table_name, $this->data->body->columns, $this->data->body->insert_values->values);
+            if (is_array($values))
+                $response = $this->urabe->insert_bulk($table_name, $values);
             else
-                $response = $this->urabe->insert($table_name, $this->data->body->insert_values->values);
+                $response = $this->urabe->insert($table_name, $values);
             return $response;
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());

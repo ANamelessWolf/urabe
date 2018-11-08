@@ -373,5 +373,14 @@ class Urabe
         }
         return str_replace($search, $replace, $sql);
     }
+    /**
+     * Gets the database connector driver
+     *
+     * @return DBDriver The database driver
+     */
+    public function get_driver()
+    {
+        return $this->connector->db_driver;
+    }
 }
 ?>

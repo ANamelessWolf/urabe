@@ -33,7 +33,7 @@ class HasamiWrapper implements IHasami
      * @var array The table fields definitions
      * Can be loaded from a query or from a JSON string
      */
-    protected $table_definition;
+    protected $table_fields;
     /**
      * @var string The table name
      */
@@ -79,7 +79,7 @@ class HasamiWrapper implements IHasami
      */
     public function get_table_definition()
     {
-        $this->table_definition = $this->urabe->get_table_definition($this->table_name);
+        $this->table_fields = $this->urabe->get_table_definition($this->table_name);
     }
     /**
      * Gets the web service request content
@@ -136,12 +136,36 @@ class HasamiWrapper implements IHasami
      */
     public function get_insert_columns()
     {
-        $columns = array();
-        for ($i = 0; $i < sizeof($this->table_definition); $i++) {
-            if ($this->table_definition[$i]["column_name"] != $this->primary_key)
-                array_push($columns, $this->table_definition[$i]["column_name"]);
-        }
-        return $columns;
+        $column_names = array_map(function ($item) {
+            return $item->column_name;
+        }, $this->table_fields);
+        unset($column_names[$this->primary_key]);
+        return $column_names;
+    }
+    /**
+     * Formats a group of values into the current table definition format
+     *
+     * @param mixed $values Can be an group of values or an array of group of values
+     * @return mixed The formatted value
+     */
+    public function format_values($values)
+    {
+        $format_values_func = function ($data) {
+            $columns = array_keys(get_object_vars($data));
+            for ($i = 0; $i < count($columns); $i++) {
+                $field_definition = $this->table_fields[$columns[$i]];
+                $data->{$columns[$i]} = $field_definition->format_value($this->urabe->get_driver(), $data->{$columns[$i]});
+            }
+            return $data;
+        };
+        //Format the entry values
+        if (is_array($values)) {
+            for ($i = 0; $i < count($values); $i++)
+                $values[$i] = $format_values_func($values[$i]);
+            return $values;
+        } else
+            return $format_values_func($values);
+
     }
     /**
      * Gets the service manager by the verbose type
@@ -255,7 +279,7 @@ class HasamiWrapper implements IHasami
             "Table" => array(
                 "name" => $this->table_name,
                 "primary_key" => $this->primary_key,
-                "columns" => $this->table_definition,
+                "columns" => $this->table_fields,
                 "selection_filter" => $this->selection_filter
             ),
             "Actions" => $this->get_available_actions(),
