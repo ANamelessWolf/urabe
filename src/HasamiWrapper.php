@@ -165,7 +165,6 @@ class HasamiWrapper implements IHasami
             return $values;
         } else
             return $format_values_func($values);
-
     }
     /**
      * Gets the service manager by the verbose type

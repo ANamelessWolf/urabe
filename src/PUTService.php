@@ -77,9 +77,10 @@ class PUTService extends HasamiRestfulService
                 throw new Exception(sprintf(ERR_INCOMPLETE_DATA, 'insert_values', NODE_VAL));    
             //Formats values with table definition
             $values = $this->wrapper->format_values($this->data->body->insert_values->values);
+            $columns = $this->data->body->insert_values->columns;
             //Build insert query
             if (is_array($values))
-                $response = $this->urabe->insert_bulk($table_name, $values);
+                $response = $this->urabe->insert_bulk($table_name, $columns, $values);
             else
                 $response = $this->urabe->insert($table_name, $values);
             return $response;
