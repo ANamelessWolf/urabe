@@ -33,7 +33,10 @@ class WebServiceContent
      * @var string The web service request method
      */
     public $method;
-
+    /**
+     * @var array The properties names contained in the body
+     */
+    private $property_names_cache;
     /**
      * __construct
      *
@@ -125,21 +128,6 @@ class WebServiceContent
         return array_keys($this->get_variables);
     }
     /**
-     * Builds a condition using the primary key that match a column name
-     *
-     * @param string $column_name The primary key column name
-     * @return string The condition
-     */
-    public function build_primary_key_condition($column_name)
-    {
-        $primary_key = null;
-        if ($this->method == 'GET' && $this->in_GET_variables($column_name))
-            $primary_key = $this->get_variables[$column_name];
-        else if (isset($this->body) && property_exists($this->body, $column_name))
-            $primary_key = $this->body->{$column_name};
-        return isset($primary_key) ? "$column_name = " . $primary_key : null;
-    }
-    /**
      * Validates if the passed variables names are contained in the web service content.
      * As the fields are considered obligatory, they must appear in the GET variables 
      * otherwise an exception will be thrown.
@@ -158,5 +146,54 @@ class WebServiceContent
         else
             throw new Exception(sprintf(ERR_INCOMPLETE_DATA, CAP_GET_VARS, "'" . implode("', '", $variables) . "'"));
     }
+    /**
+     * Validates if the passed properties names are contained in the body of the web service content.
+     * As the fields are considered obligatory, they must appear in the body 
+     * otherwise an exception will be thrown.
+     * @param array $properties The property name
+     * @throws Exception Throws an Exception if any of the properties are not presented in the body
+     * @return boolean True if all properties names are defined in body
+     */
+    public function validate_obligatory_body_properties(...$properties)
+    {
+        $obl_properties_count = 0;
+        for ($i = 0; $i < count($properties); $i++)
+            if ($this->in_body($properties[$i]))
+            $obl_properties_count++;
+        if (count($properties) == $obl_properties_count)
+            return true;
+        else
+            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, "'" . implode("', '", $properties) . "'"));
+    }
+    /**
+     * This function check if the given property name is defined in the current
+     * web service body
+     * 
+     * @param string $property_name The property name
+     * @return true Returns true when the body property is presented
+     */
+    public function in_body($property_name)
+    {
+        if (is_null($this->property_names_cache))
+            $this->property_names_cache = array_keys(get_object_vars($this->body));
+        $result = in_array($property_name, $this->property_names_cache);
+        return $result;
+    }
+    /**
+     * Builds a condition using the primary key that match a column name
+     *
+     * @param string $column_name The primary key column name
+     * @return string The condition
+     */
+    public function build_primary_key_condition($column_name)
+    {
+        $primary_key = null;
+        if ($this->method == 'GET' && $this->in_GET_variables($column_name))
+            $primary_key = $this->get_variables[$column_name];
+        else if (isset($this->body) && property_exists($this->body, $column_name))
+            $primary_key = $this->body->{$column_name};
+        return isset($primary_key) ? "$column_name = " . $primary_key : null;
+    }
+
 }
 ?>

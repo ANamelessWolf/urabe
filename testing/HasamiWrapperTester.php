@@ -25,11 +25,32 @@ class HasamiWrapperTester extends HasamiWrapper
         parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
         //This changes default status for the given services
         $this->set_service_status("PUT", ServiceStatus::AVAILABLE);
+        //This mode will simulate the user is logged executing the function 
+        $this->set_service_status("POST", ServiceStatus::LOGGED);
 
         //This only applies if GET verbose detected
         if ($this->request_data->method == "GET" && $this->request_data->GET_variable_equals("selection_mode", "advance"))
             $this->set_service_task("GET", "advance_select");
 
+    }
+
+    /**
+     * This functions simulates the validation access
+     * via a selection of an user id via a user password and username.
+     * The username and password will be send in the body.
+     *
+     * @return boolean True if the validation access succeed
+     */
+    protected function validate_access()
+    {
+        if ($this->request_data->validate_obligatory_body_properties("username", "password")) {
+            $user_name = $this->request_data->body->username;
+            $password = $this->request_data->body->password;
+            $response = $this->select_user($this->urabe, array($user_name, $password));
+            //Should select at least one row.
+            //This simulates a validation access
+            return $response->size > 0;
+        }
     }
 
     /**
@@ -41,7 +62,7 @@ class HasamiWrapperTester extends HasamiWrapper
      */
     public function get_insert_columns()
     {
-        $column_names =  parent::get_insert_columns();
+        $column_names = parent::get_insert_columns();
         //Ignore last login column
         unset($column_names["last_login"]);
         return $column_names;
@@ -60,23 +81,36 @@ class HasamiWrapperTester extends HasamiWrapper
     public function advance_select($data, $urabe)
     {
         if ($data->validate_obligatory_GET_variables("username", "password")) {
-            $table_name = $this->table_name;
             //Use universal format @paramIndex for place holders
-            $condition = "u_name = @1 AND u_pass = @2";
-            $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $condition");
-            $result = $urabe->select($sql, $data->pick_GET_variable("username", "password"));
-            return $result;
+            $parameters = $data->pick_GET_variable("username", "password");
+            return $this->select_user($urabe, $parameters);
         }
     }
-
     /**
      * Tests the service data current status this function should be called
      *
      * @return void
      */
-    public function u_action_status()
+    private function u_action_status()
     {
         return $this->get_status();
+    }
+    /**
+     * Selects and user from the database
+     *
+     * @param Urabe $urabe The database manager
+     * @param array $parameters The parameters needed to select the user,
+     * Should be user_name and password
+     * @return object The message response
+     */
+    private function select_user($urabe, $parameters)
+    {
+        $table_name = $this->table_name;
+        $condition = "u_name = @1 AND u_pass = @2";
+        $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $condition");
+        $result = $urabe->select($sql, $parameters);
+        return $result;
+
     }
 }
 $service = new HasamiWrapperTester();

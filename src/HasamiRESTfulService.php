@@ -53,12 +53,15 @@ class HasamiRestfulService
      * @throws Exception An Exception is thrown if the body is null or the body does not contains all properties
      * @return void
      */
-    public function validate_body($properties)
+    public function validate_body(...$properties)
     {
         if (is_null($this->data->body))
             throw new Exception(ERR_BODY_IS_NULL);
-        if (property_exists($this->data->body, $property_name))
-            throw new Exception(sprintf(ERR_INCOMPLETE_BODY, $property_name));
+        for ($i = 0; $i < count($properties); $i++) {
+            $property_name = $properties[$i];
+            if (!$this->data->in_body($property_name))
+                throw new Exception(sprintf(ERR_INCOMPLETE_BODY, $property_name));
+        }
     }
     /**
      * This method validates the columns contained in the given node.

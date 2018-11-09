@@ -371,7 +371,7 @@ class HasamiWrapper implements IHasami
      * By default returns true
      * @return boolean True if the validation access succeed
      */
-    protected function validation_succeed()
+    protected function validate_access()
     {
         return true;
     }
@@ -388,19 +388,19 @@ class HasamiWrapper implements IHasami
         try {
             if (isset($service)) {
                 $status = $this->get_service_status($request_method);
-                if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->validation_succeed())) {
+                if ($status == ServiceStatus::AVAILABLE || ($status == ServiceStatus::LOGGED && $this->validate_access())) {
                     http_response_code(200);
                     return $service->get_response();
                 } else if ($status == ServiceStatus::LOGGED) {
-                    http_response_code(403);
-                    throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
+                    KanojoX::$http_error_code = 403;
+                    throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $request_method));
                 } else {
-                    http_response_code(500);
-                    throw new Exception(sprintf(ERR_VERBOSE_NOT_SUPPORTED, $this->method));
+                    KanojoX::$http_error_code = 500;
+                    throw new Exception(sprintf(ERR_VERBOSE_NOT_SUPPORTED, $request_method));
                 }
             } else {
-                http_response_code(500);
-                throw new Exception(sprintf(ERR_VERBOSE_NOT_SUPPORTED, $this->method));
+                KanojoX::$http_error_code = 500;
+                throw new Exception(sprintf(ERR_VERBOSE_NOT_SUPPORTED, $request_method));
             }
         } catch (Exception $e) {
             throw new Exception($e->getMessage(), $e->getCode());

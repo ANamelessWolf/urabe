@@ -78,7 +78,7 @@ class POSTService extends HasamiRestfulService
         try {
             $table_name = $data->extra->{TAB_NAME};
             //Validate body
-            $this->validate_body(array('update_values'));
+            $this->validate_body('update_values');
             //Validate values and given condition
             if (!property_exists($this->data->body->update_values, NODE_VAL))
                 throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_VAL . ", " . NODE_CONDITION));
