@@ -74,10 +74,10 @@ const ERR_INCOMPLETE_DATA = 'The %s does not contain enough data. Needed values 
  */
 const ERR_INCOMPLETE_BODY = 'The properties [%s] were not found in the body.';
 /**
- * @var string ERR_INCOMPLETE_BODY_CONDITION
- * The error message sent when the the condition fields are missing on the body.
+ * @var string ERR_MISSING_CONDITION
+ * The error message sent when the the condition is not defined
  */
-const ERR_INCOMPLETE_BODY_CONDITION = 'The body does not contain enough data to fit the condition. Needed fields [%s].';
+const ERR_MISSING_CONDITION = 'A condition is needed to %s';
 /**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.

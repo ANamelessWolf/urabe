@@ -29,7 +29,7 @@ class POSTService extends HasamiRestfulService
     {
         $data = $wrapper->get_request_data();
         $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $data->extra->{CAP_UPDATE} = is_null($update_condition) ? "" : $update_condition;
+        $data->extra->{CAP_UPDATE} = is_null($update_condition) ? null : $update_condition;
         $urabe = $wrapper->get_urabe();
         parent::__construct($data, $urabe);
         $this->wrapper = $wrapper;
@@ -77,17 +77,17 @@ class POSTService extends HasamiRestfulService
     {
         try {
             $table_name = $data->extra->{TAB_NAME};
-            //Validate body
-            $this->validate_body('update_values');
-            //Validate values and given condition
-            if (!property_exists($this->data->body->update_values, NODE_VAL))
-                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_VAL . ", " . NODE_CONDITION));
-            else
-                $condition = property_exists($this->data->body->insert_values, NODE_CONDITION) ? $this->data->body->insert_values->condition : $data->extra->{CAP_UPDATE};
-            if ($condition == null)
-                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_CONDITION));
-            //Build update query
-            $response = $this->urabe->update($table_name, $this->data->body->update_values->values, $condition);
+            //Validate update values
+            $this->validate_body(NODE_VAL);
+            $condition = $data->extra->{CAP_UPDATE};
+            $values = $this->wrapper->format_values($data->body->{NODE_VAL});
+            //A Condition is obligatory to update
+            if (is_null($condition))
+                throw new Exception(sprintf(ERR_MISSING_CONDITION, CAP_UPDATE));
+            //Get response
+            $column_name = array_keys($condition)[0];
+            $column_value = $this->wrapper->format_value($urabe->get_driver(), $column_name, $condition[$column_name]);
+            $response = $this->update_by_field($table_name, $values, $column_name, $column_value);
             return $response;
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());

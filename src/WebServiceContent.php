@@ -180,19 +180,25 @@ class WebServiceContent
         return $result;
     }
     /**
-     * Builds a condition using the primary key that match a column name
+     * Builds a simple condition using a column name and comparing to a given value.
+     * The value is extracted from GET variables when GET verbose is presented and from 
+     * the body for other verbose
      *
-     * @param string $column_name The primary key column name
-     * @return string The condition
+     * @param string $column_name The column name
+     * @return array One record array with key value pair value, column_name => condition_value
      */
-    public function build_primary_key_condition($column_name)
+    public function build_simple_condition($column_name)
     {
-        $primary_key = null;
-        if ($this->method == 'GET' && $this->in_GET_variables($column_name))
-            $primary_key = $this->get_variables[$column_name];
-        else if (isset($this->body) && property_exists($this->body, $column_name))
-            $primary_key = $this->body->{$column_name};
-        return isset($primary_key) ? "$column_name = " . $primary_key : null;
+        $result = array();
+        if ($column_name == null)
+            $result = null;
+        else if ($this->method == 'GET' && $this->in_GET_variables(NODE_CONDITION))
+            $result["$column_name"] = $this->get_variables[NODE_CONDITION];
+        else if ($this->in_body(NODE_CONDITION))
+            $result[$column_name] = $this->body->{NODE_CONDITION};
+        else
+            $result = null;
+        return $result;
     }
 
 }

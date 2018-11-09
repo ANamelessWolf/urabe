@@ -13,7 +13,7 @@ include_once "PGSQL_Result.php";
  */
 class PGKanojoX extends KanojoX
 {
-    const DEFT_STMT_NAME = "sql_statement";
+    const DEFT_STMT_NAME = "";
     /**
      * @var string $schema The database schema used to filter the table definition
      */

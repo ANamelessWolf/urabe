@@ -142,6 +142,21 @@ class HasamiWrapper implements IHasami
         unset($column_names[$this->primary_key]);
         return $column_names;
     }
+
+    /**
+     * Formats a value using a field definition
+     *
+     * @param DBDriver $driver The database connection driver
+     * @param string $column_name The column name
+     * @param mixed $value The value to format
+     * @return mixed The value formatted
+     */
+    public function format_value($driver, $column_name, $value)
+    {
+        $field_definition = $this->table_fields[$column_name];
+        return $field_definition->format_value($driver, $value);
+    }
+
     /**
      * Formats a group of values into the current table definition format
      *
@@ -150,22 +165,22 @@ class HasamiWrapper implements IHasami
      */
     public function format_values($values)
     {
-        $format_values_func = function ($data) {
+        $driver = $this->urabe->get_driver();
+        $format_values_func = function ($driver, $data) {
             $columns = array_keys(get_object_vars($data));
-            for ($i = 0; $i < count($columns); $i++) {
-                $field_definition = $this->table_fields[$columns[$i]];
-                $data->{$columns[$i]} = $field_definition->format_value($this->urabe->get_driver(), $data->{$columns[$i]});
-            }
+            for ($i = 0; $i < count($columns); $i++)
+                $data->{$columns[$i]} = $this->format_value($driver, $columns[$i], $data->{$columns[$i]});
             return $data;
         };
         //Format the entry values
         if (is_array($values)) {
             for ($i = 0; $i < count($values); $i++)
-                $values[$i] = $format_values_func($values[$i]);
+                $values[$i] = $format_values_func($driver, $values[$i]);
             return $values;
         } else
-            return $format_values_func($values);
+            return $format_values_func($driver, $values);
     }
+
     /**
      * Gets the service manager by the verbose type
      * @param string $verbose The service verbose type
@@ -237,7 +252,8 @@ class HasamiWrapper implements IHasami
      */
     protected function init_services()
     {
-        $condition = $this->request_data->build_primary_key_condition($this->primary_key);
+
+        $condition = $this->request_data->build_simple_condition($this->primary_key);
         $this->selection_filter = is_null($this->request_data->get_filter()) ? null : $this->primary_key . "=" . $this->request_data->get_filter();
         return array(
             "GET" => new GETService($this),
