@@ -62,6 +62,28 @@ class FieldDefinition
         else if ($this->data_type == PARSE_AS_BOOLEAN)
             return boolval($value);
     }
+    /**
+     * Formats a value to be use as a place holder parameter
+     *
+     * @param DBDriver $driver The selected value as string
+     * @param mixed $value The selected value as string
+     * @return mixed The value as the same type of the table definition.
+     */
+    public function format_value($driver, $value)
+    {
+        if (is_null($value))
+            return null;
+        else if (in_array($this->data_type,array(PARSE_AS_STRING, PARSE_AS_INT, PARSE_AS_LONG, PARSE_AS_NUMBER)))
+            return $value;
+        else
+            return strval($value);
+    }
+    /**
+     * Creates a Field Definition object from a data type
+     *
+     * @param string $data The data type
+     * @return FieldDefinition The field definition object
+     */
     public static function create($data)
     {
         $tp = $data->data_type;

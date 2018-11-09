@@ -72,7 +72,7 @@ const ERR_INCOMPLETE_DATA = 'The %s does not contain enough data. Needed values 
  * @var string ERR_INCOMPLETE_BODY
  * The error message sent when the the body doesn't has a property
  */
-const ERR_INCOMPLETE_BODY = 'The property %s was not found in the body.';
+const ERR_INCOMPLETE_BODY = 'The properties [%s] were not found in the body.';
 /**
  * @var string ERR_INCOMPLETE_BODY_CONDITION
  * The error message sent when the the condition fields are missing on the body.
