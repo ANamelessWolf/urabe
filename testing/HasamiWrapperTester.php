@@ -31,7 +31,9 @@ class HasamiWrapperTester extends HasamiWrapper
         //This only applies if GET verbose detected
         if ($this->request_data->method == "GET" && $this->request_data->GET_variable_equals("selection_mode", "advance"))
             $this->set_service_task("GET", "advance_select");
-
+        //This only applies if POST verbose is detected
+        if ($this->request_data->method == "POST" && $this->request_data->GET_variable_equals("update_mode", "advance"))
+            $this->set_service_task("POST", "advance_update");
     }
 
     /**
@@ -71,7 +73,7 @@ class HasamiWrapperTester extends HasamiWrapper
     /**
      * This functions test the advance selection, this function overrides the default selection
      * and its defined using the Wrapper set_service_task passing as parameter the request method "GET"
-     * and this function name. Also for this example this function expects that the GET variables contains
+     * and the function name. Also for this example, this function expects that the GET variables contains
      * "username" and "password"
      *
      * @param WebServiceContent $data The web service content
@@ -87,11 +89,34 @@ class HasamiWrapperTester extends HasamiWrapper
         }
     }
     /**
+     * This functions test the advance update, this function overrides the default update actions
+     * and its defined using the Wrapper set_service_task passing as parameter the request method "POST"
+     * and the function name. Also for this example, this function expects that the some parameters are defined in the
+     * condition body
+     *
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @return UrabeResponse The selection response
+     */
+    public function advance_update($data, $urabe)
+    {
+        //Validate body
+        $data->validate_obligatory_body_properties(NODE_VAL, "adv_condition");
+        //Extract values
+        $percent = $this->format_value($urabe->get_driver(), "percent", $data->body->adv_condition->percent);
+        $is_active = $this->format_value($urabe->get_driver(), "is_active", $data->body->adv_condition->is_active);
+        //Build condition
+        $condition = "percent > " . $percent . " AND " . "is_active = '" . $is_active . "'";
+        $values = $this->format_values($data->body->{NODE_VAL});
+        //Update
+        return $urabe->update($this->table_name, $values, $condition);
+    }
+    /**
      * Tests the service data current status this function should be called
      *
      * @return void
      */
-    private function u_action_status()
+    public function u_action_status()
     {
         return $this->get_status();
     }

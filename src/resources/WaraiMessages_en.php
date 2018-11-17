@@ -92,7 +92,7 @@ const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current serv
  * @var string ERR_INVALID_ACTION
  * The error message sent when trying to call a not implemented action
  */
-const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s.';
+const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s. ';
 /**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.

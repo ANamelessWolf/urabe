@@ -174,6 +174,8 @@ class WebServiceContent
      */
     public function in_body($property_name)
     {
+        if (is_null($this->body))
+            return false;
         if (is_null($this->property_names_cache))
             $this->property_names_cache = array_keys(get_object_vars($this->body));
         $result = in_array($property_name, $this->property_names_cache);
