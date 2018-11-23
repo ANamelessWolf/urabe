@@ -29,7 +29,7 @@ class DELETEService extends HasamiRestfulService
     {
         $data = $wrapper->get_request_data();
         $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $data->extra->{CAP_DELETE} = is_null($delete_condition) ? "" : $delete_condition;
+        $data->extra->{CAP_DELETE} = is_null($delete_condition) ? null : $delete_condition;
         $urabe = $wrapper->get_urabe();
         parent::__construct($data, $urabe);
         $this->wrapper = $wrapper;
@@ -74,11 +74,14 @@ class DELETEService extends HasamiRestfulService
         try {
             $table_name = $data->extra->{TAB_NAME};
             //Validate body
-            $condition = property_exists($this->data->body, "condition") ? $this->data->body->delete_condition : $data->extra->{CAP_DELETE};
-            if ($condition == null)
-                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, $property_name, NODE_CONDITION));
+            $condition = $data->extra->{CAP_DELETE};
+            //A Condition is obligatory to update
+            if (is_null($condition))
+                throw new Exception(sprintf(ERR_MISSING_CONDITION, CAP_UPDATE));
+            $column_name = array_keys($condition)[0];
+            $column_value = $this->wrapper->format_value($urabe->get_driver(), $column_name, $condition[$column_name]);
             //Build delete query
-            $response = $this->urabe->delete($table_name, $this->data->body->delete_condition);
+            $response = $this->delete_by_field($table_name, $column_name, $column_value);
             return $response;
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());

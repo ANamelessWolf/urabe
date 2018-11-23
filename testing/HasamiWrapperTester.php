@@ -25,6 +25,7 @@ class HasamiWrapperTester extends HasamiWrapper
         parent::__construct($connector->schema . "." . self::TABLE_NAME, $connector, "id");
         //This changes default status for the given services
         $this->set_service_status("PUT", ServiceStatus::AVAILABLE);
+        $this->set_service_status("DELETE", ServiceStatus::AVAILABLE);
         //This mode will simulate the user is logged executing the function 
         $this->set_service_status("POST", ServiceStatus::LOGGED);
 
@@ -34,6 +35,10 @@ class HasamiWrapperTester extends HasamiWrapper
         //This only applies if POST verbose is detected
         if ($this->request_data->method == "POST" && $this->request_data->GET_variable_equals("update_mode", "advance"))
             $this->set_service_task("POST", "advance_update");
+        //This only applies if POST verbose is detected
+        if ($this->request_data->method == "DELETE" && $this->request_data->GET_variable_equals("delete_mode", "advance"))
+            $this->set_service_task("DELETE", "advance_delete");
+
     }
 
     /**
@@ -90,7 +95,7 @@ class HasamiWrapperTester extends HasamiWrapper
     }
     /**
      * This functions test the advance update, this function overrides the default update actions
-     * and its defined using the Wrapper set_service_task passing as parameter the request method "POST"
+     * using the Wrapper set_service_task passing as parameter the request method "POST"
      * and the function name. Also for this example, this function expects that the some parameters are defined in the
      * condition body
      *
@@ -113,6 +118,29 @@ class HasamiWrapperTester extends HasamiWrapper
     }
 
     /**
+     * This functions test the advance delete, this function overrides the default delete action 
+     * using the Wrapper set_service_task, passing as parameter the request method "DELETE"
+     * and the function name. Also for this example, this function expects that some parameters are defined in the
+     * condition body
+     *
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @return UrabeResponse The selection response
+     */
+    public function advance_delete($data, $urabe)
+    {
+        //Validate body
+        $data->validate_obligatory_body_properties("adv_condition");
+        //Extract values
+        $percent = $this->format_value($urabe->get_driver(), "percent", $data->body->adv_condition->percent);
+        $is_active = $this->format_value($urabe->get_driver(), "is_active", $data->body->adv_condition->is_active);
+        //Build condition
+        $condition = "percent > " . $percent . " AND " . "is_active = '" . $is_active . "'";
+        //Update
+        return $urabe->delete($this->table_name, $condition);
+    }
+
+    /**
      * Tests a function that only is allowed to execute in POST or PUT
      * By default callback functions received the web service content and the database connector
      * @param WebServiceContent $data The web service content
@@ -121,7 +149,7 @@ class HasamiWrapperTester extends HasamiWrapper
      */
     public function u_action_test_restrict_call_access($data, $urabe)
     {
-        $data->restrict_by_content("POST","PUT");
+        $data->restrict_by_content("POST", "PUT");
         $response = new UrabeResponse();
         return $response->get_response("You are allowed", array());
     }
