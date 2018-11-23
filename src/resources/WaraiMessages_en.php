@@ -72,12 +72,12 @@ const ERR_INCOMPLETE_DATA = 'The %s does not contain enough data. Needed values 
  * @var string ERR_INCOMPLETE_BODY
  * The error message sent when the the body doesn't has a property
  */
-const ERR_INCOMPLETE_BODY = 'The property %s was not found in the body.';
+const ERR_INCOMPLETE_BODY = 'The properties [%s] were not found in the body.';
 /**
- * @var string ERR_INCOMPLETE_BODY_CONDITION
- * The error message sent when the the condition fields are missing on the body.
+ * @var string ERR_MISSING_CONDITION
+ * The error message sent when the the condition is not defined
  */
-const ERR_INCOMPLETE_BODY_CONDITION = 'The body does not contain enough data to fit the condition. Needed fields [%s].';
+const ERR_MISSING_CONDITION = 'A condition is needed to %s';
 /**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.
@@ -92,7 +92,7 @@ const ERR_INVALID_SERVICE_TASK = 'No service task specified for the current serv
  * @var string ERR_INVALID_ACTION
  * The error message sent when trying to call a not implemented action
  */
-const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s.';
+const ERR_INVALID_ACTION = 'No action is implemented in this web service with the name %s. ';
 /**
  * @var string ERR_INVALID_SERVICE
  * The error message sent when no service name is specified.

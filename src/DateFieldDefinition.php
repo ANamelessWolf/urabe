@@ -39,11 +39,8 @@ class DateFieldDefinition extends FieldDefinition
     {
         if (is_null($value))
             return null;
-        else {
+        else
             return date($this->date_format, strtotime($value));
-            
-            
-        }
     }
 }
 ?>

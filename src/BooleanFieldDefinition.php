@@ -33,10 +33,24 @@ class BooleanFieldDefinition extends FieldDefinition
     {
         if (is_null($value))
             return null;
-        else if (strval (strtolower($value) == 'true') || strval(strtolower($value) == 'false'))
+        else if (strval(strtolower($value) == 'true') || strval(strtolower($value) == 'false'))
             return strval(strtolower($value)) == 'true';
         else
             return intval($value) == 1;
+    }
+    /**
+     * Formats a value to be use as a place holder parameter
+     *
+     * @param DBDriver $driver The selected value as string
+     * @param mixed $value The selected value as string
+     * @return mixed The value as the same type of the table definition.
+     */
+    public function format_value($driver, $value)
+    {
+        if ($this->data_type == PARSE_AS_BOOLEAN)
+            return $driver == DBDriver::PG ? ($value == true ? "t" : "f") : ($value == true ? 1 : 0);
+        else
+            return parent::format_value($driver, $value);
     }
 }
 ?>

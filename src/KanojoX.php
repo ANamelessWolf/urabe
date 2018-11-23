@@ -5,7 +5,7 @@ include "ConnectionError.php";
 include "UrabeResponse.php";
 include "MysteriousParser.php";
 include "WebServiceContent.php";
-require_once "/resources/Warai.php";
+require_once "resources/Warai.php";
 /**
  * Database connection model
  * 
@@ -25,10 +25,6 @@ abstract class KanojoX
      */
     public static $parser;
     /**
-     * @var DBDriver The database driver
-     */
-    public $db_driver;
-    /**
      * @var array $error 
      * The application current errors
      */
@@ -38,6 +34,14 @@ abstract class KanojoX
      * Access the application settings.
      */
     public static $settings;
+    /**
+     * @var int The http error code
+     */
+    public static $http_error_code;
+    /**
+     * @var DBDriver The database driver
+     */
+    public $db_driver;
     /**
      * @var string $host Can be either a host name or an IP address.
      */
@@ -167,7 +171,10 @@ abstract class KanojoX
      */
     public static function exception_handler($exception)
     {
-        http_response_code(400);
+        if (is_null(KanojoX::$http_error_code))
+            http_response_code(400);
+        else
+            http_response_code(KanojoX::$http_error_code);
         $class = get_class($exception);
         $error = new ConnectionError();
         $error->code = $exception->getCode();
