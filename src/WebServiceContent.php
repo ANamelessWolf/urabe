@@ -202,6 +202,18 @@ class WebServiceContent
             $result = null;
         return $result;
     }
+    /**
+     * This method throws an exception when the action is 
+     * access by a not valid allowed method.
+     *
+     * @param array ...$allowed_methods A string array containing the allowed methods
+     * @return void
+     */
+    public function restrict_by_content(...$allowed_methods)
+    {
+        if (!in_array($this->method, $allowed_methods))
+            throw new Exception(sprintf(ERR_SERVICE_RESTRICTED, $this->method));
+    }
 
 }
 ?>

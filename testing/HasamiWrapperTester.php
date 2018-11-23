@@ -111,6 +111,21 @@ class HasamiWrapperTester extends HasamiWrapper
         //Update
         return $urabe->update($this->table_name, $values, $condition);
     }
+
+    /**
+     * Tests a function that only is allowed to execute in POST or PUT
+     * By default callback functions received the web service content and the database connector
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @return UrabeResponse The urabe response
+     */
+    public function u_action_test_restrict_call_access($data, $urabe)
+    {
+        $data->restrict_by_content("POST","PUT");
+        $response = new UrabeResponse();
+        return $response->get_response("You are allowed", array());
+    }
+
     /**
      * Tests the service data current status this function should be called
      *
