@@ -5,7 +5,7 @@ include "ConnectionError.php";
 include "UrabeResponse.php";
 include "MysteriousParser.php";
 include "WebServiceContent.php";
-require_once "/resources/Warai.php";
+require_once "resources/Warai.php";
 /**
  * Database connection model
  * 
