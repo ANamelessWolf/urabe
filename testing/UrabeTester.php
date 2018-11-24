@@ -1,5 +1,5 @@
 <?php
-include_once "./utils/UrabeTestUtils.php";
+include_once "utils/UrabeTestUtils.php";
 /**
  * This file test the functionality for the class Urabe
  *  

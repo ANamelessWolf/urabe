@@ -48,7 +48,7 @@ class HasamiWrapper implements IHasami
      */
     protected $primary_key;
     /**
-     * @var array The Restful services managed by hasami wrapper in an array of HasamiRestfulService
+     * @var array The Restful services managed by hasami wrapper in an array of HasamiRESTfulService
      * Each value is index by the verbose name
      */
     protected $services;
@@ -184,7 +184,7 @@ class HasamiWrapper implements IHasami
     /**
      * Gets the service manager by the verbose type
      * @param string $verbose The service verbose type
-     * @return HasamiRestfulService The service manager
+     * @return HasamiRESTfulService The service manager
      */
     public function get_service($verbose)
     {
@@ -394,7 +394,7 @@ class HasamiWrapper implements IHasami
 
     /**
      * Gets the web service response 
-     * @param HasamiRestfulService $service The current web service
+     * @param HasamiRESTfulService $service The current web service
      * @param string $request_method The request method verbose
      * @throws Exception An exception is thrown if an error occurred executing the web request
      * @return UrabeResponse The web service response

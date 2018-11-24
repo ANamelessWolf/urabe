@@ -10,7 +10,7 @@ include_once "Urabe.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class HasamiRestfulService
+class HasamiRESTfulService
 {
     /**
      * The web service request content
