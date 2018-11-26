@@ -56,7 +56,7 @@ interface IHasami
     /**
      * Gets the service manager by the verbose type
      * @param string $verbose The service verbose type
-     * @return HasamiRestfulService The service manager
+     * @return HasamiRESTfulService The service manager
      */
     public function get_service($verbose);
     /**

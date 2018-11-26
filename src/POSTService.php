@@ -1,5 +1,5 @@
 <?php
-include_once "HasamiRestfulService.php";
+include_once "HasamiRESTfulService.php";
 
 /**
  * POST Service Class
@@ -10,7 +10,7 @@ include_once "HasamiRestfulService.php";
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class POSTService extends HasamiRestfulService
+class POSTService extends HasamiRESTfulService
 {
     /**
      * @var string The update condition

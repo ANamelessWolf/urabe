@@ -1,13 +1,14 @@
 <?php
+/**
+ * Defines application constants
+ *
+ * @package URABE-API
+ * @author A nameless wolf <anamelessdeath@gmail.com>
+ * @version v.1.1 (01/10/2019)
+ * @copyright copyright (c) 2018-2020, Nameless Studios
+ */
 require_once "WaraiMessages_en.php";
 require_once "EnumErrorMessages_en.php";
-/**
- * Defines constants and messages relative to the Urabe API.
- * @version 1.0.0
- * @api Makoto Urabe DB Manager Oracle
- * @author A nameless wolf <anamelessdeath@gmail.com>
- * @copyright 2015-2020 Nameless Studios
- */
 /***************************************
  *********** Class Names ***************
  ***************************************/
@@ -25,10 +26,7 @@ const CLASS_SQL_EXC = 'UrabeSQLException';
 /***************************************
  ************** CAPTIONS ***************
  ***************************************/
-/**
- * @var string CAP_DELETE
- * String caption for Delete.
- */
+/** String caption for Delete */
 const CAP_DELETE = 'delete';
 /**
  * @var string CAP_UPDATE
