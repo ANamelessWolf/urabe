@@ -8,7 +8,7 @@
  * @copyright 2015-2020 Nameless Studios
  */
 
-include_once "./utils/HasamiUtilsTestUtils.php";
+include_once "utils/HasamiUtilsTestUtils.php";
 //Test Response
 $response = (object)array(
     "msg" => "",
