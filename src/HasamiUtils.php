@@ -29,6 +29,11 @@ function save_connection($file_path, $kanojo)
         $data["owner"] = $kanojo->owner;
     else if ($kanojo->db_driver == DBDriver::PG)
         $data["schema"] = $kanojo->schema;
+
+    $dir = dirname($file_path);
+    if (!file_exists($dir)) 
+        mkdir($dir,0755);
+
     if (file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT)) == false)
         throw new Exception(ERR_SAVING_JSON);
 }

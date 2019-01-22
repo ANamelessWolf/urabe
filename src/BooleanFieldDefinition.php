@@ -1,14 +1,20 @@
 <?php
+/**
+ * Class BooleanFieldDefinition | FieldDefinition.php
+ *
+ * @package URABE-API
+ * @author A nameless wolf <anamelessdeath@gmail.com>
+ * @version v.1.1 (01/10/2019)
+ * @copyright copyright (c) 2018-2020, Nameless Studios
+ */
 include_once "FieldDefinition.php";
 /**
- * Boolean field Definition Class
+ * String Field Definition Class
  * 
  * This class encapsulates a table column definition and format it values to JSON field value
  * Each table field is associated to a column and stores its index and data type.
  * 
  * @api Makoto Urabe DB Manager
- * @author A nameless wolf <anamelessdeath@gmail.com>
- * @copyright 2015-2020 Nameless Studios
  */
 class BooleanFieldDefinition extends FieldDefinition
 {

@@ -1,5 +1,5 @@
 <?php
-include_once "./utils/KanojoXTestUtils.php";
+include_once "utils/KanojoXTestUtils.php";
 /**
  * This file test the functionality for the class KanojoX
  *  

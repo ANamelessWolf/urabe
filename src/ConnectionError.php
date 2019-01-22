@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Class ConnectionError
+ * 
+ * @package URABE-API
+ * @author A nameless wolf <anamelessdeath@gmail.com>
+ * @version v.1.1 (01/10/2019)
+ * @copyright copyright (c) 2018-2020, Nameless Studios
+ */
+namespace nameless\urabe;
+/**
  * A connection database error
  * Can be caused by a bad connection or bad request
  * @version 1.0.0
