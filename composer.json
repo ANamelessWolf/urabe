@@ -1,0 +1,19 @@
+
+
+{
+    "name": "a_nameless_wolf/urabe",
+    "type": "library",
+    "description": "A CRUD API for database transaction in MySQL, PostgreSQL y ORACLE",
+    "keywords": [ "crud", "database-management", "oracle", "mysql", "pgsql", "restful-api", "urabe" ],
+    "homepage": "https://github.com/ANamelessWolf/urabe",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Miguel Alanis Montes",
+            "email": "anamelesswolf@gmail.com",
+            "homepage": "https://github.com/ANamelessWolf/",
+            "role": "Developer"
+        }
+    ],
+}
+
