@@ -134,6 +134,8 @@ function table_definition_exists($table_name)
  */
 function get_table_definition_store_path()
 {
+    if (is_null(KanojoX::$settings))
+        KanojoX::$settings = require "UrabeSettings.php";
     return KanojoX::$settings->table_definitions_path;
 }
 /*************************************
