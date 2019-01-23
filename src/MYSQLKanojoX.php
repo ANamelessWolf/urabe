@@ -229,7 +229,15 @@ class MYSQLKanojoX extends KanojoX
      */
     public function get_table_definition_parser()
     {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_parser', 'MySQLKanojoX'));
+        $fields = array(
+            MYSQL_FIELD_COL_ORDER => new FieldDefinition(0, MYSQL_FIELD_COL_ORDER, PARSE_AS_INT),
+            MYSQL_FIELD_COL_NAME => new FieldDefinition(1, MYSQL_FIELD_COL_NAME, PARSE_AS_STRING),
+            MYSQL_FIELD_DATA_TP => new FieldDefinition(2, MYSQL_FIELD_DATA_TP, PARSE_AS_STRING),
+            MYSQL_FIELD_CHAR_LENGTH => new FieldDefinition(3, MYSQL_FIELD_CHAR_LENGTH, PARSE_AS_INT),
+            MYSQL_FIELD_NUM_PRECISION => new FieldDefinition(4, MYSQL_FIELD_NUM_PRECISION, PARSE_AS_INT),
+            MYSQL_FIELD_NUM_SCALE => new FieldDefinition(5, MYSQL_FIELD_NUM_SCALE, PARSE_AS_INT)
+        );
+        return $fields;
     }
     /**
      * Gets the table definition mapper for the MySQL connector
@@ -238,7 +246,15 @@ class MYSQLKanojoX extends KanojoX
      */
     public function get_table_definition_mapper()
     {
-        throw new Exception(sprintf(ERR_NOT_IMPLEMENTED, 'get_table_definition_mapper', 'MySQLKanojoX'));
+        $map = array(
+            MYSQL_FIELD_COL_ORDER => TAB_DEF_INDEX,
+            MYSQL_FIELD_COL_NAME => TAB_DEF_NAME,
+            MYSQL_FIELD_DATA_TP => TAB_DEF_TYPE,
+            MYSQL_FIELD_CHAR_LENGTH => TAB_DEF_CHAR_LENGTH,
+            MYSQL_FIELD_NUM_PRECISION => TAB_DEF_NUM_PRECISION,
+            MYSQL_FIELD_NUM_SCALE => TAB_DEF_NUM_SCALE
+        );
+        return $map;
     }
 }
 ?>
