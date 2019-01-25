@@ -31,8 +31,8 @@ function save_connection($file_path, $kanojo)
         $data["schema"] = $kanojo->schema;
 
     $dir = dirname($file_path);
-    if (!file_exists($dir)) 
-        mkdir($dir,0755);
+    if (!file_exists($dir))
+        mkdir($dir, 0755);
 
     if (file_put_contents($file_path, json_encode($data, JSON_PRETTY_PRINT)) == false)
         throw new Exception(ERR_SAVING_JSON);
@@ -126,6 +126,17 @@ function table_definition_exists($table_name)
 {
     $file_path = KanojoX::$settings->table_definitions_path . "$table_name.json";
     return file_exists($file_path);
+}
+/**
+ * Gets the table definition store path
+ *
+ * @return string The table definition store path
+ */
+function get_table_definition_store_path()
+{
+    if (is_null(KanojoX::$settings))
+        KanojoX::$settings = require "UrabeSettings.php";
+    return KanojoX::$settings->table_definitions_path;
 }
 /*************************************
  ************ File utils *************

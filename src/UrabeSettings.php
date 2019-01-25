@@ -102,11 +102,15 @@ return (object)array(
         ),
         "String" => array(
             //PG Types
-            "character", "text"
+            "character", "text",
+            //MySQL Types
+            "varchar"
         ),
         "Integer" => array(
             //PG Types
-            "integer", "smallint"
+            "integer", "smallint",
+            //MySQL Types
+            "int"
         ),
         "Long" => array(
             //PG Types

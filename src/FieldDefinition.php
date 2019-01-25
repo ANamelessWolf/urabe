@@ -61,6 +61,8 @@ class FieldDefinition
             return $value;
         else if ($this->data_type == PARSE_AS_BOOLEAN)
             return boolval($value);
+        else
+            return $value;
     }
     /**
      * Formats a value to be use as a place holder parameter
@@ -73,7 +75,7 @@ class FieldDefinition
     {
         if (is_null($value))
             return null;
-        else if (in_array($this->data_type,array(PARSE_AS_STRING, PARSE_AS_INT, PARSE_AS_LONG, PARSE_AS_NUMBER)))
+        else if (in_array($this->data_type, array(PARSE_AS_STRING, PARSE_AS_INT, PARSE_AS_LONG, PARSE_AS_NUMBER)))
             return $value;
         else
             return strval($value);
