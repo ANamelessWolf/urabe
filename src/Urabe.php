@@ -22,6 +22,12 @@ class Urabe
      */
     private $connector;
     /**
+     * Defines the parser associated to the given URABE
+     *
+     * @var MysteriousParser The current parser
+     */
+    private $parser;
+    /**
      * Gets the current connection data
      *
      * @return Object current connection data

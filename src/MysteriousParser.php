@@ -14,6 +14,7 @@ include_once "BooleanFieldDefinition.php";
  */
 class MysteriousParser
 {
+    public $id;
     /**
      * @var array The table fields definition as an array of FieldDefinition.
      */
@@ -33,6 +34,7 @@ class MysteriousParser
      * @var callback The parse method, passed as an anonymous function
      */
     public $parse_method;
+    private $caller;
     /**
      * __construct
      *
@@ -40,17 +42,26 @@ class MysteriousParser
      * @param FieldDefinition[] $table_definition The table fields definition.
      * When table definition is presented the fetched data is parsed using the parse_with_field_definition function 
      */
-    public function __construct($table_definition = null)
+    public function __construct($table_definition = null, $caller = null, $parse_method = "")
     {
-        if (isset($table_definition)) {
-            $this->table_definition = $table_definition;
-            $this->parse_method = function ($mys_parser, &$result, $row) {
-                $this->parse_with_field_definition($mys_parser, $result, $row);
-            };
-        } else
-            $this->parse_method = function ($mys_parser, &$result, $row) {
-            array_push($result, $row);
-        };
+        $this->caller = isset($caller) ? $caller : $this;
+        $this->table_definition = $table_definition;
+        if (isset($table_definition) && !isset($caller))
+            $this->parse_method = "parse_with_field_definition";
+        else if (isset($caller)) {
+            $this->parse_method = $parse_method;
+        } else {
+            $this->parse_method = "simple_parse";
+
+        }
+        $this->id = hash("md5", $this->parse_method . spl_object_hash($this));
+        echo '<br>';
+        $sender = array("caller" => get_class($this->caller), "method" => $this->parse_method, "id" => $this->id);
+        var_dump($sender);
+    }
+    public function simple_parse($mys_parser, &$result, $row)
+    {
+        array_push($result, $row);
     }
     /**
      * Check if a field name is defined on the table definition
@@ -72,7 +83,13 @@ class MysteriousParser
      */
     public function parse(&$result, $row)
     {
-        call_user_func_array($this->parse_method, array($this, &$result, $row));
+        echo '<br>';
+        $sender = array("caller" => get_class($this->caller), "method" => $this->parse_method, "id" => $this->id, "row" => $row);
+        var_dump($sender);
+        if (is_string($this->parse_method))
+            $this->caller->{$this->parse_method}($this, $result, $row);
+        else
+            call_user_func_array($this->parse_method, array($this, &$result, $row));
     }
     /**
      * Gets the field definition used to parse a row
