@@ -33,11 +33,11 @@ return (object)array(
     /**
      * @var bool If sets to true and Urabe handles exceptions the error context is shown in the response
      */
-    "show_error_context" => true,
+    "show_error_context" => false,
     /**
      * @var bool If sets to true and Urabe handles exceptions the stack trace will be added to the response
      */
-    "enable_stack_trace" => true,
+    "enable_stack_trace" => false,
     /**
      * @var bool If sets to true add SQL statement in Urabe response. This should be enable just for testing purpose,
      * not recommendable for staging or production.

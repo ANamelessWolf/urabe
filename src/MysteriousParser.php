@@ -80,7 +80,6 @@ class MysteriousParser
     {
         return array_key_exists($field_name, $this->table_definition);
     }
-
     /**
      * Parse the fetch assoc result by the parse_method callback definition
      *
