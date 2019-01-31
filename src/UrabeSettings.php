@@ -1,7 +1,7 @@
 <?php
-include "ServiceStatus.php";
-include "DBDriver.php";
-include "JsonPrettyPrint.php";
+include_once "ServiceStatus.php";
+include_once "DBDriver.php";
+include_once "JsonPrettyPrint.php";
 /**
  * Urabe application settings
  *
@@ -29,7 +29,7 @@ return (object)array(
     /**
      * @var bool If sets to true and Urabe handles exceptions the error details such as file, line, error code and context are showed in the response
      */
-    "show_error_details" => true,
+    "show_error_details" => false,
     /**
      * @var bool If sets to true and Urabe handles exceptions the error context is shown in the response
      */
