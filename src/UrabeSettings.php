@@ -115,10 +115,13 @@ return (object)array(
         "Long" => array(
             //PG Types
             "bigint"
+            //MySQL types
         ),
         "Number" => array(
             //PG Types
-            "double precision", "numeric", "real"
+            "double precision", "numeric", "real",
+            //MySQL types
+            "double"
         ),
         "Date" => array(
             //PG Types
