@@ -22,12 +22,6 @@ class Urabe
      */
     private $connector;
     /**
-     * Defines the parser associated to the given URABE
-     *
-     * @var MysteriousParser The current parser
-     */
-    private $parser;
-    /**
      * Gets the current connection data
      *
      * @return Object current connection data
@@ -56,7 +50,7 @@ class Urabe
      */
     public function get_parser()
     {
-        return KanojoX::$parser;
+        return $this->connector->parser;
     }
     /**
      * Sets the current parser
@@ -66,7 +60,7 @@ class Urabe
      */
     public function set_parser($mys_parser)
     {
-        KanojoX::$parser = $mys_parser;
+        $this->connector->parser = $mys_parser;
     }
 
     /**
@@ -108,7 +102,7 @@ class Urabe
             //1: Select row parsing method
 
             if (isset($row_parser) && is_callable($row_parser->parse_method))
-                KanojoX::$parser = $row_parser;                
+                $this->connector->parser = $row_parser;                
             //2: Executes the query and fetches the rows as an associative array
             $result = $this->connector->fetch_assoc($sql, $variables);
             //3: Formats response

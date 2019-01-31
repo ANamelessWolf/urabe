@@ -23,7 +23,7 @@ abstract class KanojoX
      *
      * @var MysteriousParser The selection data parser
      */
-    public static $parser;
+    public $parser;
     /**
      * @var array $error 
      * The application current errors
@@ -103,9 +103,9 @@ abstract class KanojoX
     {
         $this->statementsIds = array();
         if (is_null($parser))
-            KanojoX::$parser = new MysteriousParser();
+            $this->parser = new MysteriousParser();
         else
-            KanojoX::$parser = $parser;
+        $this->parser = $parser;
         KanojoX::start_urabe();
     }
     /**

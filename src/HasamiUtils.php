@@ -71,11 +71,11 @@ function get_KanojoX_from_file($file_path)
 function get_table_definition($connector, $table_name)
 {
     $connector->connect();
-    KanojoX::$parser = new MysteriousParser($connector->get_table_definition_parser());
-    KanojoX::$parser->parse_method = function ($mys_parser, &$result, $row) {
-        KanojoX::$parser->parse_table_field_definition($mys_parser, $result, $row);
+    $parser = new MysteriousParser($connector->get_table_definition_parser());
+    $parser->parse_method = function ($mys_parser, &$result, $row) {
+        $mys_parser->parse_table_field_definition($mys_parser, $result, $row);
     };
-    KanojoX::$parser->column_map = $connector->get_table_definition_mapper();
+    $parser->column_map = $connector->get_table_definition_mapper();
     $sql = $connector->get_table_definition_query($table_name);
     $result = $connector->fetch_assoc($sql, null);
     return $result;
