@@ -23,7 +23,7 @@ abstract class KanojoX
      *
      * @var MysteriousParser The selection data parser
      */
-    public static $parser;
+    public $parser;
     /**
      * @var array $error 
      * The application current errors
@@ -80,6 +80,21 @@ abstract class KanojoX
      */
     public $affected_rows;
     /**
+     * This function initialize Urabe error handling, settings
+     * and exception handler. This method is called when an instance of KanojoX is created
+     *
+     * @return void
+     */
+    public static function start_urabe()
+    {
+        KanojoX::$errors = array();
+        KanojoX::$settings = require "UrabeSettings.php";
+        if (KanojoX::$settings->handle_errors)
+            set_error_handler('KanojoX::error_handler');
+        if (KanojoX::$settings->handle_errors)
+            set_exception_handler('KanojoX::exception_handler');
+    }
+    /**
      * Initialize a new instance of the connection object
      * @param MysteriousParser $parser Defines how the data is going to be parsed if,
      * null the data is parsed associatively column value
@@ -88,16 +103,10 @@ abstract class KanojoX
     {
         $this->statementsIds = array();
         if (is_null($parser))
-            KanojoX::$parser = new MysteriousParser();
+            $this->parser = new MysteriousParser();
         else
-            KanojoX::$parser = $parser;
-
-        KanojoX::$errors = array();
-        KanojoX::$settings = require "UrabeSettings.php";
-        if (KanojoX::$settings->handle_errors)
-            set_error_handler('KanojoX::error_handler');
-        if (KanojoX::$settings->handle_errors)
-            set_exception_handler('KanojoX::exception_handler');
+        $this->parser = $parser;
+        KanojoX::start_urabe();
     }
     /**
      * Destruct the Kanojo Instance and try to close and free memory if

@@ -237,13 +237,19 @@ class HasamiWrapper implements IHasami
             save_table_definition($full_table_name, $connector->db_driver, $this->table_fields);
         } else
             $this->table_fields = $table_def;
-        //Start with the table definition parser
-        $this->urabe->set_parser(new MysteriousParser($this->table_fields));
+
         //Get the request content
         $this->request_data = new WebServiceContent();
         //Initialize services
         $this->services = $this->init_services();
         $this->services_status = $this->init_service_status();
+        //Start with the table definition parser
+        $this->set_parser($this->table_fields);
+    }
+    protected function set_parser($table_def)
+    {
+
+        $this->urabe->set_parser(new MysteriousParser($table_def));
     }
     /**
      * Initialize the services for HasamiWrapper

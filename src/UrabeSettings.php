@@ -1,7 +1,7 @@
 <?php
-include "ServiceStatus.php";
-include "DBDriver.php";
-include "JsonPrettyPrint.php";
+include_once "ServiceStatus.php";
+include_once "DBDriver.php";
+include_once "JsonPrettyPrint.php";
 /**
  * Urabe application settings
  *
@@ -29,15 +29,15 @@ return (object)array(
     /**
      * @var bool If sets to true and Urabe handles exceptions the error details such as file, line, error code and context are showed in the response
      */
-    "show_error_details" => true,
+    "show_error_details" => false,
     /**
      * @var bool If sets to true and Urabe handles exceptions the error context is shown in the response
      */
-    "show_error_context" => true,
+    "show_error_context" => false,
     /**
      * @var bool If sets to true and Urabe handles exceptions the stack trace will be added to the response
      */
-    "enable_stack_trace" => true,
+    "enable_stack_trace" => false,
     /**
      * @var bool If sets to true add SQL statement in Urabe response. This should be enable just for testing purpose,
      * not recommendable for staging or production.
@@ -115,10 +115,13 @@ return (object)array(
         "Long" => array(
             //PG Types
             "bigint"
+            //MySQL types
         ),
         "Number" => array(
             //PG Types
-            "double precision", "numeric", "real"
+            "double precision", "numeric", "real",
+            //MySQL types
+            "double"
         ),
         "Date" => array(
             //PG Types

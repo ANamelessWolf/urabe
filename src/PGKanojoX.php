@@ -170,7 +170,7 @@ class PGKanojoX extends KanojoX
         //fetch result
         if ($ok) {
             while ($row = pg_fetch_assoc($ok))
-                KanojoX::$parser->parse($rows, $row);
+            $this->parser->parse($rows, $row);
         } else {
             $err = $this->error($sql, $this->get_error($ok == false ? null : $result, $sql));
             throw new UrabeSQLException($err);

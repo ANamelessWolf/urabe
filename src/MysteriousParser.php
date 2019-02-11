@@ -14,6 +14,7 @@ include_once "BooleanFieldDefinition.php";
  */
 class MysteriousParser
 {
+    public $id;
     /**
      * @var array The table fields definition as an array of FieldDefinition.
      */
@@ -34,23 +35,40 @@ class MysteriousParser
      */
     public $parse_method;
     /**
+     * Specifies the class used to called the parsing methods
+     *
+     * @var object The main class used to call the parsing method
+     */
+    private $caller;
+    /**
      * __construct
      *
      * Initialize a new instance of the Mysterious parser.
      * @param FieldDefinition[] $table_definition The table fields definition.
      * When table definition is presented the fetched data is parsed using the parse_with_field_definition function 
      */
-    public function __construct($table_definition = null)
+    public function __construct($table_definition = null, $caller = null, $parse_method = "")
     {
-        if (isset($table_definition)) {
-            $this->table_definition = $table_definition;
-            $this->parse_method = function ($mys_parser, &$result, $row) {
-                $this->parse_with_field_definition($mys_parser, $result, $row);
-            };
-        } else
-            $this->parse_method = function ($mys_parser, &$result, $row) {
-            array_push($result, $row);
-        };
+        $this->caller = isset($caller) ? $caller : $this;
+        $this->table_definition = $table_definition;
+        if (isset($table_definition) && !isset($caller))
+            $this->parse_method = "parse_with_field_definition";
+        else if (isset($caller)) {
+            $this->parse_method = $parse_method;
+        } else {
+            $this->parse_method = "simple_parse";
+        }
+        $this->id = hash("md5", $this->parse_method . spl_object_hash($this));
+    }
+    /**
+     * Gets the sender description
+     *
+     * @param mixed $context Extra data used by this sender
+     * @return array The sender data as a key value paired array with the keys {caller, method, id, context}
+     */
+    private function get_sender($context = null)
+    {
+        return array("caller" => get_class($this->caller), "method" => $this->parse_method, "id" => $this->id, "context" => is_null($context) ? "" : $context);
     }
     /**
      * Check if a field name is defined on the table definition
@@ -62,7 +80,6 @@ class MysteriousParser
     {
         return array_key_exists($field_name, $this->table_definition);
     }
-
     /**
      * Parse the fetch assoc result by the parse_method callback definition
      *
@@ -72,7 +89,10 @@ class MysteriousParser
      */
     public function parse(&$result, $row)
     {
-        call_user_func_array($this->parse_method, array($this, &$result, $row));
+        if (is_string($this->parse_method))
+            $this->caller->{$this->parse_method}($this, $result, $row);
+        else
+            call_user_func_array($this->parse_method, array($this, &$result, $row));
     }
     /**
      * Gets the field definition used to parse a row
@@ -144,6 +164,19 @@ class MysteriousParser
         $result[$newRow[TAB_DEF_NAME]] = $this->get_parsing_data($newRow);
     }
     /**
+     * Execute the default parse storing the value to the array with an associated key.
+     * The associated key is the column name
+     *
+     * @param MysteriousParser $mys_parser The mysterious parser that are extracting the data
+     * @param array $result The collection of rows where the parsed rows are stored
+     * @param array $row The selected row picked from the fetch assoc process
+     * @return void
+     */
+    public function simple_parse($mys_parser, &$result, $row)
+    {
+        array_push($result, $row);
+    }
+    /**
      * Parse the data using the field definition, if a column map is set the result keys are mapped
      * to the given value
      *
@@ -181,6 +214,5 @@ class MysteriousParser
         else
             return $column_name;
     }
-
 }
 ?>

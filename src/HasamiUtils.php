@@ -71,11 +71,10 @@ function get_KanojoX_from_file($file_path)
 function get_table_definition($connector, $table_name)
 {
     $connector->connect();
-    KanojoX::$parser = new MysteriousParser($connector->get_table_definition_parser());
-    KanojoX::$parser->parse_method = function ($mys_parser, &$result, $row) {
-        KanojoX::$parser->parse_table_field_definition($mys_parser, $result, $row);
-    };
-    KanojoX::$parser->column_map = $connector->get_table_definition_mapper();
+    $parser = new MysteriousParser($connector->get_table_definition_parser());
+    $connector->parser = $parser;
+    $parser->parse_method = "parse_table_field_definition";
+    $parser->column_map = $connector->get_table_definition_mapper();
     $sql = $connector->get_table_definition_query($table_name);
     $result = $connector->fetch_assoc($sql, null);
     return $result;
@@ -92,7 +91,7 @@ function load_table_definition($table_name)
     $file_path = KanojoX::$settings->table_definitions_path . "$table_name.json";
     if (file_exists($file_path)) {
         $json = open_json_file($file_path);
-
+        
         $fields = array();
         foreach ($json->columns as $column_name => $field_data)
             $fields[$column_name] = FieldDefinition::create($field_data);
