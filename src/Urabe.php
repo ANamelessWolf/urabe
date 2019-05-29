@@ -100,9 +100,8 @@ class Urabe
         if ($this->is_connected) {
             $response = new UrabeResponse();
             //1: Select row parsing method
-
-            if (isset($row_parser) && is_callable($row_parser->parse_method))
-                $this->connector->parser = $row_parser;                
+            if (isset($row_parser)) //&& is_callable($row_parser->parse_method))
+                $this->connector->parser = $row_parser;
             //2: Executes the query and fetches the rows as an associative array
             $result = $this->connector->fetch_assoc($sql, $variables);
             //3: Formats response
@@ -147,7 +146,7 @@ class Urabe
             $sel_column = sizeof($columns) > 0 ? $columns[0] : null;
             if (isset($sel_column))
                 for ($i = 0; $i < sizeof($result); $i++)
-                array_push($values, $result[$i][$sel_column]);
+                    array_push($values, $result[$i][$sel_column]);
         }
         return $values;
     }
@@ -367,10 +366,10 @@ class Urabe
         $replace = array();
         for ($i = 0; $i < sizeof($matches[0]); $i++)
             if (!in_array($matches[0][$i], $search)) {
-            $index = intval(str_replace('@', '', $matches[0][$i]));
-            array_push($search, $matches[0][$i]);
-            array_push($replace, $this->connector->get_param_place_holder($index));
-        }
+                $index = intval(str_replace('@', '', $matches[0][$i]));
+                array_push($search, $matches[0][$i]);
+                array_push($replace, $this->connector->get_param_place_holder($index));
+            }
         return str_replace($search, $replace, $sql);
     }
     /**
@@ -383,4 +382,3 @@ class Urabe
         return $this->connector->db_driver;
     }
 }
-?>
