@@ -16,7 +16,7 @@ function save_connection($file_path, $kanojo)
 {
     $data = array(
         "connection" =>
-            array(
+        array(
             "host" => $kanojo->host,
             "user_name" => $kanojo->user_name,
             "password" => $kanojo->password,
@@ -91,7 +91,7 @@ function load_table_definition($table_name)
     $file_path = KanojoX::$settings->table_definitions_path . "$table_name.json";
     if (file_exists($file_path)) {
         $json = open_json_file($file_path);
-        
+
         $fields = array();
         foreach ($json->columns as $column_name => $field_data)
             $fields[$column_name] = FieldDefinition::create($field_data);
@@ -244,6 +244,7 @@ function get_error_response($e, $query = "", $encode = false)
 function pretty_print_format($json, $style, $bg_black = true)
 {
     $bg_color = $bg_black ? '#394034' : '#B1D9D2';
+    $html = "";
     $html .= '<html><head>' .
         '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">' .
         '<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>' .
@@ -251,7 +252,7 @@ function pretty_print_format($json, $style, $bg_black = true)
         '<style>' .
         'body { background-color: ' . $bg_color . '} ' .
         //'div { padding:0; margin:0; display:inline-block; float:left; }' .
-    '</style>' .
+        '</style>' .
         '</head>' .
         '<body>';
     $format = new JsonPrettyPrint($style);
@@ -282,5 +283,3 @@ function array_remove(&$base_array, $array_keys)
     foreach ($array_keys as &$key)
         unset($base_array[$key]);
 }
-
-?>

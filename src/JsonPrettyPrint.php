@@ -1,4 +1,4 @@
-<?php 
+<?php
 require_once "JsonPrettyStyle.php";
 /**
  * Json Pretty Print Class
@@ -96,6 +96,7 @@ class JsonPrettyPrint
      */
     public function format_json($json, $level)
     {
+        $html = "";
         if (is_object($json))
             $html .= $this->format_object($json, $level);
         else if (is_array($json))
@@ -113,6 +114,7 @@ class JsonPrettyPrint
      */
     public function format_object($json, $level, $offset = 0)
     {
+        $html = "";
         $html .= $this->new_line($html);
         $html = $this->open_group("{", $offset);
         $properties = array_keys(get_object_vars($json));
@@ -121,7 +123,7 @@ class JsonPrettyPrint
             $html .= $this->print_property($properties[$i], $level + 1);
             $html .= $this->print_symbol(" : ", 0);
             $html .= $this->format_json($json->{$properties[$i]}, $level + 1);
-            $html = $this->append_comma($index, count($properties), $html);
+            $html = $this->append_comma($i, count($properties), $html);
         }
         $html .= $this->new_line($html);
         $html .= $this->print_symbol("}", $level);
@@ -137,6 +139,7 @@ class JsonPrettyPrint
      */
     public function format_array($array, $level, $offset = 0)
     {
+        $html = "";
         if (count($array) == 0)
             $html .= $this->print_symbol(" [ ] ", 0);
         else {
@@ -150,12 +153,11 @@ class JsonPrettyPrint
                     $html .= $this->print_property($keys[$i], $level + 1);
                     $html .= $this->print_symbol(" : ", 0);
                     $html .= $this->format_json($array[$keys[$i]], $level + 1);
-
                 } else {
                     $html .= $this->new_line($html);
                     $html .= $this->format_value($array[$keys[$i]], $level + 1);
                 }
-                $html = $this->append_comma($index, count($properties), $html);
+                $html = $this->append_comma($i, count($keys), $html);
             }
             $html .= $this->new_line($html);
             $symbol = ($is_array_of_objects ? "}" : "]");
@@ -172,12 +174,12 @@ class JsonPrettyPrint
      */
     public function format_value($value, $level)
     {
+        $html = "";
         if (is_string($value)) {
             if (strtolower($value) == "true" || strtolower($value) == "false")
                 $html .= $this->print_bool_value($value == "true", $level);
             else
                 $html .= $this->print_text_value($value, $level);
-
         } else if (is_numeric($value))
             $html .= $this->print_number_value($value, $level);
         else if (is_null($value))
@@ -198,6 +200,7 @@ class JsonPrettyPrint
      */
     private function open_group($symbol, $level)
     {
+        $html = "";
         $html .= sprintf(self::GLYPH_BUTTON, ++$this->groupIndex, self::PLUS_BUTTON, $level * self::LEFT_PADDING_PX);
         $html .= sprintf(self::HTML_FORMAT_FONT_BOLD . '%s' . self::HTML_FORMAT_CLOSE, $this->style->symbol_color, 0, " " . $symbol);
         $html .= sprintf(self::COLLAPSE_AREA_OPEN, $this->groupIndex);
@@ -320,4 +323,3 @@ class JsonPrettyPrint
         return $html;
     }
 }
-?>

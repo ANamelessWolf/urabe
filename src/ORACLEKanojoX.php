@@ -112,7 +112,7 @@ class ORACLEKanojoX extends KanojoX
         else
             $this->error = $error;
         //If SQL error exist
-        $this->error->sql = isset($sql) ? $sql : $e[self::ERR_SQL];
+        $this->error->sql = isset($sql) ? $sql : $error[self::ERR_SQL];
         return $this->error;
     }
 
@@ -265,7 +265,7 @@ class ORACLEKanojoX extends KanojoX
      */
     private function bind($statement, $variables)
     {
-        foreach ($variable as &$value)
+        foreach ($variables as &$value)
             oci_bind_by_name($statement, ":" . $value->bv_name, $value->variable);
     }
 }

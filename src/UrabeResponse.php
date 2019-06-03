@@ -100,7 +100,7 @@ class UrabeResponse
     public function get_execute_response($succeed, $affected_rows, $sql = null)
     {
         $this->query = $sql;
-        $count = sizeof($result);
+        $count = sizeof($this->result);
         $response = array(NODE_SUCCEED => $succeed, NODE_AFF_ROWS => $affected_rows, NODE_RESULT => array(), NODE_ERROR => null);
         if (isset($this->query) && KanojoX::$settings->add_query_to_response)
             $response[NODE_QUERY] = $this->query;

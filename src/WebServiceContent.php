@@ -88,7 +88,7 @@ class WebServiceContent
      * This function picks the GET variables values by name and returns them in an array
      * if the value to pick is not in the GET variables it throws and exception
      * 
-     * @param string $var_names The variables name to pick its values
+     * @param array $var_names The variables name to pick its values
      * @return array The picked values in the given variable names order
      */
     public function pick_GET_variable(...$var_names)

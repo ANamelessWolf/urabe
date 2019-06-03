@@ -236,7 +236,7 @@ class HasamiWrapper implements IHasami
             $this->table_fields = $this->urabe->get_table_definition($this->table_name);
             save_table_definition($full_table_name, $connector->db_driver, $this->table_fields);
         } else
-            $this->table_fields = $table_def;
+            $this->table_fields = $table_definition;
 
         //Get the request content
         $this->request_data = new WebServiceContent();
