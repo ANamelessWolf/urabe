@@ -86,6 +86,15 @@ class Urabe
             throw new Exception(ERR_BAD_CONNECTION);
     }
     /**
+     * Creates a cloned version of this instance, the connection is copied
+     * without the parser
+     *
+     * @return Urabe The instance clone
+     */
+    public function get_clone(){
+        return new Urabe($this->connector);
+    }
+    /**
      * Execute an SQL selection query and parse the data as defined in the parser. 
      * If the parser is null uses the parser defined in the connector object KanojoX::parser
      *
@@ -200,7 +209,7 @@ class Urabe
      */
     public function query($sql, $variables = null)
     {
-        return $response = $this->connector->execute($sql, $variables);
+        return $this->connector->execute($sql, $variables);
     }
     /**
      * Performs an insertion query into a table
