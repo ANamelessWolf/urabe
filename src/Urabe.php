@@ -91,8 +91,25 @@ class Urabe
      *
      * @return Urabe The instance clone
      */
-    public function get_clone(){
-        return new Urabe($this->connector);
+    public function get_clone()
+    {
+        //var_dump($this->connector->db_driver);
+        $driver = $this->connector->db_driver;
+        if (DBDriver::MYSQL == $driver)
+            $connector = new MYSQLKanojoX();
+        else if (DBDriver::ORACLE == $driver) {
+            $connector = new ORACLEKanojoX();
+            $connector->owner = $this->connector->owner;
+        } else if (DBDriver::PG == $driver) {
+            $connector = new PGKanojoX();
+            $connector->schema = $this->connector->schema;
+        }
+        $connector->host = $this->connector->host;
+        $connector->port = $this->connector->port;
+        $connector->db_name = $this->connector->db_name;
+        $connector->user_name = $this->connector->user_name;
+        $connector->password = $this->connector->password;
+        return new Urabe($connector);
     }
     /**
      * Execute an SQL selection query and parse the data as defined in the parser. 
