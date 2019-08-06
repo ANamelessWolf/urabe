@@ -67,6 +67,18 @@ class PUTService extends HasamiRESTfulService
      */
     protected function default_PUT_action($data, $urabe)
     {
+        return $this->default_action($data, $urabe);
+    }
+    /**
+     * Defines the default PUT action, by default execute an insertion query with the given data passed
+     * in the body properties insert_values
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @throws Exception An Exception is thrown if the response can be processed correctly
+     * @return UrabeResponse The server response
+     */
+    public function default_action($data, $urabe)
+    {
         try {
             $table_name = $data->extra->{TAB_NAME};
             $insert = $data->extra->{CAP_INSERT};
@@ -74,7 +86,7 @@ class PUTService extends HasamiRESTfulService
             $this->validate_columns('insert_values', $insert);
             //Validate values
             if (!property_exists($this->data->body->insert_values, NODE_VAL))
-                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, 'insert_values', NODE_VAL));    
+                throw new Exception(sprintf(ERR_INCOMPLETE_DATA, 'insert_values', NODE_VAL));
             //Formats values with table definition
             $values = $this->wrapper->format_values($this->data->body->insert_values->values);
             $columns = $this->data->body->insert_values->columns;
@@ -89,4 +101,3 @@ class PUTService extends HasamiRESTfulService
         }
     }
 }
-?>
