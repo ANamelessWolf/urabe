@@ -88,7 +88,7 @@ class MysteriousParser
      * @return void
      */
     public function parse(&$result, $row)
-    {
+    {     
         if (is_string($this->parse_method))
             $this->caller->{$this->parse_method}($this, $result, $row);
         else
@@ -185,9 +185,9 @@ class MysteriousParser
      * @param array $row The selected row picked from the fetch assoc process
      * @return void
      */
-    private function parse_with_field_definition($mys_parser, &$result, $row)
+    protected function parse_with_field_definition($mys_parser, &$result, $row)
     {
-        $newRow = array();
+        $newRow = array();      
         $column_names = array_map(function ($item) {
             return $item->column_name;
         }, $mys_parser->table_definition);
@@ -207,7 +207,7 @@ class MysteriousParser
      * @param string $column_name The column name
      * @return string The column name, same or mapped name
      */
-    private function get_column_name($column_name)
+    protected function get_column_name($column_name)
     {
         if (isset($this->column_map) && array_key_exists($column_name, $this->column_map))
             return $this->column_map[$column_name];
@@ -215,4 +215,3 @@ class MysteriousParser
             return $column_name;
     }
 }
-?>
