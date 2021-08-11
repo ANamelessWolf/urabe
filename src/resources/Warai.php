@@ -7,8 +7,6 @@
  * @version v.1.1 (01/10/2019)
  * @copyright copyright (c) 2018-2020, Nameless Studios
  */
-require_once "WaraiMessages_en.php";
-require_once "EnumErrorMessages_en.php";
 /***************************************
  *********** Class Names ***************
  ***************************************/
