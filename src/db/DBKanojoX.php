@@ -1,6 +1,10 @@
-<?php 
+<?php
 namespace Urabe\DB;
 use Urabe\Config\KanojoX;
+use Urabe\Config\UrabeSettings;
+use Urabe\Config\DBDriver;
+use Urabe\Config\ConnectionError;
+use Urabe\DB\MysteriousParser;
 /**
  * Database connection model
  * 
@@ -13,7 +17,7 @@ use Urabe\Config\KanojoX;
  */
 abstract class DBKanojoX
 {
-   /**
+    /**
      * @var MysteriousParser The selection data parsed when the fetch function is called
      */
     public $parser;
@@ -30,27 +34,32 @@ abstract class DBKanojoX
      */
     public $statementsIds;
     /**
-     * @var resource The database connection object.
-     */
-    public $connection;
-    /**
      * @var int The number of affected rows
      */
     public $affected_rows;
+    /**
+     * @var resource The database connection object.
+     */
+    public $connection;
 
     /**
      * Initialize a new instance of the connection object
-     * @param MysteriousParser $parser Defines how the data is going to be parsed if,
      * null the data is parsed associatively column value
+     * @param DBDriver $db_driver The type of database to connect
+     * @param KanojoX $connection The connection data
+     * @param MysteriousParser $parser Defines how the data is going to be parsed if,
      */
-    public function __construct($parser = null)
+    public function __construct($db_driver, $connection, $parser = null)
     {
+        $this->db_driver = $db_driver;
+        $this->kanojo = $connection;
         $this->statementsIds = array();
         if (is_null($parser))
             $this->parser = new MysteriousParser();
         else
-        $this->parser = $parser;
-        KanojoX::start_urabe();
+            $this->parser = $parser;
+        $this->affected_rows = 0;
+        $this->connection = null;
     }
     /**
      * Destruct the Kanojo Instance and try to close and free memory if
@@ -62,39 +71,16 @@ abstract class DBKanojoX
             $this->close();
     }
     /**
-     * Initialize the class with a JSON object
-     *
-     * @param object $body_json The request body as JSON object
-     * @throws Exception An Exception is raised when the body is null or missed one or more of the 
-     * following variables: host, user_name, password, port, db_name
-     * @return void
-     */
-    public function init($body_json)
-    {
-        $fields = array("host", "user_name", "password", "port", "db_name");
-        if (isset($body_json)) {
-            foreach ($fields as &$value) {
-                if (isset($body_json->{$value}))
-                    $this->{$value} = $body_json->{$value};
-                else
-                    throw new Exception(sprintf(ERR_INCOMPLETE_BODY, "initialize", join(', ', $fields)));
-            }
-        } else
-            throw new Exception(ERR_BODY_IS_NULL);
-    }
-    /**
      * Gets the last executed error
      *
      * @return ConnectionError The last executed error
      */
     public function get_last_error()
     {
-        $errors = KanojoX::$errors;
+        $errors = UrabeSettings::$errors;
         $index = sizeof($errors) - 1;
         return $index >= 0 ? $errors[0] : null;
     }
-
-
     /*********************
      **** SQL Parsing ****
      *********************/
@@ -179,5 +165,3 @@ abstract class DBKanojoX
      */
     abstract function get_table_definition_mapper();
 }
-
-?>
