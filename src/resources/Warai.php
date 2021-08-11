@@ -379,7 +379,6 @@ const F_GET = 'GET_action';
 /************************************
  ************ Settings **************
  ************************************/
-
 /**
  * @var string GET_PARAM_MODE
  * The type of parameters that are obtains from get variables

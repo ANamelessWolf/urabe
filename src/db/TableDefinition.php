@@ -2,7 +2,6 @@
 namespace Urabe\DB;
 use Urabe\Config\UrabeSettings;
 use Urabe\DB\FieldDefinition;
-
 /**
  * Table Definition Class
  * 
@@ -71,7 +70,6 @@ class TableDefinition
     {
         return $this->fields[$column_name];
     }
-
     /**
      * Check Field data type compatibility
      *
@@ -87,7 +85,6 @@ class TableDefinition
                 return true;
         return false;
     }
-
     /**
      * Gets the field definition used to parse a row
      *

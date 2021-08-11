@@ -59,5 +59,4 @@ class DBUtils
         $error->message = sprintf(ERR_PARSING_VALUE, $column_name, $selValue);
         return $error;
     }
-
 }

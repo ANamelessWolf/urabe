@@ -1,9 +1,6 @@
 <?php
-
 namespace Urabe\Config;
-
 use Urabe\Config\UrabeSettings;
-
 /**
  * A connection database error
  * Can be caused by a bad connection or bad request
@@ -102,5 +99,3 @@ class ConnectionError
             return null;
     }
 }
-
-

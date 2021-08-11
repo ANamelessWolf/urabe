@@ -29,5 +29,4 @@ const ERR_PARSING_VALUE = "An error ocurred parsing the value '%s' with the colu
  * The error code for parsing a value
  */
 const ERR_PARSING_VALUE_CODE = 1001;
-
 ?>

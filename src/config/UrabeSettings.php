@@ -1,11 +1,8 @@
 <?php
-
 namespace Urabe\Config;
-
 use Urabe\Config\FieldTypeCategory;
 use Urabe\Config\ServiceStatus;
 use Urabe\Utils\JsonPrettyStyle;
-
 /**
  * Urabe application settings
  *
@@ -135,4 +132,3 @@ UrabeSettings::$table_definitions_path = dirname(__DIR__) . DIRECTORY_SEPARATOR 
 UrabeSettings::$fieldTypeCategory = new FieldTypeCategory();
 UrabeSettings::$errors = array();
 UrabeSettings::$http_error_code = null;
-
