@@ -1,5 +1,6 @@
 <?php 
-require_once "Enum.php";
+namespace Urabe\Utils;
+use Urabe\Utils\Enum;
 /**
  * Database connection drivers supported by URABE API
  * The collection of enums that manages URABE API

@@ -1,65 +1,77 @@
 <?php 
-include_once "KanojoX.php";
-include_once "PGSQL_Result.php";
+namespace Urabe\DB;
+use Exception;
+use Urabe\Utils\PGSQL_Result;
+use Urabe\DB\DBKanojoX;
+use Urabe\Config\DBDriver;
+use Urabe\Config\ConnectionError;
+use Urabe\Runtime\UrabeSQLException;
+use Urabe\Service\UrabeResponse;
 /**
- * A PostgreSQL Connection object
+ * A MySQL Connection object
  * 
  * Kanojo means girlfriend in japanese and this class saves the connection data structure used to connect to
- * an PostgreSQL database.
+ * an MySQL database.
  * @version 1.0.0
  * @api Makoto Urabe DB Manager
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class PGKanojoX extends KanojoX
+class MYSQLKanojoX extends DBKanojoX
 {
+    /**
+     * @var string DEFAULT_CHAR_SET
+     * The default char set, is UTF8
+     */
+    const DEFAULT_CHAR_SET = 'utf8';
+    /**
+     * @var string DEFT_STMT_NAME
+     * The default statement
+     */
     const DEFT_STMT_NAME = "";
     /**
-     * @var string $schema The database schema used to filter the table definition
+     * Initialize a new instance of the connection object for MySQL
+     * @param KanojoX $connection The connection data
+     * @param MysteriousParser $parser Defines how the data is going to be parsed if,
      */
-    public $schema;
-    /**
-     * Initialize a new instance of the connection object
-     */
-    public function __construct()
+    public function __construct($connection, $parser = null)
     {
-        parent::__construct();
-        $this->db_driver = DBDriver::PG;
+        parent::__construct(DBDriver::PG, $connection, $parser);
     }
     /**
-     * Open a PostgreSQL Database connection
+     * Open a PG Database connection
      *
-     * @return resource The database connection object
+     * @return ConnectionError The database connection object
      */
     public function connect()
     {
         try {
-            $host = $this->host;
-            $port = $this->port;
-            $dbname = $this->db_name;
-            $username = $this->user_name;
-            $passwd = $this->password;
+            $host = $this->kanojo->host;
+            $port = $this->kanojo->port;
+            $dbname = $this->kanojo->db_name;
+            $username = $this->kanojo->user_name;
+            $passwd = $this->kanojo->password;
             if (!isset($this->host) || strlen($host) == 0)
                 $host = "127.0.0.1";
-            $connString = $strConn = "host='$host' port='$port' dbname='$dbname' user='$username' ";
+            $connString = "host='$host' port='$port' dbname='$dbname' user='$username' "; 
             if (isset($passwd) && strlen($passwd) > 0)
-                $connString .= "password='$passwd'";
-            $this->connection = pg_connect($connString);
+                $connString .= "password='$passwd'";                                       
+            $this->connection = pg_connect($host, $username, $passwd, $dbname, $port);
             return $this->connection;
         } catch (Exception $e) {
-            return $this->error(sprintf(ERR_BAD_CONNECTION, $e->getMessage()));
+            $error_msg = sprintf(ERR_BAD_CONNECTION, $e->getMessage());
+            return $this->error(null, $error_msg);
         }
     }
     /**
-     * Closes a PostgreSQL database connection resource. 
-     * The connection is the last connection made by pg_connect().
+     * Closes a connection
      *
      * @return bool Returns TRUE on success or FALSE on failure.
      */
     public function close()
     {
         $this->free_result();
-        if (!isset($this->connection))
+        if (!$this->connection)
             throw new Exception(ERR_NOT_CONNECTED);
         return pg_close($this->connection);
     }
@@ -83,7 +95,7 @@ class PGKanojoX extends KanojoX
     public function get_param_place_holder($index = null)
     {
         return '$' . $index;
-    }
+    }    
     /**
      * Get the last error message string of a connection
      *
@@ -94,11 +106,11 @@ class PGKanojoX extends KanojoX
     public function error($sql, $error = null)
     {
         if (is_null($error)) {
-            $this->error = new ConnectionError();
-
-            $this->error->message = pg_last_error($this->connection);
-            $this->error->code = pg_result_status($this->connection);
-            $this->error->sql = $sql;
+            $error = new ConnectionError();
+            $error->message = pg_last_error($this->connection);
+            $error->code = pg_result_status($this->connection);
+            $error->sql = $sql;
+            return $error;
         } else
             $this->error = $error;
         return $this->error;
@@ -149,6 +161,7 @@ class PGKanojoX extends KanojoX
     public function fetch_assoc($sql, $variables = null)
     {
         $rows = array();
+        $result =null;
         if (!(pg_connection_status($this->connection) === PGSQL_CONNECTION_OK))
             throw new Exception(ERR_NOT_CONNECTED);
         if (isset($variables) && is_array($variables)) {
@@ -178,57 +191,6 @@ class PGKanojoX extends KanojoX
         return $rows;
     }
     /**
-     * Gets the query for selecting the table definition
-     *
-     * @param string $table_name The table name
-     * @return string The table definition selection query
-     */
-    public function get_table_definition_query($table_name)
-    {
-        $fields = PG_FIELD_COL_ORDER . ", " . PG_FIELD_COL_NAME . ", " . PG_FIELD_DATA_TP . ", " .
-            PG_FIELD_CHAR_LENGTH . ", " . PG_FIELD_NUM_PRECISION . ", " . PG_FIELD_NUM_SCALE;
-        if (isset($this->schema)) {
-            $schema = $this->schema;
-            $sql = "SELECT $fields FROM information_schema.columns WHERE table_name = '$table_name' AND table_schema = '$schema'";
-        } else
-            $sql = "SELECT $fields FROM information_schema.columns WHERE table_name = '$table_name'";
-        return $sql;
-    }
-    /**
-     * Gets the table definition parser for the PG connector
-     *
-     * @return array The table definition fields as an array of FieldDefinition
-     */
-    public function get_table_definition_parser()
-    {
-        $fields = array(
-            PG_FIELD_COL_ORDER => new FieldDefinition(0, PG_FIELD_COL_ORDER, PARSE_AS_INT),
-            PG_FIELD_COL_NAME => new FieldDefinition(1, PG_FIELD_COL_NAME, PARSE_AS_STRING),
-            PG_FIELD_DATA_TP => new FieldDefinition(2, PG_FIELD_DATA_TP, PARSE_AS_STRING),
-            PG_FIELD_CHAR_LENGTH => new FieldDefinition(3, PG_FIELD_CHAR_LENGTH, PARSE_AS_INT),
-            PG_FIELD_NUM_PRECISION => new FieldDefinition(4, PG_FIELD_NUM_PRECISION, PARSE_AS_INT),
-            PG_FIELD_NUM_SCALE => new FieldDefinition(5, PG_FIELD_NUM_SCALE, PARSE_AS_INT)
-        );
-        return $fields;
-    }
-    /**
-     * Gets the table definition mapper for the PG connector
-     *
-     * @return array The table mapper as KeyValued<String,String> array
-     */
-    public function get_table_definition_mapper()
-    {
-        $map = array(
-            PG_FIELD_COL_ORDER => TAB_DEF_INDEX,
-            PG_FIELD_COL_NAME => TAB_DEF_NAME,
-            PG_FIELD_DATA_TP => TAB_DEF_TYPE,
-            PG_FIELD_CHAR_LENGTH => TAB_DEF_CHAR_LENGTH,
-            PG_FIELD_NUM_PRECISION => TAB_DEF_NUM_PRECISION,
-            PG_FIELD_NUM_SCALE => TAB_DEF_NUM_SCALE
-        );
-        return $map;
-    }
-    /**
      * Gets the error found in a ORACLE resource object could be a
      * SQL statement error or a connection error.
      *
@@ -245,6 +207,4 @@ class PGKanojoX extends KanojoX
         $this->error->sql = $sql;
         return $this->error;
     }
-
 }
-?>
