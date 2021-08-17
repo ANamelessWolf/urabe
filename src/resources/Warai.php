@@ -347,7 +347,7 @@ const MYSQL_FIELD_COL_NAME = 'COLUMN_NAME';
  * @var string MYSQL_FIELD_DATA_TP
  * The field name that stores data type
  */
-const MYSQL_FIELD_DATA_TP = 'COLUMN_TYPE';
+const MYSQL_FIELD_DATA_TP = 'DATA_TYPE';
 /**
  * @var string MYSQL_FIELD_CHAR_LENGTH
  * The field name that stores data length
