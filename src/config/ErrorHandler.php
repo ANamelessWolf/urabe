@@ -1,6 +1,7 @@
 <?php
 use Urabe\Config\UrabeSettings;
 use Urabe\Config\ConnectionError;
+use Urabe\Service\UrabeResponse;
 /**
  * Handles application errors
  *
@@ -13,7 +14,7 @@ use Urabe\Config\ConnectionError;
  * User error handler must not modify error context. 
  * @return bool Returns a string containing the previously defined error handler.
  */
-function error_handler($err_no, $err_msg, $err_file, $err_line, $err_context)
+function error_handler($err_no, $err_msg, $err_file, $err_line, $err_context=null)
 {
     $error = new ConnectionError();
     $error->code = $err_no;
@@ -32,9 +33,9 @@ function error_handler($err_no, $err_msg, $err_file, $err_line, $err_context)
 function exception_handler($exception)
 {
     if (is_null(UrabeSettings::$http_error_code))
-        http_response_code(400);
+    http_response_code(400);
     else
-        http_response_code(UrabeSettings::$http_error_code);
+    http_response_code(UrabeSettings::$http_error_code);
     $class = get_class($exception);
     $error = new ConnectionError();
     $error->code = $exception->getCode();
@@ -49,7 +50,7 @@ function exception_handler($exception)
         $exception->getMessage(),
         UrabeSettings::$enable_stack_trace ? $exception->getTraceAsString() : null
     );
-
+    
     $exc_response = $response->get_exception_response(
         $exception->getMessage(),
         UrabeSettings::$enable_stack_trace ? $exception->getTraceAsString() : null

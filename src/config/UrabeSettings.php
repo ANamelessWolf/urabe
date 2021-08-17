@@ -114,6 +114,7 @@ class UrabeSettings
 UrabeSettings::$parameter_mode = URL_PARAM_MODE;
 UrabeSettings::$handle_errors = true;
 UrabeSettings::$handle_exceptions = true;
+UrabeSettings::$language ="EN";
 UrabeSettings::$show_error_details = false;
 UrabeSettings::$show_error_context = false;
 UrabeSettings::$enable_stack_trace = false;
@@ -125,10 +126,12 @@ UrabeSettings::$default_PUT_status = ServiceStatus::BLOCKED;
 UrabeSettings::$default_DELETE_status = ServiceStatus::BLOCKED;
 UrabeSettings::$dark_pp_style = JsonPrettyStyle::DarkStyle();
 UrabeSettings::$light_pp_style = JsonPrettyStyle::LightStyle();
-UrabeSettings::$default_pp_style = JsonPrettyStyle::DarkStyle();
+UrabeSettings::$default_pp_style = JsonPrettyStyle::LightStyle();
 UrabeSettings::$default_pp_bg = true;
 UrabeSettings::$date_format = "m-d-y";
-UrabeSettings::$table_definitions_path = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'table_definitions' . DIRECTORY_SEPARATOR;
+UrabeSettings::$table_definitions_path = "C:\\xampp\\htdocs\\urabe\\testing\\tmp\\";
+//dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'table_definitions' . DIRECTORY_SEPARATOR;
 UrabeSettings::$fieldTypeCategory = new FieldTypeCategory();
 UrabeSettings::$errors = array();
 UrabeSettings::$http_error_code = null;
+
