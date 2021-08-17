@@ -38,10 +38,13 @@ abstract class DBKanojoX
      */
     public $affected_rows;
     /**
-     * @var resource The database connection object.
+     * @var object The database connection object.
      */
     public $connection;
-
+    /**
+     * @var string The last inserted id
+     */
+    public $insert_id;
     /**
      * Initialize a new instance of the connection object
      * null the data is parsed associatively column value
@@ -49,15 +52,12 @@ abstract class DBKanojoX
      * @param KanojoX $connection The connection data
      * @param MysteriousParser $parser Defines how the data is going to be parsed if,
      */
-    public function __construct($db_driver, $connection, $parser = null)
+    public function __construct($db_driver, $connection, $parser)
     {
         $this->db_driver = $db_driver;
         $this->kanojo = $connection;
         $this->statementsIds = array();
-        if (is_null($parser))
-            $this->parser = new MysteriousParser();
-        else
-            $this->parser = $parser;
+        $this->parser = $parser;
         $this->affected_rows = 0;
         $this->connection = null;
     }
@@ -145,23 +145,5 @@ abstract class DBKanojoX
      * @return void
      */
     abstract public function free_result();
-    /**
-     * Gets the query for selecting the table definition
-     *
-     * @param string $table_name The table name
-     * @return string The table definition selection query
-     */
-    abstract public function get_table_definition_query($table_name);
-    /**
-     * Gets the table definition parser for the database connector
-     *
-     * @return array The table definition fields as an array of FieldDefinition
-     */
-    abstract function get_table_definition_parser();
-    /**
-     * Gets the table definition mapper for the database connector
-     *
-     * @return array The table mapper as KeyValued<String,String> array
-     */
-    abstract function get_table_definition_mapper();
+
 }
