@@ -55,7 +55,7 @@ class FieldTypeCategory
             //PG Types
             "character", "text",
             //MySQL Types
-            "varchar", "enum"
+            "varchar", "enum", "char"
        );
         $this->IntegerTypes = array(
             //PG Types

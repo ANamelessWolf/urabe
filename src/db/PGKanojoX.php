@@ -17,7 +17,7 @@ use Urabe\Service\UrabeResponse;
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class MYSQLKanojoX extends DBKanojoX
+class PGKanojoX extends DBKanojoX
 {
     /**
      * @var string DEFAULT_CHAR_SET

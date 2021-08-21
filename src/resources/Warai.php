@@ -19,7 +19,7 @@ const CLASS_ERR = 'ConnectionError';
  * @var string CLASS_SQL_EXC
  * The class names used for sql exceptions
  */
-const CLASS_SQL_EXC = 'UrabeSQLException';
+const CLASS_SQL_EXC = 'Urabe\Runtime\UrabeSQLException';
 
 /***************************************
  ************** CAPTIONS ***************

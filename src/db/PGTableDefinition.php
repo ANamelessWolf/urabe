@@ -18,7 +18,7 @@ use Urabe\Model\Field;
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-class MySQLTableDefinition extends TableDefinition
+class PGTableDefinition extends TableDefinition
 {
     /**
      * @var string El nombre de la base de datos

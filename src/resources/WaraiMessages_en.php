@@ -57,6 +57,11 @@ const ERR_BODY_IS_NULL = 'An error ocurred parsing the message body. The body me
  * The error message sent when the connection is not valid.
  */
 const ERR_BAD_CONNECTION = 'Invalid database connection.';
+/**
+ * @var string ERR_DB_NOT_SUPPORTED
+ * The error message sent when the database driver is not supported.
+ */
+const ERR_DB_NOT_SUPPORTED = 'Driver not supported';
 
 /**
  * @var string ERR_NOT_CONNECTED

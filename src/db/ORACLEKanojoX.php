@@ -83,7 +83,7 @@ class ORACLEKanojoX extends DBKanojoX
      */
     public function buildConnectionString($host, $dbname, $port)
     {
-        return create_SID_connection($host, $dbname, $port);
+        return $this->create_SID_connection($host, $dbname, $port);
     }
     /**
      * Closes a connection
@@ -237,7 +237,7 @@ class ORACLEKanojoX extends DBKanojoX
      * @param string $port Oracle connection port
      * @return string The oracle connection string
      */
-    function create_SID_connection($host, $SID, $port)
+    private function create_SID_connection($host, $SID, $port)
     {
         $strConn = "(DESCRIPTION=(ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = $host)(PORT = $port)))(CONNECT_DATA=(SID=$SID)))";
         return $strConn;

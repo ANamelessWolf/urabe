@@ -41,9 +41,18 @@ require 'db/TableDefinition.php';
 require 'db/MysteriousParser.php';
 require 'db/MysteriousParserForTableDefinition.php';
 require 'db/MySQLTableDefinition.php';
+require 'db/ORACLETableDefinition.php';
+require 'db/PGTableDefinition.php';
 require 'db/PreparedStatement.php';
 require 'db/InsertStatement.php';
 require 'db/InsertBulkStatement.php';
 require 'db/UpdateStatement.php';
 require 'db/DBKanojoX.php';
 require 'db/MYSQLKanojoX.php';
+require 'db/ORACLEKanojoX.php';
+require 'db/PGKanojoX.php';
+require 'db/Selector.php';
+require 'db/Executor.php';
+
+//Clases
+require 'Urabe.php';
