@@ -1,4 +1,8 @@
 <?php
+
+use Urabe\Config\UrabeSettings;
+use Urabe\Utils\HasamiUtils;
+
 include '../src/UrabeAPI.php';
 
 class LocalConnection extends Urabe\Config\KanojoX
@@ -16,3 +20,6 @@ class LocalConnection extends Urabe\Config\KanojoX
 
 //1: Se crea la conexión a la BD
 $conn = new LocalConnection();
+$conn->save("rootConn");
+$html = HasamiUtils::pretty_print_format($conn, UrabeSettings::$default_pp_style);
+echo $html;

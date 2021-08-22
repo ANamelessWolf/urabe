@@ -1,4 +1,12 @@
 <?php
+include '../src/UrabeAPI.php';
+
+use Urabe\Config\KanojoXFile;
+use Urabe\Config\DBDriver;
+use Urabe\DB\ORACLEKanojoX;
+use Urabe\DB\MYSQLKanojoX;
+use Urabe\DB\PGKanojoX;
+
 /**
  * This file test the connection to a given database, specifying the data connection and
  * Kanojo driver.
@@ -8,46 +16,44 @@
  * @author A nameless wolf <anamelessdeath@gmail.com>
  * @copyright 2015-2020 Nameless Studios
  */
-include_once "../src/KanojoX.php";
-include_once "../src/ORACLEKanojoX.php";
-include_once "../src/PGKanojoX.php";
-include_once "../src/MYSQLKanojoX.php";
 
 //Test Response
 $response = (object)array(
     "msg" => "",
-    "status" => true,
+    "connect_status" => true,
     "error" => ""
 );
-//0: Reads the body
-$body = get_body_as_json();
-//1: Selects the driver connector
-if ($body->driver == "ORACLE")
-    $kanojo = new ORACLEKanojoX();
-else if ($body->driver == "PG")
-    $kanojo = new PGKanojoX();
-else if ($body->driver == "MYSQL")
-    $kanojo = new MYSQLKanojoX();
-else {
-    $response->msg = "Driver " + (isset($body->driver) ? $body->driver . "not supported." : " not valid.");
-    $response->status = false;
-}
-if (isset($kanojo)) {
-    //2: Initialize the connection data
-    $kanojo->init($body);
-    //3: Connect to the Database
-    $conn = $kanojo->connect();
 
+//1: Create the connection from a JSON File
+$conn_data = new KanojoXFile("C:\\xampp\\htdocs\\urabe\\testing\\json\\examples\\connection-example.json");
+
+//2: Selects the driver connector
+if ($conn_data->db_driver == DBDriver::ORACLE)
+    $connector = new ORACLEKanojoX($conn_data);
+else if ($conn_data->db_driver == DBDriver::PG)
+    $connector = new PGKanojoX($conn_data);
+else if ($conn_data->db_driver == DBDriver::MYSQL)
+    $connector = new MYSQLKanojoX($conn_data);
+else {
+    $response->msg = "Driver " . (isset($conn_data->driver) ? $conn_data->driver . "not supported." : " not valid.");
+    $response->connect_status = false;
+}
+if (isset($connector)) {
+    //3: Connect to the Database
+    try {
+        $conn = $connector->connect();
+    } catch (Exception) {
+        $conn = false;
+    }
+    //4: Check connections
     if ($conn)
-        $response->msg = "Connected to " . $body->driver;
+        $response->msg = "Connected to " . $conn_data->db_name;
     else {
         http_response_code(403);
-        $response->msg = "Error connecting to " . $body->driver . ". See error for more details.";
-        $response->error = $kanojo->get_last_error();//KanojoX::$errors;
-        $response->status = false;
+        $response->msg = "Error connecting to " . $conn_data->db_name . ". See error for more details.";
+        $response->error = $connector->get_last_error()->message;
+        $response->connect_status = false;
     }
-    $response->{"settings"} = KanojoX::$settings;
-    $kanojo->close();
 }
 echo json_encode($response);
 ?>

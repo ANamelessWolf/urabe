@@ -4,11 +4,9 @@ include '../src/UrabeAPI.php';
 use Urabe\Urabe;
 use Urabe\Config\KanojoX;
 use Urabe\Config\DBDriver;
+use Urabe\Config\UrabeSettings;
 use Urabe\DB\DBUtils;
-use Urabe\DB\InsertStatement;
-use Urabe\DB\InsertBulkStatement;
-use Urabe\DB\UpdateStatement;
-use Urabe\Utils\JsonPrettyPrint;
+use Urabe\Utils\PrettyPrintFormatter;
 use Urabe\Service\UrabeResponse;
 
 class LocalConnection extends KanojoX
@@ -32,42 +30,34 @@ $departmentTabDef = DBUtils::createTableDefinitionFromMySQLTable($conn, "current
 //3: Inicialización del objeto Urabe
 $urabe = new Urabe($conn, $benTabDef);
 //5: Formateador JSON
-$jsonPretty = new JsonPrettyPrint();
-$html .= '<html><head>' .
-'<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">' .
-'<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>' .
-'<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>' .
-'<style>' .
-'body { background-color: ' . $bg_color . '} ' .
-//'div { padding:0; margin:0; display:inline-block; float:left; }' .
-'</style>' .
-'</head>' .
-'<body>';
-/*************
- * Selección *
- *************/
-$html .= "<h2>Selección: </h2>";
-$html .= '<div style="width: 50%; margin-left: 2%;">';
-$result = $urabe->selector->select("SELECT * FROM employees ORDER BY emp_no DESC LIMIT 1");
-$json = json_decode(json_encode($result), true);
-$html .= $jsonPretty->get_format($json);
-$html .= "</div><br>";
-//Cambio de tabla de parseo
-$html .= '<div style="width: 50%; margin-left: 2%;">';
+$jsonFormatter = new PrettyPrintFormatter(UrabeSettings::$default_pp_style);
+/**********
+ * Select *
+ **********/
+//Select data using place holders
+$jsonFormatter->append_title("Selección con place holders: ");
+$result = $urabe->selector->select("SELECT * FROM employees WHERE emp_no IN (?, ?)", array(500026, 500025));
+$jsonFormatter->append_response($result);
+//Change the parsing data
 $urabe->update_parser($departmentTabDef);
+$jsonFormatter->append_title("Selección normal: ");
 $result = $urabe->selector->select("SELECT * FROM current_dept_emp ORDER BY emp_no DESC LIMIT 1");
-$json = json_decode(json_encode($result), true);
-$html .= $jsonPretty->get_format($json);
-$html .= "</div>";
+$jsonFormatter->append_response($result);
 //Otros ejemplos de selección 
 $urabe->update_parser($benTabDef);
+$jsonFormatter->append_title("Selección simple y por columnas: ");
 $emp_no = $urabe->selector->select_one("SELECT emp_no FROM employees ORDER BY emp_no DESC LIMIT 1");
 $emp_list = $urabe->selector->select_items("SELECT emp_no FROM employees ORDER BY emp_no DESC LIMIT 10");
+$result = array("select_one"=>$emp_no, "select_items"=> $emp_list);
+$jsonFormatter->append_response($result);
+/**********
+ * Insert *
+ **********/
+
 
 /*******
  * Fin *
  *******/
-//Cierre HTML
-$html .= '</body></html>';
-echo $html;
+$jsonFormatter->close();
+$jsonFormatter->print();
 ?>

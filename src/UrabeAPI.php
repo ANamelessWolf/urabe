@@ -7,6 +7,8 @@ require 'utils/Enum.php';
 require 'utils/NumericType.php';
 require 'utils/JsonPrettyStyle.php';
 require 'utils/JsonPrettyPrint.php';
+require 'utils/PrettyPrintFormatter.php';
+require 'utils/HasamiUtils.php';
 require 'config/ServiceStatus.php';
 require 'config/FieldTypeCategory.php';
 require 'config/DBDriver.php';
@@ -26,6 +28,7 @@ switch (UrabeSettings::$language) {
 }
 require 'config/ErrorHandler.php';
 require 'config/KanojoX.php';
+require 'config/KanojoXFile.php';
 //Model
 require 'model/Field.php';
 require 'model/Table.php';
