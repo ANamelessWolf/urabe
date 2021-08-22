@@ -180,7 +180,7 @@ class TableDefinition
     public function save()
     {
         $tableName = $this->table_name;
-        $file_path = UrabeSettings::$table_definitions_path . "$tableName.json";
+        $file_path = UrabeSettings::$table_definitions_path . DIRECTORY_SEPARATOR . "$tableName.json";
         if (!file_exists(UrabeSettings::$table_definitions_path)) 
             mkdir(UrabeSettings::$table_definitions_path, 0777, true);
         if (file_put_contents($file_path, json_encode($this->table, JSON_PRETTY_PRINT)) == false)

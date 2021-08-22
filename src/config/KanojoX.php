@@ -1,5 +1,9 @@
 <?php
+
 namespace Urabe\Config;
+
+use Exception;
+
 /**
  * Database connection model
  * 
@@ -10,7 +14,7 @@ namespace Urabe\Config;
  * @copyright 2015-2020 Nameless Studios
  */
 abstract class KanojoX
-{ 
+{
     /**
      * @var DBDriver The database driver
      */
@@ -35,5 +39,22 @@ abstract class KanojoX
      * @var string $password The connection password 
      */
     public $password = "";
+    /**
+     * Saves the connection data
+     *
+     * @param string $conn_name The connection name
+     * @throws Exception An Exception is thrown if theres an error creating the file
+     * @return void
+     */
+    function save($conn_name)
+    {
+        $folder = UrabeSettings::$connection_definitions_path;
+        $file_path = $folder . DIRECTORY_SEPARATOR . "$conn_name.json";
+        $dir = dirname($file_path);
+        if (!file_exists($dir))
+            mkdir($dir, 0755);
+
+        if (file_put_contents($file_path, json_encode($this, JSON_PRETTY_PRINT)) == false)
+            throw new Exception(ERR_SAVING_JSON);
+    }
 }
-?>

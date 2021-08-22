@@ -42,6 +42,10 @@ class ORACLEKanojoX extends DBKanojoX
      */
     const ERR_SQL = 'sqltext';
     /**
+     * @var string $owner The oracle database owner
+     */
+    public $owner = "";
+    /**
      * Initialize a new instance of the connection object for MySQL
      * @param KanojoX $connection The connection data
      * @param MysteriousParser $parser Defines how the data is going to be parsed if,

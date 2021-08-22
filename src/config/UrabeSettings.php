@@ -1,8 +1,11 @@
 <?php
+
 namespace Urabe\Config;
+
 use Urabe\Config\FieldTypeCategory;
 use Urabe\Config\ServiceStatus;
 use Urabe\Utils\JsonPrettyStyle;
+
 /**
  * Urabe application settings
  *
@@ -96,6 +99,10 @@ class UrabeSettings
      */
     public static $table_definitions_path;
     /**
+     * @var string The path to the folder where the database connection are stored
+     */
+    public static $connection_definitions_path;
+    /**
      * @var FieldTypeCategory The name of supported database types
      */
     public static $fieldTypeCategory;
@@ -114,7 +121,7 @@ class UrabeSettings
 UrabeSettings::$parameter_mode = URL_PARAM_MODE;
 UrabeSettings::$handle_errors = true;
 UrabeSettings::$handle_exceptions = true;
-UrabeSettings::$language ="EN";
+UrabeSettings::$language = "EN";
 UrabeSettings::$show_error_details = false;
 UrabeSettings::$show_error_context = false;
 UrabeSettings::$enable_stack_trace = false;
@@ -126,12 +133,12 @@ UrabeSettings::$default_PUT_status = ServiceStatus::BLOCKED;
 UrabeSettings::$default_DELETE_status = ServiceStatus::BLOCKED;
 UrabeSettings::$dark_pp_style = JsonPrettyStyle::DarkStyle();
 UrabeSettings::$light_pp_style = JsonPrettyStyle::LightStyle();
-UrabeSettings::$default_pp_style = JsonPrettyStyle::LightStyle();
+UrabeSettings::$default_pp_style = JsonPrettyStyle::DarkStyle();
 UrabeSettings::$default_pp_bg = true;
 UrabeSettings::$date_format = "m-d-y";
-UrabeSettings::$table_definitions_path = "C:\\xampp\\htdocs\\urabe\\testing\\tmp\\";
+UrabeSettings::$table_definitions_path = "C:\\xampp\\htdocs\\urabe\\testing\\tmp\\tables";
+UrabeSettings::$connection_definitions_path = "C:\\xampp\\htdocs\\urabe\\testing\\tmp\\conn";
 //dirname(__DIR__) . DIRECTORY_SEPARATOR . 'tmp' . DIRECTORY_SEPARATOR . 'table_definitions' . DIRECTORY_SEPARATOR;
 UrabeSettings::$fieldTypeCategory = new FieldTypeCategory();
 UrabeSettings::$errors = array();
 UrabeSettings::$http_error_code = null;
-

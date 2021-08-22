@@ -1,5 +1,7 @@
-<?php 
+<?php
+
 namespace Urabe\DB;
+
 use Exception;
 use Urabe\Utils\PGSQL_Result;
 use Urabe\DB\DBKanojoX;
@@ -7,6 +9,7 @@ use Urabe\Config\DBDriver;
 use Urabe\Config\ConnectionError;
 use Urabe\Runtime\UrabeSQLException;
 use Urabe\Service\UrabeResponse;
+
 /**
  * A MySQL Connection object
  * 
@@ -29,6 +32,10 @@ class PGKanojoX extends DBKanojoX
      * The default statement
      */
     const DEFT_STMT_NAME = "";
+    /**
+     * @var string $schema The pg database schema
+     */
+    public $schema = "";
     /**
      * Initialize a new instance of the connection object for MySQL
      * @param KanojoX $connection The connection data
@@ -53,9 +60,9 @@ class PGKanojoX extends DBKanojoX
             $passwd = $this->kanojo->password;
             if (!isset($this->host) || strlen($host) == 0)
                 $host = "127.0.0.1";
-            $connString = "host='$host' port='$port' dbname='$dbname' user='$username' "; 
+            $connString = "host='$host' port='$port' dbname='$dbname' user='$username' ";
             if (isset($passwd) && strlen($passwd) > 0)
-                $connString .= "password='$passwd'";                                       
+                $connString .= "password='$passwd'";
             $this->connection = pg_connect($host, $username, $passwd, $dbname, $port);
             return $this->connection;
         } catch (Exception $e) {
@@ -95,7 +102,7 @@ class PGKanojoX extends DBKanojoX
     public function get_param_place_holder($index = null)
     {
         return '$' . $index;
-    }    
+    }
     /**
      * Get the last error message string of a connection
      *
@@ -136,7 +143,6 @@ class PGKanojoX extends DBKanojoX
                 $err = $this->error($sql, $this->get_error($result == false ? null : $result, $sql));
                 throw new UrabeSQLException($err);
             }
-
         } else {
             $result = pg_send_query($this->connection, $sql);
             $statement = pg_get_result($this->connection);
@@ -161,7 +167,7 @@ class PGKanojoX extends DBKanojoX
     public function fetch_assoc($sql, $variables = null)
     {
         $rows = array();
-        $result =null;
+        $result = null;
         if (!(pg_connection_status($this->connection) === PGSQL_CONNECTION_OK))
             throw new Exception(ERR_NOT_CONNECTED);
         if (isset($variables) && is_array($variables)) {
@@ -179,11 +185,11 @@ class PGKanojoX extends DBKanojoX
         } else {
             $ok = pg_query($this->connection, $sql);
         }
-        
+
         //fetch result
         if ($ok) {
             while ($row = pg_fetch_assoc($ok))
-            $this->parser->parse($rows, $row);
+                $this->parser->parse($rows, $row);
         } else {
             $err = $this->error($sql, $this->get_error($ok == false ? null : $result, $sql));
             throw new UrabeSQLException($err);
