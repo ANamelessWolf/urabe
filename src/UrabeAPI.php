@@ -56,6 +56,11 @@ require 'db/ORACLEKanojoX.php';
 require 'db/PGKanojoX.php';
 require 'db/Selector.php';
 require 'db/Executor.php';
+//Service
+require 'service/VariableCollection.php';
+require 'service/GETVariables.php';
+require 'service/WebServiceBody.php.php';
+require 'service/WebServiceContent.php';
 
 //Clases
 require 'Urabe.php';

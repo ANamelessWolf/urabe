@@ -53,11 +53,46 @@ $jsonFormatter->append_response($result);
 /**********
  * Insert *
  **********/
-
-
+$lastId = $urabe->selector->select_one("SELECT MAX(emp_no) emp_no FROM employees");
+$jsonFormatter->append_title("Insert row: ");
+$values = array("emp_no" => ++$lastId, "birth_date" => "1986-10-01", "first_name" => "Miguel", "last_name" => "Alanis", "gender" => "M", "hire_date" => "2019-03-21");
+$result = $urabe->executor->insert("employees", $values);
+$jsonFormatter->append_response($result);
+/**************
+ * Insert Bulk*
+ **************/
+$jsonFormatter->append_title("Insert bulk: ");
+$emp1 = array("emp_no" => ++$lastId, "birth_date" => "1986-10-01", "first_name" => "Miguel", "last_name" => "Alanis", "gender" => "M", "hire_date" => "2019-03-21");
+$emp2 = array("emp_no" => ++$lastId, "birth_date" => "1986-10-01", "first_name" => "Miguel", "last_name" => "Alanis", "gender" => "M", "hire_date" => "2019-03-21");
+$values = array();
+array_push($values, $emp1, $emp2);
+$result = $urabe->executor->insert_bulk("employees", $values);
+$jsonFormatter->append_response($result);
+/***********
+ * Updater *
+ ***********/
+$jsonFormatter->append_title("Updater: ");
+$condition = "emp_no >= $emp_no";
+$values = array("birth_date" => "1921-12-24");
+$result = $urabe->executor->update("employees", $values, $condition);
+$jsonFormatter->append_response($result);
+//Update by field condition
+$jsonFormatter->append_title("Update by Field: ");
+$result = $urabe->executor->update_by_field("employees", $values, "emp_no", $emp_no);
+$jsonFormatter->append_response($result);
+/***********
+ * Delete *
+ ***********/
+$jsonFormatter->append_title("Delete: ");
+$condition = "emp_no = $emp_no";
+$result = $urabe->executor->delete("employees", $condition);
+$jsonFormatter->append_response($result);
+//Delete by field condition
+$jsonFormatter->append_title("Delete by condition: ");
+$result = $urabe->executor->delete_by_field("employees", "emp_no", $emp_no);
+$jsonFormatter->append_response($result);
 /*******
  * Fin *
  *******/
 $jsonFormatter->close();
 $jsonFormatter->print();
-?>

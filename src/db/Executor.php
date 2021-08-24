@@ -145,7 +145,7 @@ class Executor
         else
             $format = "%s = '%s'";
         $condition = sprintf($format, $column_name, $column_value);
-        $this->update($table_name, $values, $condition);
+        return $this->update($table_name, $values, $condition);
     }
     /**
      * Performs a deletion query by defining a condition
