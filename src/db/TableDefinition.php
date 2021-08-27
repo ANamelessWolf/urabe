@@ -29,6 +29,10 @@ class TableDefinition
      */
     private $column_names;
     /**
+     * @var array The list of required fields
+     */
+    private $required_column_names;
+    /**
      * @var string el nombre de la tabla
      */
     public $table_name;
@@ -45,6 +49,7 @@ class TableDefinition
     {
         $this->fields = array();
         $this->column_names = array();
+        $this->required_column_names = array();
         $this->table_name = $tableName;
         $this->table = new Table();
         $this->table->fields = array();
@@ -75,6 +80,7 @@ class TableDefinition
                 $fieldDefinition = new StringFieldDefinition($field->column_index, $field->column_name, $type, $field->char_max_length);
             else
                 throw new Exception("No esta soportado el tipo: " . $type);
+            $fieldDefinition->required = $field->required;
             $tableDefinition->add($field->column_name, $fieldDefinition);
         }
         return $tableDefinition;
@@ -91,6 +97,8 @@ class TableDefinition
     {
         $this->fields[$key] = $field;
         array_push($this->column_names, $key);
+        if ($field->required)
+            array_push($this->required_column_names, $key);
     }
     /**
      * Check if a field name is defined on the table definition
@@ -109,6 +117,14 @@ class TableDefinition
     public function get_column_names()
     {
         return $this->column_names;
+    }
+    /***
+     * Gets the list of required column names
+     * @return array Get the list of required column names
+     */
+    public function get_required_column_names()
+    {
+        return $this->required_column_names;
     }
     /**
      * Gets the field definition by its column name
@@ -170,6 +186,7 @@ class TableDefinition
         $field->char_max_length =  isset($row[TAB_DEF_CHAR_LENGTH]) ? $row[TAB_DEF_CHAR_LENGTH] : 0;
         $field->numeric_precision = isset($row[TAB_DEF_NUM_PRECISION]) ? $row[TAB_DEF_NUM_PRECISION] : 0;
         $field->numeric_scale = isset($row[TAB_DEF_NUM_SCALE]) ? $row[TAB_DEF_NUM_SCALE] : 0;
+        $field->required = true;
         return $field;
     }
     /**
@@ -181,7 +198,7 @@ class TableDefinition
     {
         $tableName = $this->table_name;
         $file_path = UrabeSettings::$table_definitions_path . DIRECTORY_SEPARATOR . "$tableName.json";
-        if (!file_exists(UrabeSettings::$table_definitions_path)) 
+        if (!file_exists(UrabeSettings::$table_definitions_path))
             mkdir(UrabeSettings::$table_definitions_path, 0777, true);
         if (file_put_contents($file_path, json_encode($this->table, JSON_PRETTY_PRINT)) == false)
             throw new Exception(ERR_SAVING_JSON);

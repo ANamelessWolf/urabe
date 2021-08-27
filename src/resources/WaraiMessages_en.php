@@ -72,12 +72,18 @@ const ERR_NOT_CONNECTED = 'No connection to the database, did you use connect()?
  * @var string ERR_INCOMPLETE_DATA
  * The error message sent when the the node is missing data.
  */
-const ERR_INCOMPLETE_DATA = 'The %s does not contain enough data. Needed values [%s].';
+const ERR_INCOMPLETE_DATA = 'One or more fields are missing in the body request. Needed fields [%s].';
 /**
  * @var string ERR_INCOMPLETE_BODY
  * The error message sent when the the body doesn't has a property
  */
 const ERR_INCOMPLETE_BODY = 'The properties [%s] were not found in the body.';
+/**
+ * @var string ERR_MISSING_COLUMN
+ * The error message sent when the column is missing on the table
+ */
+const ERR_MISSING_COLUMN = 'The column %s does not belongs to the table %s';
+
 /**
  * @var string ERR_MISSING_CONDITION
  * The error message sent when the the condition is not defined

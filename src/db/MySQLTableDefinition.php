@@ -77,6 +77,7 @@ class MySQLTableDefinition extends TableDefinition
         $field->char_max_length =  isset($row[MYSQL_FIELD_CHAR_LENGTH]) ? $row[MYSQL_FIELD_CHAR_LENGTH] : 0;
         $field->numeric_precision = isset($row[MYSQL_FIELD_NUM_PRECISION]) ? $row[MYSQL_FIELD_NUM_PRECISION] : 0;
         $field->numeric_scale = isset($row[MYSQL_FIELD_NUM_SCALE]) ? $row[MYSQL_FIELD_NUM_SCALE] : 0;
+        $field->required = true;
         return $field;
     }
 }

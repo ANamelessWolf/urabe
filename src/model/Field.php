@@ -1,5 +1,7 @@
 <?php
+
 namespace Urabe\Model;
+
 /**
  * A model for a Field for a table database
  * 
@@ -14,6 +16,10 @@ class Field
      */
     public $column_index;
     /**
+     * @var bool If true the field is required to be inserted
+     */
+    public $required;
+    /**
      * @var string The column name
      */
     public $column_name;
@@ -27,10 +33,10 @@ class Field
     public $char_max_length;
     /**
      * @var string In case of being of data type numeric this field stores the numeric precision
-     */    
+     */
     public $numeric_precision;
     /**
      * @var string In case of being of data type numeric this field stores the numeric scale
-     */        
+     */
     public $numeric_scale;
 }

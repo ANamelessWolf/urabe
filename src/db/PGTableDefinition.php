@@ -78,6 +78,7 @@ class PGTableDefinition extends TableDefinition
         $field->char_max_length =  isset($row[PG_FIELD_CHAR_LENGTH]) ? $row[PG_FIELD_CHAR_LENGTH] : 0;
         $field->numeric_precision = isset($row[PG_FIELD_NUM_PRECISION]) ? $row[PG_FIELD_NUM_PRECISION] : 0;
         $field->numeric_scale = isset($row[PG_FIELD_NUM_SCALE]) ? $row[PG_FIELD_NUM_SCALE] : 0;
+        $field->required = true;
         return $field;
     }
 }

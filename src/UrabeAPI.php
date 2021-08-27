@@ -59,7 +59,7 @@ require 'db/Executor.php';
 //Service
 require 'service/VariableCollection.php';
 require 'service/GETVariables.php';
-require 'service/WebServiceBody.php.php';
+require 'service/WebServiceBody.php';
 require 'service/WebServiceContent.php';
 
 //Clases

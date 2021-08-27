@@ -44,6 +44,7 @@ class DBUtils
         else if ($tp == PARSE_AS_BOOLEAN)
             $field_definition = new BooleanFieldDefinition($data->column_index, $data->column_name, PARSE_AS_BOOLEAN);
         $field_definition->db_type = $data->db_type;
+        $field_definition->required = $data->required;
         return $field_definition;
     }
 

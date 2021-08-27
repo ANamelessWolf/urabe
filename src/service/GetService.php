@@ -1,5 +1,11 @@
 <?php
-include_once "HasamiRESTfulService.php";
+
+namespace Urabe\Service;
+
+use Exception;
+use Urabe\Service\WebServiceContent;
+use Urabe\Service\HasamiRESTfulService;
+use Urabe\Urabe;
 
 /**
  * GET Service Class
@@ -13,24 +19,24 @@ include_once "HasamiRESTfulService.php";
 class GETService extends HasamiRESTfulService
 {
     /**
+     * @var string The selection filter, a query condition used in the
+     * WHERE clause to filter the selection content
+     */
+    protected $selection_filter;
+    /**
      * __construct
      *
      * Initialize a new instance of the GET Service class.
      * A default service task is defined as a callback using the function GETService::default_GET_action
      * 
-     * @param IHasami $wrapper The web service wrapper
+     * @param WebServiceContent $data The web service content
+     * @param Urabe $urabe The database manager
+     * @param string $sel_filter The selection filter.
      */
-    public function __construct($wrapper)
+    public function __construct($data, $urabe, $sel_filter)
     {
-        $data = $wrapper->get_request_data();
-        $data->extra->{TAB_NAME} = $wrapper->get_table_name();
-        $data->extra->{TAB_COL_FILTER} = $wrapper->get_selection_filter();
-        $urabe = $wrapper->get_urabe();
-        parent::__construct($data, $urabe);
-        $this->wrapper = $wrapper;
-        $this->service_task = function ($data, $urabe) {
-            return $this->default_GET_action($data, $urabe);
-        };
+        $this->selection_filter = $sel_filter;
+        parent::__construct($data, $urabe, "default_GET_action");
     }
 
     /**
@@ -40,38 +46,34 @@ class GETService extends HasamiRESTfulService
      *
      * @param string $sql The SQL statement
      * @param array $variables The colon-prefixed bind variables placeholder used in the statement, @1..@n
-     * @param MysteriousParser $row_parser The row parser. 
      * @throws Exception An Exception is thrown if not connected to the database or if the SQL is not valid
      * @return UrabeResponse The SQL selection result
      */
-    public function select($sql, $variables = null, $row_parser = null)
+    public function select($sql, $variables = null)
     {
-        return $this->urabe->select($sql, $variables, $row_parser);
+        return $this->urabe->selector->select($sql, $variables);
     }
 
     /**
      * Defines the default GET action, by default selects all data from the wrapper table name that match the
      * column filter. If the column filter name is not given in the GET variables this function selects
      * all data from the table
-     * @param WebServiceContent $data The web service content
-     * @param Urabe $urabe The database manager
+     * @param HasamiRESTfulService $service The web service that executes the action
      * @throws Exception An Exception is thrown if the response can be processed correctly
      * @return UrabeResponse The server response
      */
-    protected function default_GET_action($data, $urabe)
+    public function default_GET_action($service)
     {
         try {
-            $table_name = $data->extra->{TAB_NAME};
-            $filter = $data->extra->{TAB_COL_FILTER};
+            $table_name = $service->get_table()->table_name;
+            $filter = $service->selection_filter;
             if (!is_null($filter)) {
-                $sql = $urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $filter");
-                return $urabe->select($sql);
+                $sql = $service->urabe->format_sql_place_holders("SELECT * FROM $table_name WHERE $filter");
+                return $service->urabe->selector->select($sql);
             } else
-                return $urabe->select_all($table_name);
+                return $service->urabe->selector->select_all($table_name);
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());
         }
     }
-
 }
-?>

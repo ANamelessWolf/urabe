@@ -78,6 +78,7 @@ class ORACLETableDefinition extends TableDefinition
         $field->char_max_length =  isset($row[ORACLE_FIELD_CHAR_LENGTH]) ? $row[ORACLE_FIELD_CHAR_LENGTH] : 0;
         $field->numeric_precision = isset($row[ORACLE_FIELD_NUM_PRECISION]) ? $row[ORACLE_FIELD_NUM_PRECISION] : 0;
         $field->numeric_scale = isset($row[ORACLE_FIELD_NUM_SCALE]) ? $row[ORACLE_FIELD_NUM_SCALE] : 0;
+        $field->required = true;
         return $field;
     }
 }

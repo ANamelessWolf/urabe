@@ -1,5 +1,7 @@
 <?php
+
 namespace Urabe\DB;
+
 /**
  * Field Definition Class
  * 
@@ -16,6 +18,10 @@ abstract class FieldDefinition
      * @var int The column index
      */
     public $column_index;
+    /**
+     * @var bool True if the field is required to insert
+     */
+    public $required;
     /**
      * @var string The column name
      */
@@ -40,6 +46,7 @@ abstract class FieldDefinition
         $this->column_index = $index;
         $this->column_name = $column;
         $this->data_type = $data_type;
+        $this->required = true;
     }
     /**
      * Gets the value from a string in the row definition data type

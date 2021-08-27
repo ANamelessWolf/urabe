@@ -38,9 +38,10 @@ class GETVariables extends VariableCollection
     public function build_simple_condition($column_name)
     {
         $result = array();
-        if ($column_name != null && $this->exists($column_name))
-            return $result["$column_name"] = $this->get_variables[NODE_CONDITION];
-        else
+        if ($column_name != null && $this->exists($column_name)) {
+            $result["$column_name"] = $this->vars[NODE_CONDITION];
+            return $result;
+        } else
             return null;
     }
 }
