@@ -137,6 +137,16 @@ class TableDefinition
         return $this->fields[$column_name];
     }
     /**
+     * Gets the field definition by its column name
+     *
+     * @param string $column_name The column name
+     * @param FieldDefinition $field The field definition
+     */
+    public function set_field_definition($column_name, $field)
+    {
+        $this->fields[$column_name] = $field;
+    }
+    /**
      * Gets the PhP type for a database data type
      *
      * @param string $data_type The database data type

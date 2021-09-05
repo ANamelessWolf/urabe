@@ -161,7 +161,7 @@ class HasamiRESTfulService
         if (is_null($this->service_task))
             throw new Exception(ERR_INVALID_SERVICE_TASK);
         else if (!is_null($this->caller) && is_string($this->service_task))
-            $result = $this->caller->{$this->service_task}($this->data, $this->urabe);
+            $result = $this->caller->{$this->service_task}($this);
         else
             throw new Exception(ERR_BAD_RESPONSE);
         return $result;

@@ -1,10 +1,12 @@
 <?php
 
 namespace Urabe\DB;
+
 use Exception;
 use Urabe\Model\Table;
 use Urabe\Model\Field;
 use Urabe\Config\ConnectionError;
+use Urabe\Config\UrabeSettings;
 use Urabe\DB\FieldDefinition;
 use Urabe\DB\StringFieldDefinition;
 use Urabe\DB\NumericFieldDefinition;
@@ -85,7 +87,7 @@ class DBUtils
             $table = new Table();
             $table->table_name = $data["table_name"];
             $table->fields = array();
-            $table->driver =$data["driver"];
+            $table->driver = $data["driver"];
             foreach ($data["fields"] as $properties) {
                 $field = new Field();
                 foreach ($properties as $key => $value)
@@ -111,5 +113,19 @@ class DBUtils
         $error->code = ERR_PARSING_VALUE_CODE;
         $error->message = sprintf(ERR_PARSING_VALUE, $column_name, $selValue);
         return $error;
+    }
+
+    /**
+     * Check if the table exists on the Urabe Settings
+     * table folder
+     *
+     * @param string $table The name of the table
+     * @return void
+     */
+    public static function exists($table)
+    {
+        $tableDir = UrabeSettings::$table_definitions_path;
+        $jsonPth = $tableDir . DIRECTORY_SEPARATOR . "$table.json";
+        return file_exists($jsonPth);
     }
 }

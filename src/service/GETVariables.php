@@ -26,7 +26,10 @@ class GETVariables extends VariableCollection
         foreach ($_GET as $key => $value)
             $this->vars[$key] = $value;
         //Get the keys
-        $this->keys = array_keys($this->vars);
+        if (isset($this->vars))
+            $this->keys = array_keys($this->vars);
+        else
+            $this->key = array();
     }
     /**
      * Builds a simple condition using the column name to be equals to the  condition variable

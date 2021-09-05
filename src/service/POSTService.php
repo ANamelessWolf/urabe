@@ -88,6 +88,17 @@ class POSTService extends HasamiRESTfulService
         //Validate the body contains the field "values"
         if (!$body->exists(NODE_VAL))
             throw new Exception(sprintf(ERR_INCOMPLETE_DATA, NODE_VAL));
+        //Validate columns to update
+        $columns = array_keys(get_object_vars($body->content->values));
+        $unknown_columns = array();
+        foreach ($columns as &$column_name) 
+            if (!in_array($column_name, $table->get_column_names()))
+                array_push($unknown_columns, $column_name);
+        if (sizeof($unknown_columns)>0)
+        {
+            $columns = implode(', ', $unknown_columns);
+            throw new Exception(sprintf(ERR_MISSING_COLUMN, $columns, $table->table_name));
+        }
     }
 
     /**

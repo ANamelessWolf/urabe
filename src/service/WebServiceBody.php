@@ -36,7 +36,10 @@ class WebServiceBody
             $this->content = file_get_contents('php://input');
             $this->content = json_decode($this->content);
             //Extracting property names
-            $this->property_names = array_keys(get_object_vars($this->content));
+            if (isset($this->content))
+                $this->property_names = array_keys(get_object_vars($this->content));
+            else
+                $this->property_names = array();
         } else
             $this->content = null;
     }
@@ -66,7 +69,7 @@ class WebServiceBody
      */
     public function exists($prop_name)
     {
-        if (is_null($this->body))
+        if (is_null($this->content))
             return false;
         else
             return  in_array($prop_name, $this->property_names);
