@@ -61,6 +61,14 @@ require 'service/VariableCollection.php';
 require 'service/GETVariables.php';
 require 'service/WebServiceBody.php';
 require 'service/WebServiceContent.php';
+require 'service/ServiceCollection.php';
+require 'service/HasamiRESTfulService.php';
+require 'service/GETService.php';
+require 'service/POSTService.php';
+require 'service/PUTService.php';
+require 'service/DELETEService.php';
 
 //Clases
 require 'Urabe.php';
+require 'HasamiWebService.php';
+require 'HasamiViewWebService.php';
