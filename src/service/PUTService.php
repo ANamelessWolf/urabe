@@ -44,16 +44,18 @@ class PUTService extends HasamiRESTfulService
      * 
      * @param WebServiceContent $data The web service content
      * @param Urabe $urabe The database manager
+     * @param string $primary_key The primary key name
      * @param string $sel_filter The selection filter.
      */
-    public function __construct($data, $urabe)
+    public function __construct($data, $urabe, $primary_key = null)
     {
         //1: Initialize parent
         parent::__construct($data, $urabe, "default_PUT_action");
         $body = $this->get_body();
+        $this->primary_key = $primary_key;
         //2: Initialize service
         $this->values = $body->content->values;
-        if (is_array($this->values)) {
+        if (!is_array($this->values)) {
             $this->insertionType = "single";
             $this->values = $this->filter((array)$this->values);
             $this->insert_columns = array_keys($this->values);
@@ -66,8 +68,8 @@ class PUTService extends HasamiRESTfulService
             $this->insert_columns = array_keys($bulk[0]);
         }
         //3: Validate body
-        $this->validate($body);
         $this->required = $this->get_required_columns();
+        $this->validate($body);
     }
     /**
      * Wraps the insert function from urabe
@@ -115,6 +117,21 @@ class PUTService extends HasamiRESTfulService
     }
 
     /**
+     * Select the max id from a given table
+     *
+     * @param Urabe $urabe The database manager
+     * @param string $table_name The table name 
+     * @param string $col_id_name The column name for the id
+     * @return int The maxe id vaue
+     */
+    public function get_max_id($urabe, $table_name, $col_id_name)
+    {
+        $sql = "SELECT MAX($col_id_name) $col_id_name FROM $table_name";
+        $id = $urabe->selector->select_one($sql);
+        return $id;
+    }
+
+    /**
      * Defines the default PUT action, by default execute an insertion query with the given data passed
      * in the body properties insert_values
      * @param HasamiRESTfulService $service The web service that executes the action
@@ -129,8 +146,16 @@ class PUTService extends HasamiRESTfulService
             //Insert 
             if ($service->insertionType == "bulk")
                 $response = $service->urabe->executor->insert_bulk($table_name, $service->values);
-            else if ($service->insertionType == "single")
+            else if ($service->insertionType == "single") {
                 $response = $service->urabe->executor->insert($table_name, $service->values);
+                if ($response->affected_rows > 0 && isset($this->primary_key)) {
+                    $column_name = $this->primary_key;
+                    $insert_id = $this->get_max_id($service->urabe, $table_name, $this->primary_key);
+                    $result = $response->result;
+                    $result[$column_name] = $insert_id;
+                    $response->result = $result;
+                }
+            }
             return $response;
         } catch (Exception $e) {
             throw new Exception("Error Processing Request, " . $e->getMessage(), $e->getCode());

@@ -115,7 +115,7 @@ class HasamiRESTfulService
         $diff = array_diff($obligatory_column_names, $column_names);
         //1: One or mor obligatory column is missing
         if (sizeof($diff) > 0) {
-            $msg =  sprintf(ERR_INCOMPLETE_DATA, NODE_COLS, implode(', ', $obligatory_column_names));
+            $msg =  sprintf(ERR_INCOMPLETE_DATA, implode(', ', $obligatory_column_names));
             throw new Exception($msg);
         }
     }

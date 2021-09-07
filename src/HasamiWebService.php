@@ -97,7 +97,7 @@ class HasamiWebService
                 break;
             case 'PUT':
                 $this->check_block_status($put_status, "PUT");
-                $this->services->set("PUT", new PUTService($this->data, $this->urabe), $put_status);
+                $this->services->set("PUT", new PUTService($this->data, $this->urabe, $this->primary_key), $put_status);
                 break;
             case 'POST':
                 $this->check_block_status($post_status, "POST");
