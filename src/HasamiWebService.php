@@ -79,7 +79,6 @@ class HasamiWebService
     /**
      * Initialize the services for HasamiWrapper, by default
      * the web services had available accessibility
-     
      * @param int $get_satus The default status for the GET Service
      * @param int $put_status The default status for the PUT Service
      * @param int $post_status The default status for the POST Service
@@ -93,7 +92,11 @@ class HasamiWebService
         switch ($verbose) {
             case 'GET':
                 $this->check_block_status($get_satus, "GET");
-                $this->services->set("GET", new GETService($this->data, $this->urabe, null), $get_satus);
+                $filter = $this->data->get_vars->get("filter");
+                if (!is_null($this->primary_key) && !is_null($filter))
+                    $this->services->set("GET", new GETService($this->data, $this->urabe, $this->primary_key . "=" . $filter), $get_satus);
+                else
+                    $this->services->set("GET", new GETService($this->data, $this->urabe, null), $get_satus);
                 break;
             case 'PUT':
                 $this->check_block_status($put_status, "PUT");
@@ -108,6 +111,46 @@ class HasamiWebService
                 $this->services->set("DELETE", new DELETEService($this->data, $this->urabe, $this->primary_key), $delete_status);
                 break;
         }
+    }
+    /**
+     * Obtains the get service
+     *
+     * @return GETService The Get Service
+     */
+    public function get_service_GET()
+    {
+        $service = $this->services->get("GET");
+        return $service;
+    }
+        /**
+     * Obtains the PUT service
+     *
+     * @return PUTService The Get Service
+     */
+    public function get_service_PUT()
+    {
+        $service = $this->services->get("PUT");
+        return $service;
+    }
+        /**
+     * Obtains the POST service
+     *
+     * @return POSTService The POST Service
+     */
+    public function get_service_POST()
+    {
+        $service = $this->services->get("POST");
+        return $service;
+    }
+        /**
+     * Obtains the DELETE service
+     *
+     * @return DELETEService The Get Service
+     */
+    public function get_service_DELETE()
+    {
+        $service = $this->services->get("DELETE");
+        return $service;
     }
     /**
      * Check the service blocked status
