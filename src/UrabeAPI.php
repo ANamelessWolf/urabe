@@ -9,6 +9,8 @@ require 'utils/JsonPrettyStyle.php';
 require 'utils/JsonPrettyPrint.php';
 require 'utils/PrettyPrintFormatter.php';
 require 'utils/HasamiUtils.php';
+require 'utils/ConditionBuilder.php';
+
 require 'config/ServiceStatus.php';
 require 'config/FieldTypeCategory.php';
 require 'config/DBDriver.php';

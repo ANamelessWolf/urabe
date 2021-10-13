@@ -22,7 +22,7 @@ class GETService extends HasamiRESTfulService
      * @var string The selection filter, a query condition used in the
      * WHERE clause to filter the selection content
      */
-    protected $selection_filter;
+    public $selection_filter;
     /**
      * __construct
      *

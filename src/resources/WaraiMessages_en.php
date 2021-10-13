@@ -119,4 +119,9 @@ const ERR_VERBOSE_NOT_SUPPORTED = 'This service does not support the verbose %s.
  * The error message sent when an exception occurred during a web request
  */
 const ERR_SERVICE_RESPONSE = 'Error executing the service.';
+/**
+ * @var string ERR_BAD_DATE_FORMAT
+ * The error when converting the date value.
+ */
+const ERR_BAD_DATE_FORMAT = "Error converting the date format.";
 ?>

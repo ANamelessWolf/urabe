@@ -1,6 +1,7 @@
 <?php
 
 namespace Urabe\Utils;
+
 use Exception;
 use Urabe\Utils\JsonPrettyStyle;
 
@@ -32,6 +33,23 @@ class HasamiUtils
         $jsonFormatter->append_response($data);
         $jsonFormatter->close();
         return $jsonFormatter->html;
+    }
+    /**
+     * Converts a value to MySQL date format
+     *
+     * @param string $date_format The date format
+     * @param string $value The value to parse
+     * @return string The date value formatted
+     */
+    public static function to_date($date_format, $value)
+    {
+        try {
+            $dateValue = date_parse($value);
+            $value = sprintf($date_format, $dateValue["year"], $dateValue["month"], $dateValue["day"]);
+            return $value;
+        } catch (Exception $e) {
+            throw new Exception(ERR_BAD_DATE_FORMAT);
+        }
     }
     /*************************************
      ************ File utils *************
